@@ -6,7 +6,7 @@ Before committing anything, set up gitignore and git LFS correctly for your proj
 Please update the [game teaser image](game_teaser.jpg) and this README throughout the semester. Please don't rename, move or delete these files.
 
 ![teaser image](game_teaser.jpg){width=400px}
-# ENTER YOUR GAME TITLE HERE
+# Tiny Shopping
 # :video_game: Game Programming Lab 2024 - House Hyrule - Team2
 
 ENTER DESCRIPTION HERE
