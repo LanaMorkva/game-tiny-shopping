@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameLab.TinyShopping;
+using System;
 
 namespace GameLab
 {
@@ -7,7 +8,7 @@ namespace GameLab
         [STAThread]
         static void Main()
         {
-            using (var game = new GameLabGame())
+            using (var game = new Game())
                 game.Run();
         }
     }
