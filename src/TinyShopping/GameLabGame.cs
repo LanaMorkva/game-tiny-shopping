@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace GameLab.TinyShopping {
 
@@ -10,7 +11,7 @@ namespace GameLab.TinyShopping {
         private SpriteBatch _spriteBatch;
 
         private World _world;
-        private Insect _ant;
+        private List<Insect> _ants = new List<Insect>();
 
         public Game() {
             _graphics = new GraphicsDeviceManager(this);
@@ -27,7 +28,9 @@ namespace GameLab.TinyShopping {
             _graphics.ApplyChanges();
 
             _world = new World(_graphics);
-            _ant = new Insect(_world);
+            for (int i = 0; i < 20; ++i) {
+                _ants.Add(new Insect(_world));
+            }
 
             base.Initialize();
         }
@@ -36,14 +39,18 @@ namespace GameLab.TinyShopping {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _world.LoadContent(Content);
-            _ant.LoadContent(Content);
+            foreach (Insect insect in _ants) {
+                insect.LoadContent(Content);
+            }
         }
 
         protected override void Update(GameTime gameTime) {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            _ant.Update(gameTime);
+            foreach (Insect insect in _ants) {
+                insect.Update(gameTime);
+            }
 
             base.Update(gameTime);
         }
@@ -54,7 +61,9 @@ namespace GameLab.TinyShopping {
             _spriteBatch.Begin();
 
             _world.Draw(_spriteBatch, gameTime);
-            _ant.Draw(_spriteBatch, gameTime);
+            foreach (Insect insect in _ants) {
+                insect.Draw(_spriteBatch, gameTime);
+            }
 
             _spriteBatch.End();
 

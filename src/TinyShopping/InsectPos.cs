@@ -1,0 +1,101 @@
+﻿using Microsoft.Xna.Framework;
+using System;
+
+namespace GameLab.TinyShopping {
+
+    internal class InsectPos {
+
+        private Vector2 _position;
+
+        private float _rotationRad;
+
+        private float _rotation;
+
+        private Vector2 _direction;
+
+        /// <summary>
+        /// The x coordinate of the current position.
+        /// </summary>
+        public int X {
+            get {
+                return (int)_position.X;
+            }
+        }
+
+        /// <summary>
+        /// The y coordinate of the current position.
+        /// </summary>
+        public int Y {
+            get {
+                return (int)_position.Y;
+            }
+        }
+
+        /// <summary>
+        /// The current rotation in radians.
+        /// </summary>
+        public float Rotation {
+            get {
+                return _rotationRad;
+            }
+        }
+
+        /// <summary>
+        /// The desired rotation of the insect.
+        /// </summary>
+        public int TargetRotation {
+            get; set;
+        }
+
+        /// <summary>
+        /// True if the insect's rotation is equal to the target rotation.
+        /// </summary>
+        public bool IsTurning {
+            get {
+                return Math.Abs(TargetRotation - _rotation) > 1;
+            }
+        }
+
+        /// <summary>
+        /// Creates a new object with the given coordinates.
+        /// </summary>
+        /// <param name="x">The initial x coordinate.</param>
+        /// <param name="y">The initial y coordinate.</param>
+        public InsectPos(int x, int y) {
+            _position = new Vector2(x, y);
+            Rotate(0);
+        }
+
+        /// <summary>
+        /// Rotates the insect towards the target rotation.
+        /// </summary>
+        /// <param name="degrees">The number of degrees to rotate.</param>
+        public void Rotate(float degrees) {
+            float diff = TargetRotation - _rotation;
+            if (Math.Abs(diff) > 180) {
+                diff *= -1;
+                if (_rotation < TargetRotation) {
+                    _rotation += 360;
+                }
+                else {
+                    _rotation -= 360;
+                }
+            }
+            if (diff != 0) {
+                _rotation += (float)((diff / Math.Abs(diff)) * degrees);
+            }
+            _rotationRad = MathHelper.ToRadians(_rotation);
+            _direction = new Vector2(MathF.Sin(_rotationRad), -MathF.Cos(_rotationRad));
+            _direction.Normalize();
+        }
+
+        /// <summary>
+        /// Moves the insect forward.
+        /// </summary>
+        /// <param name="steps">The number of pixels to move.</param>
+        public void Move(float steps) {
+            _position.X += _direction.X * steps;
+            _position.Y += _direction.Y * steps;
+        }
+    }
+}

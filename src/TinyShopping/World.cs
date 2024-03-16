@@ -21,6 +21,12 @@ namespace GameLab.TinyShopping {
 
         private Rectangle _worldPosition;
 
+        private Vector2 _offset;
+
+        private Vector2 _screen;
+
+        private Rectangle[] _obstacles;
+
         public float TileSize {
             get;
             private set;
@@ -36,7 +42,8 @@ namespace GameLab.TinyShopping {
         /// <param name="contentManager">The content manager of the main game.</param>
         public void LoadContent(ContentManager contentManager) {
             _worldTexture = contentManager.Load<Texture2D>("static_map");
-            this.calculateWorldPosition();
+            this.CalculateWorldPosition();
+            this.CreateCollisionAreas();
             
         }
 
@@ -52,20 +59,68 @@ namespace GameLab.TinyShopping {
         /// <summary>
         /// Calculates the position and size of the map such that it is fully on screen.
         /// </summary>
-        private void calculateWorldPosition() {
+        private void CalculateWorldPosition() {
+            _screen = new Vector2(_device.PreferredBackBufferWidth, _device.PreferredBackBufferHeight);
             float ratio;
-            if (_worldTexture.Height / _device.PreferredBackBufferHeight > _worldTexture.Width / _device.PreferredBackBufferWidth) {
-                ratio = _device.PreferredBackBufferHeight / (float)_worldTexture.Height;
+            if (_worldTexture.Height / _screen.Y > _worldTexture.Width / _screen.X) {
+                ratio = _screen.Y / (float)_worldTexture.Height;
             }
             else {
-                ratio = _device.PreferredBackBufferWidth / (float)_worldTexture.Width;
+                ratio = _screen.X / (float)_worldTexture.Width;
             }
             int worldWidth = (int)(_worldTexture.Width * ratio);
             int worldHeight = (int)(_worldTexture.Height * ratio);
-            int xOffset = (int)((_device.PreferredBackBufferWidth - worldWidth) / 2.0);
-            int yOffset = (int)((_device.PreferredBackBufferHeight - worldHeight) / 2.0);
+            int xOffset = (int)((_screen.X - worldWidth) / 2.0);
+            int yOffset = (int)((_screen.Y - worldHeight) / 2.0);
+            _offset = new Vector2(xOffset, yOffset);
             _worldPosition = new Rectangle(xOffset, yOffset, worldWidth, worldHeight);
             TileSize = _worldPosition.Width / (float)NUM_OF_SQUARES_WIDTH;
+        }
+
+        /// <summary>
+        /// Creates obstacles that are considered not walkable.
+        /// </summary>
+        private void CreateCollisionAreas() {
+            _obstacles = new Rectangle[] { 
+                new Rectangle(0, 0, 1, NUM_OF_SQUARES_HEIGHT), // left wall
+                new Rectangle(0, 0, NUM_OF_SQUARES_WIDTH, 2), // top wall
+                new Rectangle(NUM_OF_SQUARES_WIDTH-1, 0, 1, NUM_OF_SQUARES_HEIGHT), // right wall
+                new Rectangle(0, NUM_OF_SQUARES_HEIGHT-1, NUM_OF_SQUARES_WIDTH, 1), // bottom wall
+                new Rectangle(18, 0, 2, 11),
+                new Rectangle(0, 15, 18, 3),
+                new Rectangle(11, 18, 2, 8),
+                new Rectangle(1, 28, 8, 3),
+                new Rectangle(7, 31, 2, 3),
+                new Rectangle(17, 24, 9, 3),
+                new Rectangle(14, 22, 2, 2),
+                new Rectangle(33, 25, 2, 14),
+                new Rectangle(24, 30, 9, 3),
+                new Rectangle(37, 18, 19, 3),
+                new Rectangle(45, 10, 2, 8),
+                new Rectangle(28, 11, 10, 3),
+                new Rectangle(28, 14, 2, 4),
+                new Rectangle(31, 2, 2, 4),
+            };
+        }
+
+        /// <summary>
+        /// Checks if the given position +- range is walkable.
+        /// </summary>
+        /// <param name="x">The x coordinate of the position.</param>
+        /// <param name="y">The y coordinate of the position.</param>
+        /// <param name="range">The range to include in the check.</param>
+        /// <returns>True if walkable, false otherwise.</returns>
+        public bool IsWalkable(int x, int y, int range) {
+            foreach (Rectangle obstacle  in _obstacles) {
+                float rightBorder = _offset.X + TileSize * obstacle.X + TileSize * obstacle.Width;
+                float leftBorder = _offset.X + TileSize * obstacle.X;
+                float topBorder = _offset.Y + TileSize * obstacle.Y;
+                float bottomBorder = _offset.Y + TileSize * obstacle.Y + TileSize * obstacle.Height;
+                if (x-range < rightBorder && x+range > leftBorder && y-range < bottomBorder && y+range > topBorder) {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }
