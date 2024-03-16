@@ -27,17 +27,17 @@ namespace GameLab.TinyShopping {
 
         private bool _isTurning;
 
-        public Insect(World world) {
+        public Insect(World world, Vector2 spawn) {
             _world = world;
+            _position = new InsectPos((int)spawn.X, (int)spawn.Y);
         }
 
         /// <summary>
         /// Loads necessary data from disk.
         /// </summary>
         /// <param name="contentManager">The content manager of the main game.</param>
-        public void LoadContent(ContentManager contentManager) {
-            _texture = contentManager.Load<Texture2D>("ant_texture");
-            _position = new InsectPos(300, 300);
+        public void LoadContent(ContentManager contentManager, Texture2D texture) {
+            _texture = texture;
             _textureSize = (int)_world.TileSize;
         }
 

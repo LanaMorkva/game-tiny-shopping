@@ -11,7 +11,10 @@ namespace GameLab.TinyShopping {
         private SpriteBatch _spriteBatch;
 
         private World _world;
-        private List<Insect> _ants = new List<Insect>();
+
+        private Colony _colony1;
+
+        private Colony _colony2;
 
         public Game() {
             _graphics = new GraphicsDeviceManager(this);
@@ -28,9 +31,10 @@ namespace GameLab.TinyShopping {
             _graphics.ApplyChanges();
 
             _world = new World(_graphics);
-            for (int i = 0; i < 20; ++i) {
-                _ants.Add(new Insect(_world));
-            }
+            _colony1 = new Colony(new Vector2(300, 300), _world);
+            _colony1.Initialize();
+            _colony2 = new Colony(new Vector2(1200, 800), _world);
+            _colony2.Initialize();
 
             base.Initialize();
         }
@@ -39,18 +43,16 @@ namespace GameLab.TinyShopping {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _world.LoadContent(Content);
-            foreach (Insect insect in _ants) {
-                insect.LoadContent(Content);
-            }
+            _colony1.LoadContent(Content);
+            _colony2.LoadContent(Content);
         }
 
         protected override void Update(GameTime gameTime) {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            foreach (Insect insect in _ants) {
-                insect.Update(gameTime);
-            }
+            _colony1.Update(gameTime);
+            _colony2.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -61,9 +63,8 @@ namespace GameLab.TinyShopping {
             _spriteBatch.Begin();
 
             _world.Draw(_spriteBatch, gameTime);
-            foreach (Insect insect in _ants) {
-                insect.Draw(_spriteBatch, gameTime);
-            }
+            _colony1.Draw(_spriteBatch, gameTime);
+            _colony2.Draw(_spriteBatch, gameTime);
 
             _spriteBatch.End();
 
