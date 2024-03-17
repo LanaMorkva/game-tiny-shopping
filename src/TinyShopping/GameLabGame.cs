@@ -20,6 +20,8 @@ namespace GameLab.TinyShopping {
 
         private PheromoneHandler _pheromoneHandler;
 
+        private UIController _ui;
+
         public Game() {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -45,6 +47,7 @@ namespace GameLab.TinyShopping {
 
             _player1 = new Player(_world, _pheromoneHandler);
 
+            _ui = new UIController();
 
             base.Initialize();
         }
@@ -57,6 +60,7 @@ namespace GameLab.TinyShopping {
             _colony2.LoadContent(Content);
             _player1.LoadContent(Content);
             _pheromoneHandler.LoadContent(Content);
+            _ui.LoadContent(Content);
         }
 
         protected override void Update(GameTime gameTime) {
@@ -69,6 +73,8 @@ namespace GameLab.TinyShopping {
             _player1.Update(gameTime);
 
             _pheromoneHandler.Update(gameTime);
+
+            _ui.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -85,6 +91,8 @@ namespace GameLab.TinyShopping {
             _player1.Draw(_spriteBatch, gameTime);
 
             _pheromoneHandler.Draw(_spriteBatch, gameTime);
+
+            _ui.Draw(_spriteBatch, gameTime);
 
             _spriteBatch.End();
 

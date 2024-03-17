@@ -25,6 +25,13 @@
 /processorParam:TextureFormat=Color
 /build:ant_texture.png
 
+#begin Arial.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Arial.spritefont
+
 #begin circle.png
 /importer:TextureImporter
 /processor:TextureProcessor
