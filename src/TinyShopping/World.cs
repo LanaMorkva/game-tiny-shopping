@@ -27,6 +27,10 @@ namespace GameLab.TinyShopping {
 
         private Rectangle[] _obstacles;
 
+#if DEBUG
+        private Texture2D _obstacleTexture;
+#endif
+
         public float TileSize {
             get;
             private set;
@@ -44,7 +48,9 @@ namespace GameLab.TinyShopping {
             _worldTexture = contentManager.Load<Texture2D>("static_map");
             this.CalculateWorldPosition();
             this.CreateCollisionAreas();
-            
+#if DEBUG
+            _obstacleTexture = contentManager.Load<Texture2D>("obstacle");
+#endif
         }
 
         /// <summary>
@@ -54,6 +60,15 @@ namespace GameLab.TinyShopping {
         /// <param name="gameTime">The current time information.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
             batch.Draw(_worldTexture, _worldPosition, Color.White);
+#if DEBUG
+            foreach (var o in _obstacles) {
+                float x = o.X * TileSize + _offset.X;
+                float y = o.Y * TileSize + _offset.Y;
+                float w = o.Width * TileSize;
+                float h = o.Height * TileSize;
+                batch.Draw(_obstacleTexture, new Rectangle((int)x, (int)y, (int)w, (int)h), Color.White);
+            }
+#endif
         }
 
         /// <summary>
@@ -92,7 +107,7 @@ namespace GameLab.TinyShopping {
                 new Rectangle(1, 28, 8, 3),
                 new Rectangle(7, 31, 2, 3),
                 new Rectangle(17, 24, 9, 3),
-                new Rectangle(14, 22, 2, 2),
+                new Rectangle(24, 22, 2, 2),
                 new Rectangle(33, 25, 2, 14),
                 new Rectangle(24, 30, 9, 3),
                 new Rectangle(37, 18, 19, 3),
