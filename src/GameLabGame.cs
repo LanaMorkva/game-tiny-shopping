@@ -3,24 +3,20 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 
-namespace GameLab
-{
+namespace GameLab {
 
-    public class Game : Microsoft.Xna.Framework.Game
-    {
+    public class Game : Microsoft.Xna.Framework.Game {
 
         private GraphicsDeviceManager _graphics;
         private Scene _scene;
 
-        public Game()
-        {
+        public Game() {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
 
-        protected override void Initialize()
-        {
+        protected override void Initialize() {
 
             _graphics.PreferredBackBufferWidth = 1400;
             _graphics.PreferredBackBufferHeight = 1024;
@@ -33,27 +29,23 @@ namespace GameLab
             base.Initialize();
         }
 
-        protected override void LoadContent()
-        {
+        protected override void LoadContent() {
             _scene.LoadContent();
             base.LoadContent();
         }
 
-        protected override void Update(GameTime gameTime)
-        {
+        protected override void Update(GameTime gameTime) {
             _scene.Update(gameTime);
             base.Update(gameTime);
         }
 
-        protected override void Draw(GameTime gameTime)
-        {
+        protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.Black);
             _scene.Draw(gameTime);
             base.Draw(gameTime);
         }
 
-        public void ChangeScene(Scene newScene)
-        {
+        public void ChangeScene(Scene newScene) {
             newScene.Initialize();
             newScene.LoadContent();
             _scene = newScene;

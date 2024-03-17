@@ -7,10 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameLab
-{
+namespace GameLab {
 
-    public  abstract class Scene {
+    public abstract class Scene {
 
         protected ContentManager Content { get; private set; }
 

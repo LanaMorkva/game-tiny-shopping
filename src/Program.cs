@@ -1,13 +1,12 @@
 ﻿using GameLab.TinyShopping;
 using System;
 
-namespace GameLab
-{
-    public static class Program
-    {
+namespace GameLab {
+
+    public static class Program {
+
         [STAThread]
-        static void Main()
-        {
+        static void Main() {
             using (var game = new Game())
                 game.Run();
         }

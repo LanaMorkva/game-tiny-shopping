@@ -7,8 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameLab.TinyShopping
-{
+namespace GameLab.TinyShopping {
+
     public class Scene : GameLab.Scene {
 
         private SpriteBatch _spriteBatch;
@@ -25,7 +25,7 @@ namespace GameLab.TinyShopping
 
         private UIController _ui;
 
-        public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Game game) : 
+        public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Game game) :
             base(content, graphics, manager, game) {
         }
 
