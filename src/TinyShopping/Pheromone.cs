@@ -10,7 +10,9 @@ namespace GameLab.TinyShopping {
 
     internal class Pheromone {
 
-        private Vector2 _position;
+        public Vector2 Position {
+            private set; get;
+        }
 
         private World _world;
 
@@ -30,7 +32,7 @@ namespace GameLab.TinyShopping {
         /// <param name="world">The world to exist in.</param>
         /// <param name="creationTime">The current game time at creation.</param>
         public Pheromone(Vector2 position, Texture2D texture, World world, int creationTime) {
-            _position = position;
+            Position = position;
             _world = world;
             _textureSize = (int)_world.TileSize;
             _texture = texture;
@@ -43,7 +45,7 @@ namespace GameLab.TinyShopping {
         /// <param name="batch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
-            Rectangle bounds = new Rectangle((int)(_position.X - _textureSize / 2f), (int)(_position.Y - _textureSize / 2f), _textureSize, _textureSize);
+            Rectangle bounds = new Rectangle((int)(Position.X - _textureSize / 2f), (int)(Position.Y - _textureSize / 2f), _textureSize, _textureSize);
             batch.Draw(_texture, bounds, Color.White);
         }
 

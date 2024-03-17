@@ -16,6 +16,8 @@ namespace GameLab.TinyShopping {
 
         private World _world;
 
+        private PheromoneHandler _handler;
+
         private List<Insect> _insects = new List<Insect>();
 
         /// <summary>
@@ -23,9 +25,10 @@ namespace GameLab.TinyShopping {
         /// </summary>
         /// <param name="spawn">The spawn point of the insects.</param>
         /// <param name="world">The world to live in.</param>
-        public Colony(Vector2 spawn, World world) {
+        public Colony(Vector2 spawn, World world, PheromoneHandler handler) {
             _spawn = spawn;
             _world = world;
+            _handler = handler;
         }
 
         /// <summary>
@@ -33,7 +36,7 @@ namespace GameLab.TinyShopping {
         /// </summary>
         public void Initialize() {
             for (int i = 0; i < 20; ++i) {
-                _insects.Add(new Insect(_world, _spawn));
+                _insects.Add(new Insect(_world, _handler, _spawn));
             }
         }
 

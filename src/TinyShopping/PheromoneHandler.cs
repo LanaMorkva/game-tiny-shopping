@@ -11,6 +11,8 @@ namespace GameLab.TinyShopping {
 
     internal class PheromoneHandler {
 
+        private static readonly int RANGE = 8;
+
         private World _world;
 
         private Texture2D _texture;
@@ -71,6 +73,30 @@ namespace GameLab.TinyShopping {
             foreach (var p in _pheromones) {
                 p.Draw(batch, gameTime);
             }
+        }
+
+        /// <summary>
+        /// Gets the direction to the closest pheromone in range.
+        /// </summary>
+        /// <param name="position">The position to compare to.</param>
+        /// <returns>A vector representing the direction or null if no pheromone is in range.</returns>
+        public Vector2? GetDirectionToClosestPheromone(Vector2 position) {
+            int range = (int) (RANGE * _world.TileSize);
+            // TODO: make efficient
+            float minDis = float.MaxValue;
+            Pheromone closest = null;
+            foreach (var p in _pheromones) {
+                float sqDis = Vector2.DistanceSquared(position, p.Position);
+                if (sqDis < minDis) {
+                    closest = p;
+                    minDis = sqDis;
+                }
+            }
+            if (closest == null || minDis > range*range) {
+                return null;
+            }
+            Vector2 direction = closest.Position - position;
+            return direction;
         }
     }
 }

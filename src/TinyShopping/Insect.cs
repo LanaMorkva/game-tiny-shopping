@@ -25,10 +25,13 @@ namespace GameLab.TinyShopping {
 
         private InsectPos _position;
 
-        private bool _isTurning;
+        private bool _isRecovering;
 
-        public Insect(World world, Vector2 spawn) {
+        private PheromoneHandler _handler;
+
+        public Insect(World world, PheromoneHandler handler, Vector2 spawn) {
             _world = world;
+            _handler = handler;
             _position = new InsectPos((int)spawn.X, (int)spawn.Y);
         }
 
@@ -57,12 +60,17 @@ namespace GameLab.TinyShopping {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
-            if (_isTurning) {
+            Vector2? dir = _handler.GetDirectionToClosestPheromone(new Vector2(_position.X, _position.Y));
+            if (_isRecovering) {
                 RecoverCollision(gameTime);
             }
             else if (!_world.IsWalkable(_position.X, _position.Y, _textureSize / 2)) {
-                _isTurning = true;
+                _isRecovering = true;
                 _position.TargetRotation += 180;
+            }
+            else if (dir != null) {
+                _position.TargetDirection = dir.Value;
+                Walk(gameTime);
             }
             else {
                 Wander(gameTime);
@@ -76,7 +84,7 @@ namespace GameLab.TinyShopping {
         /// <param name="gameTime">The current game time.</param>
         private void RecoverCollision(GameTime gameTime) {
             if (!_position.IsTurning) {
-                _isTurning = false;
+                _isRecovering = false;
             }
             if (!_world.IsWalkable(_position.X, _position.Y, _textureSize)) {
                 _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * -SPEED);
@@ -95,6 +103,14 @@ namespace GameLab.TinyShopping {
                 _nextUpdateTime = gameTime.TotalGameTime.TotalMilliseconds + Random.Shared.Next(5000) + 500;
                 _position.TargetRotation = Random.Shared.Next(360);
             }
+            Walk(gameTime);
+        }
+
+        /// <summary>
+        /// Turns towards the target and walks towards it.
+        /// </summary>
+        /// <param name="gameTime">The current game time.</param>
+        private void Walk(GameTime gameTime) {
             if (_position.IsTurning) {
                 _position.Rotate((float)gameTime.ElapsedGameTime.TotalSeconds * ROTATION_SPEED);
                 _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * SPEED / 3);

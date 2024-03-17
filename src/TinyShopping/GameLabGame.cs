@@ -36,12 +36,12 @@ namespace GameLab.TinyShopping {
 
             _world = new World(_graphics);
 
-            _colony1 = new Colony(new Vector2(300, 300), _world);
-            _colony1.Initialize();
-            _colony2 = new Colony(new Vector2(1200, 800), _world);
-            _colony2.Initialize();
-
             _pheromoneHandler = new PheromoneHandler(_world);
+
+            _colony1 = new Colony(new Vector2(300, 300), _world, _pheromoneHandler);
+            _colony1.Initialize();
+            _colony2 = new Colony(new Vector2(1200, 800), _world, _pheromoneHandler);
+            _colony2.Initialize();
 
             _player1 = new Player(_world, _pheromoneHandler);
 

@@ -47,6 +47,13 @@ namespace GameLab.TinyShopping {
             get; set;
         }
 
+        public Vector2 TargetDirection {
+            set { 
+                float angle = MathF.Atan2(value.Y, value.X);
+                TargetRotation = (int) MathHelper.ToDegrees(angle) + 90;
+            }
+        }
+
         /// <summary>
         /// True if the insect's rotation is equal to the target rotation.
         /// </summary>
