@@ -1,13 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace GameLab.TinyShopping {
+namespace GameLab.TinyShopping
+{
+    public class Scene : GameLab.Scene {
 
-    public class Game : Microsoft.Xna.Framework.Game {
-
-        private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
         private World _world;
@@ -22,21 +25,12 @@ namespace GameLab.TinyShopping {
 
         private UIController _ui;
 
-        public Game() {
-            _graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+        public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Game game) : 
+            base(content, graphics, manager, game) {
         }
 
-        protected override void Initialize() {
-            // TODO: Add your initialization logic here
-
-            _graphics.PreferredBackBufferWidth = 1400;
-            _graphics.PreferredBackBufferHeight = 1024;
-            //_graphics.ToggleFullScreen();
-            _graphics.ApplyChanges();
-
-            _world = new World(_graphics);
+        public override void Initialize() {
+            _world = new World(GraphicsDeviceManager);
 
             _pheromoneHandler = new PheromoneHandler(_world);
 
@@ -48,11 +42,10 @@ namespace GameLab.TinyShopping {
             _player1 = new Player(_world, _pheromoneHandler);
 
             _ui = new UIController();
-
             base.Initialize();
         }
 
-        protected override void LoadContent() {
+        public override void LoadContent() {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             _world.LoadContent(Content);
@@ -61,12 +54,10 @@ namespace GameLab.TinyShopping {
             _player1.LoadContent(Content);
             _pheromoneHandler.LoadContent(Content);
             _ui.LoadContent(Content);
+            base.LoadContent();
         }
 
-        protected override void Update(GameTime gameTime) {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-                Exit();
-
+        public override void Update(GameTime gameTime) {
             _colony1.Update(gameTime);
             _colony2.Update(gameTime);
 
@@ -75,13 +66,10 @@ namespace GameLab.TinyShopping {
             _pheromoneHandler.Update(gameTime);
 
             _ui.Update(gameTime);
-
             base.Update(gameTime);
         }
 
-        protected override void Draw(GameTime gameTime) {
-            GraphicsDevice.Clear(Color.Black);
-
+        public override void Draw(GameTime gameTime) {
             _spriteBatch.Begin();
 
             _world.Draw(_spriteBatch, gameTime);
@@ -95,7 +83,6 @@ namespace GameLab.TinyShopping {
             _ui.Draw(_spriteBatch, gameTime);
 
             _spriteBatch.End();
-
             base.Draw(gameTime);
         }
     }
