@@ -122,5 +122,17 @@ namespace GameLab.TinyShopping {
             }
             return true;
         }
+
+        /// <summary>
+        /// Aligns the given position to the center of the current grid tile.
+        /// </summary>
+        /// <param name="position">The position to align.</param>
+        public Vector2 AlignPositionToGridCenter(Vector2 position) {
+            int xRaw = (int) MathF.Floor((position.X - _offset.X) / TileSize);
+            int yRaw = (int) MathF.Floor((position.Y - _offset.Y) / TileSize);
+            float x = xRaw * TileSize + TileSize / 2;
+            float y = yRaw * TileSize + TileSize / 2;
+            return new Vector2(x + _offset.X, y + _offset.Y);
+        }
     }
 }

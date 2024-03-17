@@ -16,6 +16,10 @@ namespace GameLab.TinyShopping {
 
         private Colony _colony2;
 
+        private Player _player1;
+
+        private PheromoneHandler _pheromoneHandler;
+
         public Game() {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -31,10 +35,16 @@ namespace GameLab.TinyShopping {
             _graphics.ApplyChanges();
 
             _world = new World(_graphics);
+
             _colony1 = new Colony(new Vector2(300, 300), _world);
             _colony1.Initialize();
             _colony2 = new Colony(new Vector2(1200, 800), _world);
             _colony2.Initialize();
+
+            _pheromoneHandler = new PheromoneHandler(_world);
+
+            _player1 = new Player(_world, _pheromoneHandler);
+
 
             base.Initialize();
         }
@@ -45,6 +55,8 @@ namespace GameLab.TinyShopping {
             _world.LoadContent(Content);
             _colony1.LoadContent(Content);
             _colony2.LoadContent(Content);
+            _player1.LoadContent(Content);
+            _pheromoneHandler.LoadContent(Content);
         }
 
         protected override void Update(GameTime gameTime) {
@@ -53,6 +65,10 @@ namespace GameLab.TinyShopping {
 
             _colony1.Update(gameTime);
             _colony2.Update(gameTime);
+
+            _player1.Update(gameTime);
+
+            _pheromoneHandler.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -65,6 +81,10 @@ namespace GameLab.TinyShopping {
             _world.Draw(_spriteBatch, gameTime);
             _colony1.Draw(_spriteBatch, gameTime);
             _colony2.Draw(_spriteBatch, gameTime);
+
+            _player1.Draw(_spriteBatch, gameTime);
+
+            _pheromoneHandler.Draw(_spriteBatch, gameTime);
 
             _spriteBatch.End();
 
