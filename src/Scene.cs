@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameLab {
+namespace TinyShopping {
 
     public abstract class Scene {
 

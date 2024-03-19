@@ -8,7 +8,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameLab.TinyShopping {
+namespace TinyShopping.Game {
 
     internal class Colony {
 

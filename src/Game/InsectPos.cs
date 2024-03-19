@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 
-namespace GameLab.TinyShopping {
+namespace TinyShopping.Game {
 
     internal class InsectPos {
 

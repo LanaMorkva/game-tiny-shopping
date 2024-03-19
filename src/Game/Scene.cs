@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameLab.TinyShopping {
+namespace TinyShopping.Game {
 
-    public class Scene : GameLab.Scene {
+    public class Scene : global::TinyShopping.Scene {
 
         private SpriteBatch _spriteBatch;
 

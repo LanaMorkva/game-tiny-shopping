@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameLab.MainMenu
+namespace TinyShopping.MainMenu
 {
-    internal class Scene : GameLab.Scene {
+    internal class Scene : global::TinyShopping.Scene {
 
         private Texture2D _background;
 
@@ -31,7 +31,7 @@ namespace GameLab.MainMenu
         public override void Update(GameTime gameTime) {
             KeyboardState state = Keyboard.GetState();
             if (state.GetPressedKeys().Length > 0) {
-                Game.ChangeScene(new TinyShopping.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game));
+                Game.ChangeScene(new Game.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game));
             }
             base.Update(gameTime);
         }

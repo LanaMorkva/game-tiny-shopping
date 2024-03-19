@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameLab.TinyShopping {
+namespace TinyShopping.Game {
 
     /// <summary>
     /// The Player handles user input and pheromone placement

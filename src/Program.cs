@@ -1,7 +1,7 @@
-﻿using GameLab.TinyShopping;
+﻿using TinyShopping.Game;
 using System;
 
-namespace GameLab {
+namespace TinyShopping {
 
     public static class Program {
 
