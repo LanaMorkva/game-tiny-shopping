@@ -94,7 +94,7 @@ namespace TinyShopping.Game {
             }
             // handle pheromones
             if (!_isCarrying) {
-                Vector2? dir = _handler.GetDirectionToClosestPheromone(new Vector2(_position.X, _position.Y));
+                Vector2? dir = _handler.GetDirectionToForwardPheromone(new Vector2(_position.X, _position.Y));
                 if (dir != null) {
                     _position.TargetDirection = dir.Value;
                     Walk(gameTime);
@@ -102,7 +102,7 @@ namespace TinyShopping.Game {
                 }
             }
             else {
-                Vector2? dir = _handler.GetDirectionToClosestReturnPheromone(new Vector2(_position.X, _position.Y));
+                Vector2? dir = _handler.GetDirectionToReturnPheromone(new Vector2(_position.X, _position.Y));
                 if (dir != null) {
                     _position.TargetDirection = dir.Value;
                     Walk(gameTime);

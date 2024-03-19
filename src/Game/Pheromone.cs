@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,9 +11,7 @@ namespace TinyShopping.Game {
 
     internal class Pheromone {
 
-        public Vector2 Position {
-            private set; get;
-        }
+        public Vector2 Position { private set; get; }
 
         private World _world;
 
@@ -20,9 +19,7 @@ namespace TinyShopping.Game {
 
         private Texture2D _texture;
 
-        public int CreationTime {
-            private set; get;
-        }
+        public int Priority { private set; get; }
 
         /// <summary>
         /// Creates a new pheromone spot.
@@ -30,13 +27,13 @@ namespace TinyShopping.Game {
         /// <param name="position">The position to use.</param>
         /// <param name="texture">The texture to draw.</param>
         /// <param name="world">The world to exist in.</param>
-        /// <param name="creationTime">The current game time at creation.</param>
-        public Pheromone(Vector2 position, Texture2D texture, World world, int creationTime) {
+        /// <param name="priority">The starting priority. This will decrease for each passing milisecond.</param>
+        public Pheromone(Vector2 position, Texture2D texture, World world, int priority) {
             Position = position;
             _world = world;
             _textureSize = (int)_world.TileSize;
             _texture = texture;
-            CreationTime = creationTime;
+            Priority = priority;
         }
 
         /// <summary>
@@ -49,8 +46,12 @@ namespace TinyShopping.Game {
             batch.Draw(_texture, bounds, Color.White);
         }
 
+        /// <summary>
+        /// Updates the pheromone. Decreases the priority.
+        /// </summary>
+        /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
-            
+            Priority -= (int) Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
         }
     }
 }

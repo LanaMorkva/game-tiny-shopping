@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace TinyShopping.Game {
 
-    public class Scene : global::TinyShopping.Scene {
+    public class Scene : TinyShopping.Scene {
 
         private SpriteBatch _spriteBatch;
 

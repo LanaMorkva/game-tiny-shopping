@@ -18,7 +18,7 @@ namespace TinyShopping.Game {
 
         private static readonly int SIZE = 50;
 
-        private static readonly int SPEED = 150;
+        private static readonly int SPEED = 200;
 
         private World _world;
 
