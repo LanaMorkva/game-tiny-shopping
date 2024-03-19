@@ -19,6 +19,8 @@ namespace GameLab.TinyShopping {
 
         private List<Pheromone> _pheromones;
 
+        private List<Pheromone> _returnPheromones;
+
         /// <summary>
         /// Creates a new pheromone handler.
         /// </summary>
@@ -26,6 +28,7 @@ namespace GameLab.TinyShopping {
         public PheromoneHandler(World world) {
             _world = world;
             _pheromones = new List<Pheromone>();
+            _returnPheromones = new List<Pheromone>();
         }
 
         /// <summary>
@@ -41,9 +44,15 @@ namespace GameLab.TinyShopping {
         /// </summary>
         /// <param name="rawPosition">The position of the player's cursor.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void AddPheromone(Vector2 rawPosition, GameTime gameTime) {
+        public void AddPheromone(Vector2 rawPosition, GameTime gameTime, PheromoneType type) {
             Vector2 position = _world.AlignPositionToGridCenter(rawPosition);
-            _pheromones.Add(new Pheromone(position, _texture, _world, (int) gameTime.TotalGameTime.TotalMilliseconds));
+            Pheromone p = new Pheromone(position, _texture, _world, (int)gameTime.TotalGameTime.TotalMilliseconds);
+            if (type == PheromoneType.RETURN) {
+                _returnPheromones.Add(p);
+            }
+            else {
+                _pheromones.Add(p);
+            }
         }
 
         /// <summary>
@@ -62,6 +71,18 @@ namespace GameLab.TinyShopping {
             if (endIndex > 0) {
                 _pheromones.RemoveRange(0, endIndex);
             }
+
+            endIndex = _returnPheromones.Count;
+            for (int i = 0; i < _returnPheromones.Count; ++i) {
+                Pheromone p = _returnPheromones[i];
+                if (gameTime.TotalGameTime.TotalMilliseconds - p.CreationTime < 5000) {
+                    endIndex = i;
+                    break;
+                }
+            }
+            if (endIndex > 0) {
+                _returnPheromones.RemoveRange(0, endIndex);
+            }
         }
 
         /// <summary>
@@ -73,16 +94,18 @@ namespace GameLab.TinyShopping {
             foreach (var p in _pheromones) {
                 p.Draw(batch, gameTime);
             }
+            foreach (var p in _returnPheromones) {
+                p.Draw(batch, gameTime);
+            }
         }
 
         /// <summary>
-        /// Gets the direction to the closest pheromone in range.
+        /// Gets the direction to the closest forward pheromone in range.
         /// </summary>
         /// <param name="position">The position to compare to.</param>
         /// <returns>A vector representing the direction or null if no pheromone is in range.</returns>
         public Vector2? GetDirectionToClosestPheromone(Vector2 position) {
             int range = (int) (RANGE * _world.TileSize);
-            // TODO: make efficient
             float minDis = float.MaxValue;
             Pheromone closest = null;
             foreach (var p in _pheromones) {
@@ -93,6 +116,29 @@ namespace GameLab.TinyShopping {
                 }
             }
             if (closest == null || minDis > range*range) {
+                return null;
+            }
+            Vector2 direction = closest.Position - position;
+            return direction;
+        }
+
+        /// <summary>
+        /// Gets the direction to the closest return pheromone in range.
+        /// </summary>
+        /// <param name="position">The position to compare to.</param>
+        /// <returns>A vector representing the direction or null if no pheromone is in range.</returns>
+        public Vector2? GetDirectionToClosestReturnPheromone(Vector2 position) {
+            int range = (int)(RANGE * _world.TileSize);
+            float minDis = float.MaxValue;
+            Pheromone closest = null;
+            foreach (var p in _returnPheromones) {
+                float sqDis = Vector2.DistanceSquared(position, p.Position);
+                if (sqDis < minDis) {
+                    closest = p;
+                    minDis = sqDis;
+                }
+            }
+            if (closest == null || minDis > range * range) {
                 return null;
             }
             Vector2 direction = closest.Position - position;

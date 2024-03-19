@@ -11,9 +11,9 @@ namespace GameLab.TinyShopping {
 
     internal class World {
 
-        private static int NUM_OF_SQUARES_WIDTH = 57;
+        public static int NUM_OF_SQUARES_WIDTH = 57;
 
-        private static int NUM_OF_SQUARES_HEIGHT = 40;
+        public static int NUM_OF_SQUARES_HEIGHT = 40;
 
         private GraphicsDeviceManager _device;
 
@@ -148,6 +148,16 @@ namespace GameLab.TinyShopping {
             float x = xRaw * TileSize + TileSize / 2;
             float y = yRaw * TileSize + TileSize / 2;
             return new Vector2(x + _offset.X, y + _offset.Y);
+        }
+
+        /// <summary>
+        /// Calculates the center of the tile at given position.
+        /// </summary>
+        /// <param name="tileX">X coordinate of the tile.</param>
+        /// <param name="tileY">Y coordinate of the tile.</param>
+        /// <returns>The center of the tile in screen pixel coordinates.</returns>
+        public Vector2 GetCenterOfTile(int tileX, int tileY) {
+            return new Vector2(_offset.X + TileSize*tileX + TileSize/2, _offset.Y + TileSize*tileY + TileSize/2);
         }
     }
 }

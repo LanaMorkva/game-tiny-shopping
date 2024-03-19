@@ -19,6 +19,8 @@ namespace GameLab.TinyShopping {
 
         private Texture2D _texture;
 
+        private Texture2D _textureFull;
+
         private int _textureSize;
 
         private double _nextUpdateTime;
@@ -29,30 +31,36 @@ namespace GameLab.TinyShopping {
 
         private PheromoneHandler _handler;
 
-        public Insect(World world, PheromoneHandler handler, Vector2 spawn) {
+        private FruitHandler _fruits;
+
+        private bool _isCarrying;
+
+        public Insect(World world, PheromoneHandler handler, Vector2 spawn, FruitHandler fruits) {
             _world = world;
             _handler = handler;
             _position = new InsectPos((int)spawn.X, (int)spawn.Y);
+            _fruits = fruits;
         }
 
         /// <summary>
         /// Loads necessary data from disk.
         /// </summary>
         /// <param name="contentManager">The content manager of the main game.</param>
-        public void LoadContent(ContentManager contentManager, Texture2D texture) {
+        public void LoadContent(ContentManager contentManager, Texture2D texture, Texture2D textureFull) {
             _texture = texture;
+            _textureFull = textureFull;
             _textureSize = (int)_world.TileSize;
         }
 
         /// <summary>
-        /// Draws the world to the sprite batch.
+        /// Draws the insect to the sprite batch.
         /// </summary>
         /// <param name="batch">The batch to draw to.</param>
         /// <param name="gameTime">The current time information.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
             Vector2 origin = new(_texture.Width / 2f, _texture.Height / 2f);
             Rectangle destination = new ((int)_position.X, (int)_position.Y, _textureSize, _textureSize);
-            batch.Draw(_texture, destination, null, Color.White, _position.Rotation, origin, SpriteEffects.None, 0);
+            batch.Draw(_isCarrying ? _textureFull : _texture, destination, null, Color.White, _position.Rotation, origin, SpriteEffects.None, 0);
         }
 
         /// <summary>
@@ -60,21 +68,49 @@ namespace GameLab.TinyShopping {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
-            Vector2? dir = _handler.GetDirectionToClosestPheromone(new Vector2(_position.X, _position.Y));
+            // handle collision
             if (_isRecovering) {
                 RecoverCollision(gameTime);
+                return;
             }
-            else if (!_world.IsWalkable(_position.X, _position.Y, _textureSize / 2)) {
+            if (!_world.IsWalkable(_position.X, _position.Y, _textureSize / 2)) {
                 _isRecovering = true;
                 _position.TargetRotation += 180;
+                return;
             }
-            else if (dir != null) {
-                _position.TargetDirection = dir.Value;
-                Walk(gameTime);
+            // handle close-by fruit
+            if (!_isCarrying) {
+                Vector2? dir = _fruits.GetDirectionToClosestFruit(new Vector2(_position.X, _position.Y), out Fruit closestFruit);
+                if (dir != null && dir.Value.LengthSquared() <= (_world.TileSize * _world.TileSize) / 4) {
+                    _isCarrying = true;
+                    _fruits.RemoveFruit(closestFruit);
+                    return;
+                }
+                if (dir != null) {
+                    _position.TargetDirection = dir.Value;
+                    Walk(gameTime);
+                    return;
+                }
+            }
+            // handle pheromones
+            if (!_isCarrying) {
+                Vector2? dir = _handler.GetDirectionToClosestPheromone(new Vector2(_position.X, _position.Y));
+                if (dir != null) {
+                    _position.TargetDirection = dir.Value;
+                    Walk(gameTime);
+                    return;
+                }
             }
             else {
-                Wander(gameTime);
+                Vector2? dir = _handler.GetDirectionToClosestReturnPheromone(new Vector2(_position.X, _position.Y));
+                if (dir != null) {
+                    _position.TargetDirection = dir.Value;
+                    Walk(gameTime);
+                    return;
+                }
             }
+            // wander if nothing else was done
+            Wander(gameTime);
             
         }
 

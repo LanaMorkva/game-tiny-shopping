@@ -26,7 +26,9 @@ namespace GameLab.TinyShopping {
 
         private Texture2D _texture;
 
-        private bool _spacePressed;
+        private bool _discoverPressed;
+
+        private bool _returnPressed;
 
         private PheromoneHandler _handler;
 
@@ -77,12 +79,19 @@ namespace GameLab.TinyShopping {
             if (state.IsKeyDown(Keys.S)) {
                 motion.Y = +1;
             }
-            if (state.IsKeyDown(Keys.Space)) {
-                _spacePressed = true;
+            if (state.IsKeyDown(Keys.J)) {
+                _discoverPressed = true;
             }
-            else if (_spacePressed) {
-                _spacePressed = false;
-                _handler.AddPheromone(_position, gameTime);
+            else if (_discoverPressed) {
+                _discoverPressed = false;
+                _handler.AddPheromone(_position, gameTime, PheromoneType.DISCOVER);
+            }
+            if (state.IsKeyDown(Keys.K)) {
+                _returnPressed = true;
+            }
+            else if (_returnPressed) {
+                _returnPressed = false;
+                _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN);
             }
             if (motion.LengthSquared()  > 0) {
                 motion.Normalize();

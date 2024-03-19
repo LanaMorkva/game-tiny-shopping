@@ -18,6 +18,8 @@ namespace GameLab.TinyShopping {
 
         private PheromoneHandler _handler;
 
+        private FruitHandler _fruits;
+
         private List<Insect> _insects = new List<Insect>();
 
         /// <summary>
@@ -25,10 +27,11 @@ namespace GameLab.TinyShopping {
         /// </summary>
         /// <param name="spawn">The spawn point of the insects.</param>
         /// <param name="world">The world to live in.</param>
-        public Colony(Vector2 spawn, World world, PheromoneHandler handler) {
+        public Colony(Vector2 spawn, World world, PheromoneHandler handler, FruitHandler fruits) {
             _spawn = spawn;
             _world = world;
             _handler = handler;
+            _fruits = fruits;
         }
 
         /// <summary>
@@ -36,7 +39,7 @@ namespace GameLab.TinyShopping {
         /// </summary>
         public void Initialize() {
             for (int i = 0; i < 20; ++i) {
-                _insects.Add(new Insect(_world, _handler, _spawn));
+                _insects.Add(new Insect(_world, _handler, _spawn, _fruits));
             }
         }
 
@@ -46,8 +49,9 @@ namespace GameLab.TinyShopping {
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
             Texture2D texture = content.Load<Texture2D>("ant_texture");
+            Texture2D textureFull = content.Load<Texture2D>("ant_full_texture");
             foreach (Insect insect in _insects) {
-                insect.LoadContent(content, texture);
+                insect.LoadContent(content, texture, textureFull);
             }
         }
 
