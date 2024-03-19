@@ -5,12 +5,12 @@ using System.Collections.Generic;
 
 namespace TinyShopping {
 
-    public class Game : Microsoft.Xna.Framework.Game {
+    public class Renderer : Microsoft.Xna.Framework.Game {
 
         private GraphicsDeviceManager _graphics;
         private Scene _scene;
 
-        public Game() {
+        public Renderer() {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;

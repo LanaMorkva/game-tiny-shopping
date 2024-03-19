@@ -19,9 +19,9 @@ namespace TinyShopping {
 
         protected SpriteBatch SpriteBatch { get; private set; }
 
-        protected Game Game { get; private set; }
+        protected Renderer Game { get; private set; }
 
-        protected Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Game game) {
+        protected Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game) {
             Content = content;
             GraphicsDevice = graphics;
             GraphicsDeviceManager = manager;

@@ -18,12 +18,12 @@ namespace TinyShopping.MainMenu
 
         private Rectangle _backgroundPosition;
 
-        public Scene(ContentManager content, GraphicsDevice device, GraphicsDeviceManager manager, Game game): 
+        public Scene(ContentManager content, GraphicsDevice device, GraphicsDeviceManager manager, Renderer game): 
             base(content, device, manager, game) {
         }
 
         public override void LoadContent() {
-            _background = Content.Load<Texture2D>("Teaser");
+            _background = Content.Load<Texture2D>("teaser");
             CalculateBackgroundPosition();
             base.LoadContent();
         }

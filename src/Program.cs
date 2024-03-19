@@ -7,7 +7,7 @@ namespace TinyShopping {
 
         [STAThread]
         static void Main() {
-            using (var game = new Game())
+            using (var game = new Renderer())
                 game.Run();
         }
     }

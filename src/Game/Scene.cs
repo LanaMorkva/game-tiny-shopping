@@ -27,7 +27,7 @@ namespace TinyShopping.Game {
 
         private FruitHandler _fruitHandler;
 
-        public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Game game) :
+        public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game) :
             base(content, graphics, manager, game) {
         }
 
