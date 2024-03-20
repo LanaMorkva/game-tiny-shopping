@@ -32,15 +32,19 @@ namespace TinyShopping.Game {
 
         private PheromoneHandler _handler;
 
+        private PlayerInput _input;
+
         /// <summary>
         /// Creates a new player.
         /// </summary>
         /// <param name="world">The world to exist in.</param>
         /// <param name="handler">The pheromone handler to use.</param>
-        public Player(World world, PheromoneHandler handler) {
+        /// <param name="input">The player input to use.</param>
+        public Player(World world, PheromoneHandler handler, PlayerInput input) {
             _world = world;
             _position = new Vector2(300, 300);
             _handler = handler;
+            _input = input;
         }
 
         /// <summary>
@@ -65,36 +69,20 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime) {
-            KeyboardState state = Keyboard.GetState();
-            Vector2 motion = new Vector2(0, 0);
-            if (state.IsKeyDown(Keys.A)) {
-                motion.X = -1;
-            }
-            if (state.IsKeyDown(Keys.D)) {
-                motion.X = +1;
-            }
-            if (state.IsKeyDown(Keys.W)) {
-                motion.Y = -1;
-            }
-            if (state.IsKeyDown(Keys.S)) {
-                motion.Y = +1;
-            }
-            if (state.IsKeyDown(Keys.J)) {
+            Vector2 motion = _input.GetMotion();
+            if (_input.IsDiscoverPressed()) {
                 _discoverPressed = true;
             }
             else if (_discoverPressed) {
                 _discoverPressed = false;
                 _handler.AddPheromone(_position, gameTime, PheromoneType.DISCOVER);
             }
-            if (state.IsKeyDown(Keys.K)) {
+            if (_input.IsReturnPressed()) {
                 _returnPressed = true;
             }
             else if (_returnPressed) {
                 _returnPressed = false;
                 _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN);
-            }
-            if (motion.LengthSquared()  > 0) {
-                motion.Normalize();
             }
             _position.X += motion.X * (float)gameTime.ElapsedGameTime.TotalSeconds * SPEED;
             _position.Y += motion.Y * (float)gameTime.ElapsedGameTime.TotalSeconds * SPEED;

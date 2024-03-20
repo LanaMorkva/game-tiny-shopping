@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +40,8 @@ namespace TinyShopping.Game {
             _colony1.Initialize();
             _colony2 = new Colony(new Vector2(1200, 800), _world, _pheromoneHandler, _fruitHandler);
             _colony2.Initialize();
-            _player1 = new Player(_world, _pheromoneHandler);
+            PlayerInput input1 = new PlayerInput(Keys.W, Keys.S, Keys.A, Keys.D, Keys.J, Keys.K, PlayerIndex.One, Buttons.A, Buttons.B);
+            _player1 = new Player(_world, _pheromoneHandler, input1);
             _ui = new UIController();
             base.Initialize();
         }
