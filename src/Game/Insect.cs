@@ -39,7 +39,9 @@ namespace TinyShopping.Game {
 
         private Colony _colony;
 
-        public Insect(World world, PheromoneHandler handler, Vector2 spawn, int spawnRotation, FruitHandler fruits, Texture2D texture, Texture2D textureFull, Colony colony) {
+        private int _owner;
+
+        public Insect(World world, PheromoneHandler handler, Vector2 spawn, int spawnRotation, FruitHandler fruits, Texture2D texture, Texture2D textureFull, Colony colony, int owner) {
             _world = world;
             _handler = handler;
             _position = new InsectPos((int)spawn.X, (int)spawn.Y, spawnRotation);
@@ -49,6 +51,7 @@ namespace TinyShopping.Game {
             _textureFull = textureFull;
             _textureSize = (int)_world.TileSize;
             _colony = colony;
+            _owner = owner;
         }
 
         /// <summary>
@@ -107,7 +110,7 @@ namespace TinyShopping.Game {
             }
             // handle pheromones
             if (!_isCarrying) {
-                Vector2? dir = _handler.GetDirectionToForwardPheromone(new Vector2(_position.X, _position.Y));
+                Vector2? dir = _handler.GetDirectionToForwardPheromone(new Vector2(_position.X, _position.Y), _owner);
                 if (dir != null) {
                     _position.TargetDirection = dir.Value;
                     Walk(gameTime);
@@ -115,7 +118,7 @@ namespace TinyShopping.Game {
                 }
             }
             else {
-                Vector2? dir = _handler.GetDirectionToReturnPheromone(new Vector2(_position.X, _position.Y));
+                Vector2? dir = _handler.GetDirectionToReturnPheromone(new Vector2(_position.X, _position.Y), _owner);
                 if (dir != null) {
                     _position.TargetDirection = dir.Value;
                     Walk(gameTime);

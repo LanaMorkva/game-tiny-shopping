@@ -36,6 +36,8 @@ namespace TinyShopping.Game {
 
         private int _collectedFruit;
 
+        private int _owner;
+
         /// <summary>
         /// Creates a new colony.
         /// </summary>
@@ -45,7 +47,8 @@ namespace TinyShopping.Game {
         /// <param name="handler">The pheromone handler to use.</param>
         /// <param name="fruits">The fruit handler to use.</param>
         /// <param name="dropOff">The position the ants can drop off fruit.</param>
-        public Colony(Vector2 spawn, int spawnRotation, World world, PheromoneHandler handler, FruitHandler fruits, Vector2 dropOff) {
+        /// <param name="owner">The id of the owning player, 0 or 1.</param>
+        public Colony(Vector2 spawn, int spawnRotation, World world, PheromoneHandler handler, FruitHandler fruits, Vector2 dropOff, int owner) {
             _spawn = spawn;
             _world = world;
             _handler = handler;
@@ -53,6 +56,7 @@ namespace TinyShopping.Game {
             _spawnRotation = spawnRotation;
             _queue = 6;
             DropOff = dropOff;
+            _owner = owner;
         }
 
         /// <summary>
@@ -79,7 +83,7 @@ namespace TinyShopping.Game {
             if (_spawnCooldown < 0 && _queue > 0) {
                 _spawnCooldown = 1000;
                 _queue -= 1;
-                Insect ant = new Insect(_world, _handler, _spawn, _spawnRotation, _fruits, _antTexture, _antFullTexture, this);
+                Insect ant = new Insect(_world, _handler, _spawn, _spawnRotation, _fruits, _antTexture, _antFullTexture, this, _owner);
                 _insects.Add(ant);
             }
             foreach (Insect insect in _insects) {

@@ -17,18 +17,18 @@ namespace TinyShopping.Game {
 
         private Texture2D _texture;
 
-        private List<Pheromone> _pheromones;
+        private List<Pheromone>[] _pheromones;
 
-        private List<Pheromone> _returnPheromones;
+        private List<Pheromone>[] _returnPheromones;
 
         /// <summary>
-        /// Creates a new pheromone handler.
+        /// Creates a new pheromone handler for two players.
         /// </summary>
         /// <param name="world">The world to exist in.</param>
         public PheromoneHandler(World world) {
             _world = world;
-            _pheromones = new List<Pheromone>();
-            _returnPheromones = new List<Pheromone>();
+            _pheromones = new List<Pheromone>[] { new (), new () };
+            _returnPheromones = new List<Pheromone>[] { new(), new() };
         }
 
         /// <summary>
@@ -44,14 +44,15 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="rawPosition">The position of the player's cursor.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void AddPheromone(Vector2 rawPosition, GameTime gameTime, PheromoneType type) {
+        /// <param name="player">The current player id, 0 or 1.</param>
+        public void AddPheromone(Vector2 rawPosition, GameTime gameTime, PheromoneType type, int player) {
             Vector2 position = _world.AlignPositionToGridCenter(rawPosition);
             Pheromone p = new Pheromone(position, _texture, _world, 5000);
             if (type == PheromoneType.RETURN) {
-                _returnPheromones.Add(p);
+                _returnPheromones[player].Add(p);
             }
             else {
-                _pheromones.Add(p);
+                _pheromones[player].Add(p);
             }
         }
 
@@ -60,8 +61,8 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
-            _pheromones = UpdateAndRemovePheromones(_pheromones, gameTime);
-            _returnPheromones = UpdateAndRemovePheromones(_returnPheromones, gameTime);
+            UpdateAndRemovePheromones(_pheromones, gameTime);
+            UpdateAndRemovePheromones(_returnPheromones, gameTime);
         }
 
         /// <summary>
@@ -70,15 +71,17 @@ namespace TinyShopping.Game {
         /// <param name="pheromones">The pheromones to update.</param>
         /// <param name="gameTime">The current game time.</param>
         /// <returns>A List with the pheromones still relevant.</returns>
-        private List<Pheromone> UpdateAndRemovePheromones(List<Pheromone> pheromones, GameTime gameTime) {
-            List<Pheromone> relevant = new List<Pheromone>(pheromones.Count);
-            foreach (var p in pheromones) {
-                p.Update(gameTime);
-                if (p.Priority > 0) {
-                    relevant.Add(p);
+        private void UpdateAndRemovePheromones(List<Pheromone>[] pheromones, GameTime gameTime) {
+            for (int id = 0; id < pheromones.Length; ++id) {
+                List<Pheromone> relevant = new List<Pheromone>(pheromones[id].Count);
+                foreach (var p in pheromones[id]) {
+                    p.Update(gameTime);
+                    if (p.Priority > 0) {
+                        relevant.Add(p);
+                    }
                 }
+                pheromones[id] = relevant;
             }
-            return relevant;
         }
 
         /// <summary>
@@ -87,11 +90,15 @@ namespace TinyShopping.Game {
         /// <param name="batch">The batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
-            foreach (var p in _pheromones) {
-                p.Draw(batch, gameTime);
+            foreach (var ps in  _pheromones) {
+                foreach (var p in ps) {
+                    p.Draw(batch, gameTime);
+                }
             }
-            foreach (var p in _returnPheromones) {
-                p.Draw(batch, gameTime);
+            foreach (var ps in _returnPheromones) {
+                foreach (var p in ps) {
+                    p.Draw(batch, gameTime);
+                }
             }
         }
 
@@ -99,18 +106,20 @@ namespace TinyShopping.Game {
         /// Gets the direction to the highest-priority forward pheromone in range.
         /// </summary>
         /// <param name="position">The position to compare to.</param>
+        /// <param name="player">The id of the current player, 0 or 1.</param>
         /// <returns>A vector representing the direction or null if no pheromone is in range.</returns>
-        public Vector2? GetDirectionToForwardPheromone(Vector2 position) {
-            return GetDirectionToHighestPriorityPheromone(position, _pheromones);
+        public Vector2? GetDirectionToForwardPheromone(Vector2 position, int player) {
+            return GetDirectionToHighestPriorityPheromone(position, _pheromones[player]);
         }
 
         /// <summary>
         /// Gets the direction to the highest-priority return pheromone in range.
         /// </summary>
         /// <param name="position">The position to compare to.</param>
+        /// <param name="player">The id of the current palyer, 0 or 1.</param>
         /// <returns>A vector representing the direction or null if no pheromone is in range.</returns>
-        public Vector2? GetDirectionToReturnPheromone(Vector2 position) {
-            return GetDirectionToHighestPriorityPheromone(position, _returnPheromones);
+        public Vector2? GetDirectionToReturnPheromone(Vector2 position, int player) {
+            return GetDirectionToHighestPriorityPheromone(position, _returnPheromones[player]);
         }
 
         /// <summary>

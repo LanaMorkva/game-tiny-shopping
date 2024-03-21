@@ -38,6 +38,8 @@ namespace TinyShopping.Game {
 
         private Colony _colony;
 
+        private int _id;
+
         /// <summary>
         /// Creates a new player.
         /// </summary>
@@ -45,12 +47,14 @@ namespace TinyShopping.Game {
         /// <param name="handler">The pheromone handler to use.</param>
         /// <param name="input">The player input to use.</param>
         /// <param name="colony">The colony controlled by this player.</param>
-        public Player(World world, PheromoneHandler handler, PlayerInput input, Colony colony) {
+        /// <param name="id">The palyer id, 0 or 1.</param>
+        public Player(World world, PheromoneHandler handler, PlayerInput input, Colony colony, int id) {
             _world = world;
             _position = new Vector2(300, 300);
             _handler = handler;
             _input = input;
             _colony = colony;
+            _id = id;
         }
 
         /// <summary>
@@ -81,14 +85,14 @@ namespace TinyShopping.Game {
             }
             else if (_discoverPressed) {
                 _discoverPressed = false;
-                _handler.AddPheromone(_position, gameTime, PheromoneType.DISCOVER);
+                _handler.AddPheromone(_position, gameTime, PheromoneType.DISCOVER, _id);
             }
             if (_input.IsReturnPressed()) {
                 _returnPressed = true;
             }
             else if (_returnPressed) {
                 _returnPressed = false;
-                _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN);
+                _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN, _id);
             }
             if (_input.IsNewInsectPressed()) {
                 _newInsectPressed = true;
