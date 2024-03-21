@@ -22,6 +22,8 @@ namespace TinyShopping.Game {
 
         private Player _player1;
 
+        private Player _player2;
+
         private PheromoneHandler _pheromoneHandler;
 
         private UIController _ui;
@@ -44,7 +46,7 @@ namespace TinyShopping.Game {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _world.LoadContent(Content);
 
-            _colony1 = new Colony(_world.GetTopLeftOfTile(5, 0), 180, _world, _pheromoneHandler, _fruitHandler, _world.GetTopLeftOfTile(6, 4), 0);
+            _colony1 = new Colony(_world.GetTopLeftOfTile(5, 0), 180, _world, _pheromoneHandler, _fruitHandler, _world.GetTopLeftOfTile(5, 3), 0);
             _colony1.Initialize();
             _colony2 = new Colony(_world.GetTopLeftOfTile(57, 35), 270, _world, _pheromoneHandler, _fruitHandler, _world.GetTopLeftOfTile(54, 35), 1);
             _colony2.Initialize();
@@ -52,9 +54,11 @@ namespace TinyShopping.Game {
             _colony2.LoadContent(Content);
 
             PlayerInput input1 = new PlayerInput(Keys.W, Keys.S, Keys.A, Keys.D, Keys.I, Keys.J, Keys.K, PlayerIndex.Two, Buttons.Y, Buttons.A, Buttons.B);
-            _player1 = new Player(_world, _pheromoneHandler, input1, _colony1, 0);
+            _player1 = new Player(_world, _pheromoneHandler, input1, _colony1, 0, _world.GetTopLeftOfTile(5, 3));
             _player1.LoadContent(Content);
-            
+            PlayerInput input2 = new PlayerInput(PlayerIndex.One, Buttons.Y, Buttons.A, Buttons.B);
+            _player2 = new Player(_world, _pheromoneHandler, input2, _colony2, 1, _world.GetTopLeftOfTile(54, 35));
+            _player2.LoadContent(Content);
 
             _pheromoneHandler.LoadContent(Content);
             _ui.LoadContent(Content);
@@ -66,6 +70,7 @@ namespace TinyShopping.Game {
             _colony1.Update(gameTime);
             _colony2.Update(gameTime);
             _player1.Update(gameTime);
+            _player2.Update(gameTime);
             _pheromoneHandler.Update(gameTime);
             _ui.Update(gameTime);
             base.Update(gameTime);
@@ -77,6 +82,7 @@ namespace TinyShopping.Game {
             _colony1.Draw(_spriteBatch, gameTime);
             _colony2.Draw(_spriteBatch, gameTime);
             _player1.Draw(_spriteBatch, gameTime);
+            _player2.Draw(_spriteBatch, gameTime);
             _pheromoneHandler.Draw(_spriteBatch, gameTime);
             _fruitHandler.Draw(_spriteBatch, gameTime);
             _ui.Draw(_spriteBatch, gameTime);

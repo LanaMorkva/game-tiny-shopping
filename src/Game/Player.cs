@@ -48,9 +48,10 @@ namespace TinyShopping.Game {
         /// <param name="input">The player input to use.</param>
         /// <param name="colony">The colony controlled by this player.</param>
         /// <param name="id">The palyer id, 0 or 1.</param>
-        public Player(World world, PheromoneHandler handler, PlayerInput input, Colony colony, int id) {
+        /// <param name="position">The cursor starting position</param>
+        public Player(World world, PheromoneHandler handler, PlayerInput input, Colony colony, int id, Vector2 position) {
             _world = world;
-            _position = new Vector2(300, 300);
+            _position = position;
             _handler = handler;
             _input = input;
             _colony = colony;
