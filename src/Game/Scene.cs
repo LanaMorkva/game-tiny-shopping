@@ -36,8 +36,6 @@ namespace TinyShopping.Game {
             _world = new World(GraphicsDeviceManager);
             _pheromoneHandler = new PheromoneHandler(_world);
             _fruitHandler = new FruitHandler(_world);
-            PlayerInput input1 = new PlayerInput(Keys.W, Keys.S, Keys.A, Keys.D, Keys.J, Keys.K, PlayerIndex.One, Buttons.A, Buttons.B);
-            _player1 = new Player(_world, _pheromoneHandler, input1);
             _ui = new UIController();
             base.Initialize();
         }
@@ -45,13 +43,18 @@ namespace TinyShopping.Game {
         public override void LoadContent() {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _world.LoadContent(Content);
-            _colony1 = new Colony(_world.GetTopLeftOfTile(5, 0), 180, _world, _pheromoneHandler, _fruitHandler);
+
+            _colony1 = new Colony(_world.GetTopLeftOfTile(5, 0), 180, _world, _pheromoneHandler, _fruitHandler, _world.GetTopLeftOfTile(6, 4));
             _colony1.Initialize();
-            _colony2 = new Colony(_world.GetTopLeftOfTile(57, 35), 270, _world, _pheromoneHandler, _fruitHandler);
+            _colony2 = new Colony(_world.GetTopLeftOfTile(57, 35), 270, _world, _pheromoneHandler, _fruitHandler, _world.GetTopLeftOfTile(54, 35));
             _colony2.Initialize();
             _colony1.LoadContent(Content);
             _colony2.LoadContent(Content);
+
+            PlayerInput input1 = new PlayerInput(Keys.W, Keys.S, Keys.A, Keys.D, Keys.I, Keys.J, Keys.K, PlayerIndex.One, Buttons.Y, Buttons.A, Buttons.B);
+            _player1 = new Player(_world, _pheromoneHandler, input1, _colony1);
             _player1.LoadContent(Content);
+
             _pheromoneHandler.LoadContent(Content);
             _ui.LoadContent(Content);
             _fruitHandler.LoadContent(Content);

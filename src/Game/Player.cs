@@ -30,9 +30,13 @@ namespace TinyShopping.Game {
 
         private bool _returnPressed;
 
+        private bool _newInsectPressed;
+
         private PheromoneHandler _handler;
 
         private PlayerInput _input;
+
+        private Colony _colony;
 
         /// <summary>
         /// Creates a new player.
@@ -40,11 +44,13 @@ namespace TinyShopping.Game {
         /// <param name="world">The world to exist in.</param>
         /// <param name="handler">The pheromone handler to use.</param>
         /// <param name="input">The player input to use.</param>
-        public Player(World world, PheromoneHandler handler, PlayerInput input) {
+        /// <param name="colony">The colony controlled by this player.</param>
+        public Player(World world, PheromoneHandler handler, PlayerInput input, Colony colony) {
             _world = world;
             _position = new Vector2(300, 300);
             _handler = handler;
             _input = input;
+            _colony = colony;
         }
 
         /// <summary>
@@ -83,6 +89,13 @@ namespace TinyShopping.Game {
             else if (_returnPressed) {
                 _returnPressed = false;
                 _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN);
+            }
+            if (_input.IsNewInsectPressed()) {
+                _newInsectPressed = true;
+            }
+            else if (_newInsectPressed) {
+                _newInsectPressed = false;
+                _colony.BuyNewInsect();
             }
             _position.X += motion.X * (float)gameTime.ElapsedGameTime.TotalSeconds * SPEED;
             _position.Y += motion.Y * (float)gameTime.ElapsedGameTime.TotalSeconds * SPEED;

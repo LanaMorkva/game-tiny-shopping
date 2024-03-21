@@ -37,7 +37,9 @@ namespace TinyShopping.Game {
 
         private bool _isCarrying;
 
-        public Insect(World world, PheromoneHandler handler, Vector2 spawn, int spawnRotation, FruitHandler fruits, Texture2D texture, Texture2D textureFull) {
+        private Colony _colony;
+
+        public Insect(World world, PheromoneHandler handler, Vector2 spawn, int spawnRotation, FruitHandler fruits, Texture2D texture, Texture2D textureFull, Colony colony) {
             _world = world;
             _handler = handler;
             _position = new InsectPos((int)spawn.X, (int)spawn.Y, spawnRotation);
@@ -46,6 +48,7 @@ namespace TinyShopping.Game {
             _texture = texture;
             _textureFull = textureFull;
             _textureSize = (int)_world.TileSize;
+            _colony = colony;
         }
 
         /// <summary>
@@ -95,6 +98,12 @@ namespace TinyShopping.Game {
                     Walk(gameTime);
                     return;
                 }
+            }
+            // handle fruit drop off
+            if (_isCarrying && Vector2.DistanceSquared(new Vector2(_position.X, _position.Y), _colony.DropOff) < _world.TileSize*_world.TileSize) {
+                _isCarrying = false;
+                _colony.IncreaseFruitCount();
+                return;
             }
             // handle pheromones
             if (!_isCarrying) {

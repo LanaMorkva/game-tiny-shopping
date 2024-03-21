@@ -22,6 +22,8 @@ namespace TinyShopping.Game {
 
         private Keys _returnKey;
 
+        private Keys _newInsectKey;
+
         private bool _supportsKeyboard;
 
         private PlayerIndex _playerIndex;
@@ -29,6 +31,8 @@ namespace TinyShopping.Game {
         private Buttons _discoverButton;
 
         private Buttons _returnButton;
+
+        private Buttons _newInsectButton;
 
         private bool _supportsController;
 
@@ -39,13 +43,15 @@ namespace TinyShopping.Game {
         /// <param name="down">The down button to use.</param>
         /// <param name="left">The left button to use.</param>
         /// <param name="right">The right button to use.</param>
+        /// <param name="newInsectKey">The button to spawn new insects.</param>
         /// <param name="discoverPher">The button to place the discover pheromone.</param>
         /// <param name="returnPher">The button to place the return pheromone.</param>
-        public PlayerInput(Keys up, Keys down, Keys left, Keys right, Keys discoverPher, Keys returnPher) {
+        public PlayerInput(Keys up, Keys down, Keys left, Keys right, Keys newInsectKey, Keys discoverPher, Keys returnPher) {
             _up = up;
             _down = down;
             _left = left;
             _right = right;
+            _newInsectKey = newInsectKey;
             _discoverKey = discoverPher;
             _returnKey = returnPher;
             _supportsKeyboard = true;
@@ -55,10 +61,12 @@ namespace TinyShopping.Game {
         /// Creates an instance that supports controller input only.
         /// </summary>
         /// <param name="controllerIndex">The controller index.</param>
+        /// <param name="newInsectButton">The button to spawn new insects.</param>
         /// <param name="discoverPher">The button to place the discover pheromone.</param>
         /// <param name="returnPher">The button to place the return pheromone.</param>
-        public PlayerInput(PlayerIndex controllerIndex, Buttons discoverPher, Buttons returnPher) {
+        public PlayerInput(PlayerIndex controllerIndex, Buttons newInsectButton, Buttons discoverPher, Buttons returnPher) {
             _playerIndex = controllerIndex;
+            _newInsectButton = newInsectButton;
             _discoverButton = discoverPher;
             _returnButton = returnPher;
             _supportsController = true;
@@ -79,14 +87,16 @@ namespace TinyShopping.Game {
         /// <param name="playerIndex">The controller index.</param>
         /// <param name="discoverButton">The button to place the discover pheromone.</param>
         /// <param name="returnButton">The button to place the return pheromone.</param>
-        public PlayerInput(Keys up, Keys down, Keys left, Keys right, Keys discoverKey, Keys returnKey, PlayerIndex playerIndex, Buttons discoverButton, Buttons returnButton) {
+        public PlayerInput(Keys up, Keys down, Keys left, Keys right, Keys newInsectKey, Keys discoverKey, Keys returnKey, PlayerIndex playerIndex, Buttons newInsectButton, Buttons discoverButton, Buttons returnButton) {
             _up = up;
             _down = down;
             _left = left;
             _right = right;
+            _newInsectKey = newInsectKey;
             _discoverKey = discoverKey;
             _returnKey = returnKey;
             _playerIndex = playerIndex;
+            _newInsectButton = newInsectButton;
             _discoverButton = discoverButton;
             _returnButton = returnButton;
             _supportsController = true;
@@ -169,6 +179,16 @@ namespace TinyShopping.Game {
             GamePadState cState = GamePad.GetState(_playerIndex);
             KeyboardState kState = Keyboard.GetState();
             return cState.IsButtonDown(_returnButton) || kState.IsKeyDown(_returnKey);
+        }
+
+        /// <summary>
+        /// Checks if the new insect button is pressed.
+        /// </summary>
+        /// <returns>True if the button is pressed, false otherwise.</returns>
+        public bool IsNewInsectPressed() {
+            GamePadState cState = GamePad.GetState(_playerIndex);
+            KeyboardState kState = Keyboard.GetState();
+            return cState.IsButtonDown(_newInsectButton) || kState.IsKeyDown(_newInsectKey);
         }
     }
 }

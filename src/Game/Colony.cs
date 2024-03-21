@@ -32,6 +32,10 @@ namespace TinyShopping.Game {
 
         private int _spawnCooldown;
 
+        public Vector2 DropOff { get; private set; }
+
+        private int _collectedFruit;
+
         /// <summary>
         /// Creates a new colony.
         /// </summary>
@@ -40,13 +44,15 @@ namespace TinyShopping.Game {
         /// <param name="world">The world to live in.</param>
         /// <param name="handler">The pheromone handler to use.</param>
         /// <param name="fruits">The fruit handler to use.</param>
-        public Colony(Vector2 spawn, int spawnRotation, World world, PheromoneHandler handler, FruitHandler fruits) {
+        /// <param name="dropOff">The position the ants can drop off fruit.</param>
+        public Colony(Vector2 spawn, int spawnRotation, World world, PheromoneHandler handler, FruitHandler fruits, Vector2 dropOff) {
             _spawn = spawn;
             _world = world;
             _handler = handler;
             _fruits = fruits;
             _spawnRotation = spawnRotation;
             _queue = 6;
+            DropOff = dropOff;
         }
 
         /// <summary>
@@ -73,7 +79,7 @@ namespace TinyShopping.Game {
             if (_spawnCooldown < 0 && _queue > 0) {
                 _spawnCooldown = 1000;
                 _queue -= 1;
-                Insect ant = new Insect(_world, _handler, _spawn, _spawnRotation, _fruits, _antTexture, _antFullTexture);
+                Insect ant = new Insect(_world, _handler, _spawn, _spawnRotation, _fruits, _antTexture, _antFullTexture, this);
                 _insects.Add(ant);
             }
             foreach (Insect insect in _insects) {
@@ -90,6 +96,24 @@ namespace TinyShopping.Game {
             foreach (Insect insect in _insects) {
                 insect.Draw(spriteBatch, gameTime);
             }
+        }
+
+        /// <summary>
+        /// Reprots one more collected fruit.
+        /// </summary>
+        public void IncreaseFruitCount() {
+            _collectedFruit += 1;
+        }
+
+        /// <summary>
+        /// Trades a collected fruit for a new insect.
+        /// </summary>
+        public void BuyNewInsect() {
+            if (_collectedFruit <= 0) {
+                return;
+            }
+            _collectedFruit -= 1;
+            _queue += 1;
         }
     }
 }
