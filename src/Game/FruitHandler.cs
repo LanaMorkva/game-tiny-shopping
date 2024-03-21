@@ -30,7 +30,7 @@ namespace TinyShopping.Game {
         /// <param name="contentManager">The content manager to use.</param>
         public void LoadContent(ContentManager content) {
             _appleTexture = content.Load<Texture2D>("apple");
-            for (int i = 0; i < 30; i++) {
+            for (int i = 0; i < 50; i++) {
                 int tileX = Random.Shared.Next(World.NUM_OF_SQUARES_WIDTH);
                 int tileY = Random.Shared.Next(World.NUM_OF_SQUARES_WIDTH);
                 Vector2 center = _world.GetCenterOfTile(tileX, tileY);

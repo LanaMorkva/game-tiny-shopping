@@ -167,6 +167,9 @@ namespace TinyShopping.Game {
                 _position.Rotate((float)gameTime.ElapsedGameTime.TotalSeconds * ROTATION_SPEED);
                 _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * SPEED / 3);
             }
+            else if (_isCarrying) {
+                _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * SPEED * 3/5);
+            }
             else {
                 _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * SPEED);
             }
