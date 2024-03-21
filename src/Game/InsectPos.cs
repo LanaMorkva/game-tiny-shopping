@@ -68,8 +68,11 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="x">The initial x coordinate.</param>
         /// <param name="y">The initial y coordinate.</param>
-        public InsectPos(int x, int y) {
+        /// <param name="rotation">The initial rotation</param>
+        public InsectPos(int x, int y, int rotation) {
             _position = new Vector2(x, y);
+            _rotation = rotation;
+            TargetRotation = rotation;
             Rotate(0);
         }
 

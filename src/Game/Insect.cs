@@ -33,20 +33,16 @@ namespace TinyShopping.Game {
 
         private FruitHandler _fruits;
 
+        private bool _isSpawning;
+
         private bool _isCarrying;
 
-        public Insect(World world, PheromoneHandler handler, Vector2 spawn, FruitHandler fruits) {
+        public Insect(World world, PheromoneHandler handler, Vector2 spawn, int spawnRotation, FruitHandler fruits, Texture2D texture, Texture2D textureFull) {
             _world = world;
             _handler = handler;
-            _position = new InsectPos((int)spawn.X, (int)spawn.Y);
+            _position = new InsectPos((int)spawn.X, (int)spawn.Y, spawnRotation);
             _fruits = fruits;
-        }
-
-        /// <summary>
-        /// Loads necessary data from disk.
-        /// </summary>
-        /// <param name="contentManager">The content manager of the main game.</param>
-        public void LoadContent(ContentManager contentManager, Texture2D texture, Texture2D textureFull) {
+            _isSpawning = true;
             _texture = texture;
             _textureFull = textureFull;
             _textureSize = (int)_world.TileSize;
@@ -68,6 +64,14 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
+            // handle spawning
+            if (_isSpawning) {
+                if (_world.IsWalkable(_position.X, _position.Y, _textureSize / 2)) {
+                    _isSpawning = false;
+                }
+                Walk(gameTime);
+                return;
+            }
             // handle collision
             if (_isRecovering) {
                 RecoverCollision(gameTime);
@@ -122,7 +126,7 @@ namespace TinyShopping.Game {
             if (!_position.IsTurning) {
                 _isRecovering = false;
             }
-            if (!_world.IsWalkable(_position.X, _position.Y, _textureSize)) {
+            if (!_world.IsWalkable(_position.X, _position.Y, _textureSize/2)) {
                 _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * -SPEED);
             }
             else {

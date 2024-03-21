@@ -31,9 +31,15 @@ namespace TinyShopping.Game {
         private Texture2D _obstacleTexture;
 #endif
 
+        private float _tileSize;
+
         public float TileSize {
-            get;
-            private set;
+            get {
+                if (_tileSize == 0) {
+                    throw new Exception("Tile size is not yet known, call LoadContent first!");
+                }
+                return _tileSize;
+            }
         }
 
         public World(GraphicsDeviceManager device) {
@@ -46,8 +52,8 @@ namespace TinyShopping.Game {
         /// <param name="contentManager">The content manager of the main game.</param>
         public void LoadContent(ContentManager contentManager) {
             _worldTexture = contentManager.Load<Texture2D>("static_map");
-            this.CalculateWorldPosition();
-            this.CreateCollisionAreas();
+            CalculateWorldPosition();
+            CreateCollisionAreas();
 #if DEBUG
             _obstacleTexture = contentManager.Load<Texture2D>("obstacle");
 #endif
@@ -78,10 +84,10 @@ namespace TinyShopping.Game {
             _screen = new Vector2(_device.PreferredBackBufferWidth, _device.PreferredBackBufferHeight);
             float ratio;
             if (_worldTexture.Height / _screen.Y > _worldTexture.Width / _screen.X) {
-                ratio = _screen.Y / (float)_worldTexture.Height;
+                ratio = _screen.Y / _worldTexture.Height;
             }
             else {
-                ratio = _screen.X / (float)_worldTexture.Width;
+                ratio = _screen.X / _worldTexture.Width;
             }
             int worldWidth = (int)(_worldTexture.Width * ratio);
             int worldHeight = (int)(_worldTexture.Height * ratio);
@@ -89,7 +95,7 @@ namespace TinyShopping.Game {
             int yOffset = (int)((_screen.Y - worldHeight) / 2.0);
             _offset = new Vector2(xOffset, yOffset);
             _worldPosition = new Rectangle(xOffset, yOffset, worldWidth, worldHeight);
-            TileSize = _worldPosition.Width / (float)NUM_OF_SQUARES_WIDTH;
+            _tileSize = _worldPosition.Width / (float)NUM_OF_SQUARES_WIDTH;
         }
 
         /// <summary>
@@ -101,6 +107,8 @@ namespace TinyShopping.Game {
                 new Rectangle(0, 0, NUM_OF_SQUARES_WIDTH, 2), // top wall
                 new Rectangle(NUM_OF_SQUARES_WIDTH-1, 0, 1, NUM_OF_SQUARES_HEIGHT), // right wall
                 new Rectangle(0, NUM_OF_SQUARES_HEIGHT-1, NUM_OF_SQUARES_WIDTH, 1), // bottom wall
+                new Rectangle(4, 0, 2, 3), // top counter
+                new Rectangle(NUM_OF_SQUARES_WIDTH-3, NUM_OF_SQUARES_HEIGHT-6, 3, 2), // bottom counter
                 new Rectangle(18, 0, 2, 11),
                 new Rectangle(0, 15, 18, 3),
                 new Rectangle(11, 18, 2, 8),
@@ -157,7 +165,17 @@ namespace TinyShopping.Game {
         /// <param name="tileY">Y coordinate of the tile.</param>
         /// <returns>The center of the tile in screen pixel coordinates.</returns>
         public Vector2 GetCenterOfTile(int tileX, int tileY) {
-            return new Vector2(_offset.X + TileSize*tileX + TileSize/2, _offset.Y + TileSize*tileY + TileSize/2);
+            return new Vector2(_offset.X + TileSize * tileX + TileSize / 2, _offset.Y + TileSize * tileY + TileSize / 2);
+        }
+
+        /// <summary>
+        /// Calculates the top left of the given tile.
+        /// </summary>
+        /// <param name="tileX">X coordinate of the tile.</param>
+        /// <param name="tileY">Y coordinate of the tile.</param>
+        /// <returns>The top left position of the given tile.</returns>
+        public Vector2 GetTopLeftOfTile(int tileX, int tileY) {
+            return new Vector2(_offset.X + TileSize * tileX, _offset.Y + TileSize * tileY);
         }
     }
 }
