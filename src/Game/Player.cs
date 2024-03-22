@@ -26,9 +26,9 @@ namespace TinyShopping.Game {
 
         private Texture2D _texture;
 
-        private bool _discoverPressed;
+        private int _discoverPressed;
 
-        private bool _returnPressed;
+        private int _returnPressed;
 
         private bool _newInsectPressed;
 
@@ -82,18 +82,18 @@ namespace TinyShopping.Game {
         public void Update(GameTime gameTime) {
             Vector2 motion = _input.GetMotion();
             if (_input.IsDiscoverPressed()) {
-                _discoverPressed = true;
+                _discoverPressed += (int) Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
             }
-            else if (_discoverPressed) {
-                _discoverPressed = false;
-                _handler.AddPheromone(_position, gameTime, PheromoneType.DISCOVER, _id);
+            else if (_discoverPressed > 0) {
+                _handler.AddPheromone(_position, gameTime, PheromoneType.DISCOVER, _id, 5000 + _discoverPressed * 2);
+                _discoverPressed = 0;
             }
             if (_input.IsReturnPressed()) {
-                _returnPressed = true;
+                _returnPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds); ;
             }
-            else if (_returnPressed) {
-                _returnPressed = false;
-                _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN, _id);
+            else if (_returnPressed > 0) {
+                _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN, _id, 5000 + _returnPressed * 2);
+                _returnPressed = 0;
             }
             if (_input.IsNewInsectPressed()) {
                 _newInsectPressed = true;

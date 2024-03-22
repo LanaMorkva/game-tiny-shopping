@@ -17,6 +17,8 @@ namespace TinyShopping.Game {
 
         private Texture2D _texture;
 
+        private SpriteFont _font;
+
         private List<Pheromone>[] _pheromones;
 
         private List<Pheromone>[] _returnPheromones;
@@ -37,6 +39,7 @@ namespace TinyShopping.Game {
         /// <param name="contentManager">The content manager to use.</param>
         public void LoadContent(ContentManager contentManager) {
             _texture = contentManager.Load<Texture2D>("circle");
+            _font = contentManager.Load<SpriteFont>("arial");
         }
 
         /// <summary>
@@ -44,10 +47,12 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="rawPosition">The position of the player's cursor.</param>
         /// <param name="gameTime">The current game time.</param>
+        /// <param name="type">The pheromone type to place.</param>
         /// <param name="player">The current player id, 0 or 1.</param>
-        public void AddPheromone(Vector2 rawPosition, GameTime gameTime, PheromoneType type, int player) {
+        /// <param name="priority">The priority of the pheromone, given in miliseconds.</param>
+        public void AddPheromone(Vector2 rawPosition, GameTime gameTime, PheromoneType type, int player, int priority) {
             Vector2 position = _world.AlignPositionToGridCenter(rawPosition);
-            Pheromone p = new Pheromone(position, _texture, _world, 5000);
+            Pheromone p = new Pheromone(position, _texture, _font, _world, priority);
             if (type == PheromoneType.RETURN) {
                 _returnPheromones[player].Add(p);
             }
