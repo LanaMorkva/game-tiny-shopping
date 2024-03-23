@@ -8,139 +8,112 @@ using System.Threading.Tasks;
 
 namespace TinyShopping.Game {
 
-    internal class PlayerInput {
+    internal abstract class PlayerInput {
 
-        private Keys _up;
-
-        private Keys _down;
-
-        private Keys _left;
-
-        private Keys _right;
-
-        private Keys _discoverKey;
-
-        private Keys _returnKey;
-
-        private Keys _newInsectKey;
-
-        private bool _supportsKeyboard;
-
-        private PlayerIndex _playerIndex;
-
-        private Buttons _discoverButton;
-
-        private Buttons _returnButton;
-
-        private Buttons _newInsectButton;
-
-        private bool _supportsController;
-
-        /// <summary>
-        /// Creates an instance that supports keyboard input only.
-        /// </summary>
-        /// <param name="up">The up button to use.</param>
-        /// <param name="down">The down button to use.</param>
-        /// <param name="left">The left button to use.</param>
-        /// <param name="right">The right button to use.</param>
-        /// <param name="newInsectKey">The button to spawn new insects.</param>
-        /// <param name="discoverPher">The button to place the discover pheromone.</param>
-        /// <param name="returnPher">The button to place the return pheromone.</param>
-        public PlayerInput(Keys up, Keys down, Keys left, Keys right, Keys newInsectKey, Keys discoverPher, Keys returnPher) {
-            _up = up;
-            _down = down;
-            _left = left;
-            _right = right;
-            _newInsectKey = newInsectKey;
-            _discoverKey = discoverPher;
-            _returnKey = returnPher;
-            _supportsKeyboard = true;
-        }
-
-        /// <summary>
-        /// Creates an instance that supports controller input only.
-        /// </summary>
-        /// <param name="controllerIndex">The controller index.</param>
-        /// <param name="newInsectButton">The button to spawn new insects.</param>
-        /// <param name="discoverPher">The button to place the discover pheromone.</param>
-        /// <param name="returnPher">The button to place the return pheromone.</param>
-        public PlayerInput(PlayerIndex controllerIndex, Buttons newInsectButton, Buttons discoverPher, Buttons returnPher) {
-            _playerIndex = controllerIndex;
-            _newInsectButton = newInsectButton;
-            _discoverButton = discoverPher;
-            _returnButton = returnPher;
-            _supportsController = true;
-        }
-
-        /// <summary>
-        /// Creates an instance that supports keyboard and controller input.
-        /// </summary>
-        /// <param name="up">The up button to use.</param>
-        /// <param name="down">The down button to use.</param>
-        /// <param name="left">The left button to use.</param>
-        /// <param name="right">The right button to use.</param>
-        /// <param name="discoverKey">The button to place the discover pheromone.</param>
-        /// <param name="returnKey">The button to place the return pheromone.</param>
-        /// <param name="playerIndex"></param>
-        /// <param name="discoverButton"></param>
-        /// <param name="returnButton"></param>
-        /// <param name="playerIndex">The controller index.</param>
-        /// <param name="discoverButton">The button to place the discover pheromone.</param>
-        /// <param name="returnButton">The button to place the return pheromone.</param>
-        public PlayerInput(Keys up, Keys down, Keys left, Keys right, Keys newInsectKey, Keys discoverKey, Keys returnKey, PlayerIndex playerIndex, Buttons newInsectButton, Buttons discoverButton, Buttons returnButton) {
-            _up = up;
-            _down = down;
-            _left = left;
-            _right = right;
-            _newInsectKey = newInsectKey;
-            _discoverKey = discoverKey;
-            _returnKey = returnKey;
-            _playerIndex = playerIndex;
-            _newInsectButton = newInsectButton;
-            _discoverButton = discoverButton;
-            _returnButton = returnButton;
-            _supportsController = true;
-            _supportsKeyboard = true;
-        }
+        protected PlayerIndex _playerIndex;
 
         /// <summary>
         /// Reads the desired player motion from the input.
         /// </summary>
         /// <returns>A Vector2 of motion input.</returns>
         /// <exception cref="Exception">Thrown if no input was received.</exception>
-        public Vector2 GetMotion() {
-            Vector2? motion = null;
-            if (_supportsController) {
-                motion = GetControllerMotion();
-            }
-            if ((motion == null || motion.Value.LengthSquared() == 0) && _supportsKeyboard) {
-                motion = GetKeyboardMotion();
-            }
-            if (motion == null) {
-                throw new Exception("Unable to read player input, no available input methods left!");
-            }
-            return motion.Value;
-        }
+        public abstract Vector2 GetMotion();
 
         /// <summary>
-        /// Reads the motion from the controller.
+        /// Checks if the discover pheromone button is pressed.
         /// </summary>
-        /// <returns>A Vector2 with the current motion direction.</returns>
-        private Vector2? GetControllerMotion() {
+        /// <returns>True if the button is pressed, false otherwise.</returns>
+        public abstract bool IsDiscoverPressed();
+
+        /// <summary>
+        /// Checks if the return pheromone button is pressed.
+        /// </summary>
+        /// <returns>True if the button is pressed, false otherwise.</returns>
+        public abstract bool IsReturnPressed();
+
+        /// <summary>
+        /// Checks if the new insect button is pressed.
+        /// </summary>
+        /// <returns>True if the button is pressed, false otherwise.</returns>
+        public abstract bool IsNewInsectPressed();
+    }
+
+    internal class GamePadInput : PlayerInput {
+
+        private Buttons _discoverButton = Buttons.A;
+
+        private Buttons _returnButton = Buttons.B;
+
+        private Buttons _newInsectButton = Buttons.Y;
+
+        public GamePadInput(PlayerIndex playerIndex) {
+            _playerIndex = playerIndex;
+        }
+
+        public override Vector2 GetMotion() {
             GamePadState state = GamePad.GetState(_playerIndex);
             if (!state.IsConnected) {
-                return null;
+                throw new Exception("Unable to read player input, no available input methods left!");
             }
             Vector2 motion = state.ThumbSticks.Left;
             motion.Y *= -1;
             return motion;
         }
 
-        /// <summary>
-        /// Reads the motion from the keyboard.
-        /// </summary>
-        /// <returns>A Vector2 with the current motion direction.</returns>
-        private Vector2 GetKeyboardMotion() {
+        public override bool IsDiscoverPressed()
+        {
+            GamePadState cState = GamePad.GetState(_playerIndex);
+            return cState.IsButtonDown(_discoverButton);
+        }
+
+        public override bool IsReturnPressed()
+        {
+            GamePadState cState = GamePad.GetState(_playerIndex);
+            return cState.IsButtonDown(_returnButton);
+        }
+
+        public override bool IsNewInsectPressed()
+        {
+            GamePadState cState = GamePad.GetState(_playerIndex);
+            return cState.IsButtonDown(_newInsectButton);
+        }
+    }
+
+    internal class KeyboardInput : PlayerInput {
+
+        private Keys _up = Keys.W;
+
+        private Keys _down = Keys.S;
+
+        private Keys _left = Keys.A;
+
+        private Keys _right = Keys.D;
+
+        private Keys _discoverKey = Keys.D1;
+
+        private Keys _returnKey = Keys.D2;
+
+        private Keys _newInsectKey = Keys.D3;
+
+        public KeyboardInput(PlayerIndex playerIndex)
+        {
+            if (playerIndex < 0 || playerIndex > PlayerIndex.Two) {
+                throw new Exception("Invalid player index, maximum 2 players are allowed");
+            }
+            if (playerIndex == PlayerIndex.Two) {
+                _up = Keys.I;
+                _down = Keys.K;
+                _left = Keys.J;
+                _right = Keys.L;
+                _discoverKey = Keys.D7;
+                _returnKey = Keys.D8;
+                _newInsectKey = Keys.D9;
+            }
+            _playerIndex = playerIndex;
+        }
+
+
+        public override Vector2 GetMotion() {
             KeyboardState state = Keyboard.GetState();
             Vector2 motion = new Vector2(0, 0);
             if (state.IsKeyDown(_left)) {
@@ -161,34 +134,19 @@ namespace TinyShopping.Game {
             return motion;
         }
 
-        /// <summary>
-        /// Checks if the discover pheromone button is pressed.
-        /// </summary>
-        /// <returns>True if the button is pressed, false otherwise.</returns>
-        public bool IsDiscoverPressed() {
-            GamePadState cState = GamePad.GetState(_playerIndex);
+        public override bool IsDiscoverPressed() {
             KeyboardState kState = Keyboard.GetState();
-            return cState.IsButtonDown(_discoverButton) || kState.IsKeyDown(_discoverKey);
+            return kState.IsKeyDown(_discoverKey);
+        }
+        
+        public override bool IsReturnPressed() {
+            KeyboardState kState = Keyboard.GetState();
+            return kState.IsKeyDown(_returnKey);
         }
 
-        /// <summary>
-        /// Checks if the return pheromone button is pressed.
-        /// </summary>
-        /// <returns>True if the button is pressed, false otherwise.</returns>
-        public bool IsReturnPressed() {
-            GamePadState cState = GamePad.GetState(_playerIndex);
+        public override bool IsNewInsectPressed() {
             KeyboardState kState = Keyboard.GetState();
-            return cState.IsButtonDown(_returnButton) || kState.IsKeyDown(_returnKey);
-        }
-
-        /// <summary>
-        /// Checks if the new insect button is pressed.
-        /// </summary>
-        /// <returns>True if the button is pressed, false otherwise.</returns>
-        public bool IsNewInsectPressed() {
-            GamePadState cState = GamePad.GetState(_playerIndex);
-            KeyboardState kState = Keyboard.GetState();
-            return cState.IsButtonDown(_newInsectButton) || kState.IsKeyDown(_newInsectKey);
+            return kState.IsKeyDown(_newInsectKey);
         }
     }
 }
