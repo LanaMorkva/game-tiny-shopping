@@ -53,10 +53,11 @@ namespace TinyShopping.Game {
             _colony1.LoadContent(Content);
             _colony2.LoadContent(Content);
 
-            PlayerInput input1 = new PlayerInput(Keys.W, Keys.S, Keys.A, Keys.D, Keys.I, Keys.J, Keys.K, PlayerIndex.Two, Buttons.Y, Buttons.A, Buttons.B);
+            PlayerInput input1 = createPlayerInput(PlayerIndex.One);
             _player1 = new Player(_world, _pheromoneHandler, input1, _colony1, 0, _world.GetTopLeftOfTile(5, 3));
             _player1.LoadContent(Content);
-            PlayerInput input2 = new PlayerInput(PlayerIndex.One, Buttons.Y, Buttons.A, Buttons.B);
+
+            PlayerInput input2 = createPlayerInput(PlayerIndex.Two);
             _player2 = new Player(_world, _pheromoneHandler, input2, _colony2, 1, _world.GetTopLeftOfTile(54, 35));
             _player2.LoadContent(Content);
 
@@ -89,6 +90,15 @@ namespace TinyShopping.Game {
 
             _spriteBatch.End();
             base.Draw(gameTime);
+        }
+
+        private PlayerInput createPlayerInput(PlayerIndex playerIndex) {
+            GamePadState state = GamePad.GetState(playerIndex);
+            if (state.IsConnected) {
+                return new GamePadInput(playerIndex);
+            } 
+            return new KeyboardInput(playerIndex);
+
         }
     }
 }
