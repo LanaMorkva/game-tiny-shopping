@@ -2,10 +2,6 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TinyShopping.Game {
 
@@ -15,17 +11,15 @@ namespace TinyShopping.Game {
 
         public static int NUM_OF_SQUARES_HEIGHT = 40;
 
-        private GraphicsDeviceManager _device;
-
         private Texture2D _worldTexture;
 
-        private Rectangle _worldPosition;
+        private Rectangle _worldRegion;
 
         private Vector2 _offset;
 
-        private Vector2 _screen;
-
         private Rectangle[] _obstacles;
+
+        public Rectangle WorldRegion => _worldRegion;
 
 #if DEBUG
         private Texture2D _obstacleTexture;
@@ -42,21 +36,20 @@ namespace TinyShopping.Game {
             }
         }
 
-        public World(GraphicsDeviceManager device) {
-            _device = device;
-        }
-
         /// <summary>
         /// Loads necessary data from disk.
         /// </summary>
         /// <param name="contentManager">The content manager of the main game.</param>
         public void LoadContent(ContentManager contentManager) {
             _worldTexture = contentManager.Load<Texture2D>("static_map");
-            CalculateWorldPosition();
-            CreateCollisionAreas();
 #if DEBUG
             _obstacleTexture = contentManager.Load<Texture2D>("obstacle");
 #endif
+        }
+
+        public void createWorld(Rectangle boundaries) {
+            CalculateWorldPosition(boundaries);
+            CreateCollisionAreas();
         }
 
         /// <summary>
@@ -65,7 +58,7 @@ namespace TinyShopping.Game {
         /// <param name="batch">The batch to draw to.</param>
         /// <param name="gameTime">The current time information.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
-            batch.Draw(_worldTexture, _worldPosition, Color.White);
+            batch.Draw(_worldTexture, _worldRegion, Color.White);
 #if DEBUG
             foreach (var o in _obstacles) {
                 float x = o.X * TileSize + _offset.X;
@@ -80,22 +73,21 @@ namespace TinyShopping.Game {
         /// <summary>
         /// Calculates the position and size of the map such that it is fully on screen.
         /// </summary>
-        private void CalculateWorldPosition() {
-            _screen = new Vector2(_device.PreferredBackBufferWidth, _device.PreferredBackBufferHeight);
+        private void CalculateWorldPosition(Rectangle boundaries) {
             float ratio;
-            if (_worldTexture.Height / _screen.Y > _worldTexture.Width / _screen.X) {
-                ratio = _screen.Y / _worldTexture.Height;
+            if ((float)_worldTexture.Height / boundaries.Height > (float)_worldTexture.Width / boundaries.Width) {
+                ratio = (float)boundaries.Height / _worldTexture.Height;
             }
             else {
-                ratio = _screen.X / _worldTexture.Width;
+                ratio = (float)boundaries.Width / _worldTexture.Width;
             }
             int worldWidth = (int)(_worldTexture.Width * ratio);
             int worldHeight = (int)(_worldTexture.Height * ratio);
-            int xOffset = (int)((_screen.X - worldWidth) / 2.0);
-            int yOffset = (int)((_screen.Y - worldHeight) / 2.0);
+            int xOffset = (int)((boundaries.Width - worldWidth) / 2.0);
+            int yOffset = (int)((boundaries.Height - worldHeight) / 2.0) + boundaries.Y;
             _offset = new Vector2(xOffset, yOffset);
-            _worldPosition = new Rectangle(xOffset, yOffset, worldWidth, worldHeight);
-            _tileSize = _worldPosition.Width / (float)NUM_OF_SQUARES_WIDTH;
+            _worldRegion = new Rectangle(xOffset, yOffset, worldWidth, worldHeight);
+            _tileSize = _worldRegion.Width / (float)NUM_OF_SQUARES_WIDTH;
         }
 
         /// <summary>

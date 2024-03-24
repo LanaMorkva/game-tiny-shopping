@@ -3,10 +3,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TinyShopping.Game {
 
@@ -37,6 +33,11 @@ namespace TinyShopping.Game {
         private int _collectedFruit;
 
         private int _owner;
+
+        public int FruitsNum => _collectedFruit;
+
+        public int AntsNum => _insects.Count;
+
 
         /// <summary>
         /// Creates a new colony.
