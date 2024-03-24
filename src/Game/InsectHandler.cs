@@ -15,6 +15,8 @@ namespace TinyShopping.Game {
     /// </summary>
     internal class InsectHandler {
 
+        private readonly static int ENEMY_VISIBILITY_RANGE = 2;
+
         private World _world;
 
         private PheromoneHandler _pheromoneHandler;
@@ -40,10 +42,10 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager to use.</param>
         public void LoadContent(ContentManager content) {
-            Colony colony1 = new Colony(_world.GetTopLeftOfTile(5, 0), 180, _world, _pheromoneHandler, _fruitHandler, _world.GetTopLeftOfTile(5, 3), 0);
+            Colony colony1 = new Colony(_world.GetTopLeftOfTile(5, 0), 180, _world, _pheromoneHandler, _fruitHandler, _world.GetTopLeftOfTile(5, 3), 0, this);
             colony1.Initialize();
             colony1.LoadContent(content);
-            Colony colony2 = new Colony(_world.GetTopLeftOfTile(57, 35), 270, _world, _pheromoneHandler, _fruitHandler, _world.GetTopLeftOfTile(54, 35), 1);
+            Colony colony2 = new Colony(_world.GetTopLeftOfTile(57, 35), 270, _world, _pheromoneHandler, _fruitHandler, _world.GetTopLeftOfTile(54, 35), 1, this);
             colony2.Initialize();
             colony2.LoadContent(content);
             _colonies = new Colony[] { colony1, colony2 };
@@ -76,6 +78,36 @@ namespace TinyShopping.Game {
         /// <param name="player">The id of the player performing the action.</param>
         public void BuyNewInsect(int player) {
             _colonies[player].BuyNewInsect();
+        }
+
+        /// <summary>
+        /// Returns the closest enemy insect.
+        /// </summary>
+        /// <param name="player">The current player requesting an enemy ant.</param>
+        /// <param name="position">The position to compare to.</param>
+        /// <returns>An instance of an enemy insect or null if none is in range.</returns>
+        public Insect GetClosestEnemy(int player, Vector2 position) {
+            int enemyIndex = 1 - player;
+            Colony c = _colonies[enemyIndex];
+            float range = _world.TileSize * ENEMY_VISIBILITY_RANGE;
+            return c.GetClosestToInRange(position, range);            
+        }
+
+        /// <summary>
+        /// Returns the drop off position for the given player.
+        /// </summary>
+        /// <param name="player">The player id.</param>
+        /// <returns>The position of the drop off position.</returns>
+        public Vector2 GetDropOff(int player) {
+            return _colonies[player].DropOff;
+        }
+
+        /// <summary>
+        /// Increases the given players fruit count.
+        /// </summary>
+        /// <param name="player">The player id.</param>
+        public void IncreaseFruitCount(int player) {
+            _colonies[player].IncreaseFruitCount();
         }
     }
 }

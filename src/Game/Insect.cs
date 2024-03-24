@@ -15,6 +15,10 @@ namespace TinyShopping.Game {
 
         private static readonly int ROTATION_SPEED = 100;
 
+        private static readonly int FIGHT_RANGE = 1;
+
+        private static readonly int DAMAGE = 2;
+
         private readonly World _world;
 
         private Texture2D _texture;
@@ -41,6 +45,14 @@ namespace TinyShopping.Game {
 
         private int _owner;
 
+        public Vector2 Position {
+            get {
+                return _position.Position;
+            }
+        }
+
+        public int Health { private set; get; }
+
         public Insect(World world, PheromoneHandler handler, Vector2 spawn, int spawnRotation, FruitHandler fruits, Texture2D texture, Texture2D textureFull, Colony colony, int owner) {
             _world = world;
             _handler = handler;
@@ -52,6 +64,7 @@ namespace TinyShopping.Game {
             _textureSize = (int)_world.TileSize;
             _colony = colony;
             _owner = owner;
+            Health = 100;
         }
 
         /// <summary>
@@ -90,7 +103,7 @@ namespace TinyShopping.Game {
             }
             // handle close-by fruit
             if (!_isCarrying) {
-                Vector2? dir = _fruits.GetDirectionToClosestFruit(new Vector2(_position.X, _position.Y), out Fruit closestFruit);
+                Vector2? dir = _fruits.GetDirectionToClosestFruit(_position.Position, out Fruit closestFruit);
                 if (dir != null && dir.Value.LengthSquared() <= (_world.TileSize * _world.TileSize) / 4) {
                     _isCarrying = true;
                     _fruits.RemoveFruit(closestFruit);
@@ -103,24 +116,35 @@ namespace TinyShopping.Game {
                 }
             }
             // handle fruit drop off
-            if (_isCarrying && Vector2.DistanceSquared(new Vector2(_position.X, _position.Y), _colony.DropOff) < _world.TileSize*_world.TileSize) {
+            if (_isCarrying && Vector2.DistanceSquared(_position.Position, _colony.DropOff) < _world.TileSize*_world.TileSize) {
                 _isCarrying = false;
                 _colony.IncreaseFruitCount();
                 return;
             }
             // handle pheromones
             if (!_isCarrying) {
-                Vector2? dir = _handler.GetDirectionToForwardPheromone(new Vector2(_position.X, _position.Y), _owner);
-                if (dir != null) {
-                    _position.TargetDirection = dir.Value;
+                Pheromone p = _handler.GetForwardPheromone(_position.Position, _owner);
+                if (p != null) {
+                    Vector2 direction = p.Position - _position.Position;
+                    if (p.Type == PheromoneType.FIGHT) {
+                        Insect enemy = _colony.GetClosestEnemy(_position.Position);
+                        if (enemy != null) {
+                            direction = enemy.Position - _position.Position;
+                            float fightRange = _world.TileSize * FIGHT_RANGE;
+                            if (Vector2.DistanceSquared(enemy.Position, _position.Position) < fightRange * fightRange) {
+                                enemy.TakeDamage(DAMAGE);
+                            }
+                        }
+                    }
+                    _position.TargetDirection = direction;
                     Walk(gameTime);
                     return;
                 }
             }
             else {
-                Vector2? dir = _handler.GetDirectionToReturnPheromone(new Vector2(_position.X, _position.Y), _owner);
-                if (dir != null) {
-                    _position.TargetDirection = dir.Value;
+                Pheromone p = _handler.GetReturnPheromone(_position.Position, _owner);
+                if (p != null) {
+                    _position.TargetDirection = p.Position - _position.Position;
                     Walk(gameTime);
                     return;
                 }
@@ -173,6 +197,14 @@ namespace TinyShopping.Game {
             else {
                 _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * SPEED);
             }
+        }
+
+        /// <summary>
+        /// Reduces the insect's health.
+        /// </summary>
+        /// <param name="damage">The damage to take.</param>
+        public void TakeDamage(int damage) {
+            Health -= damage;
         }
     }
 }

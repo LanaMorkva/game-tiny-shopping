@@ -52,7 +52,7 @@ namespace TinyShopping.Game {
         /// <param name="priority">The priority of the pheromone, given in miliseconds.</param>
         public void AddPheromone(Vector2 rawPosition, GameTime gameTime, PheromoneType type, int player, int priority) {
             Vector2 position = _world.AlignPositionToGridCenter(rawPosition);
-            Pheromone p = new Pheromone(position, _texture, _font, _world, priority);
+            Pheromone p = new Pheromone(position, _texture, _font, _world, priority, type);
             if (type == PheromoneType.RETURN) {
                 _returnPheromones[player].Add(p);
             }
@@ -108,23 +108,23 @@ namespace TinyShopping.Game {
         }
 
         /// <summary>
-        /// Gets the direction to the highest-priority forward pheromone in range.
+        /// Gets the highest-priority forward pheromone in range.
         /// </summary>
         /// <param name="position">The position to compare to.</param>
         /// <param name="player">The id of the current player, 0 or 1.</param>
-        /// <returns>A vector representing the direction or null if no pheromone is in range.</returns>
-        public Vector2? GetDirectionToForwardPheromone(Vector2 position, int player) {
-            return GetDirectionToHighestPriorityPheromone(position, _pheromones[player]);
+        /// <returns>The pheromone instance or null if no pheromone is in range.</returns>
+        public Pheromone GetForwardPheromone(Vector2 position, int player) {
+            return GetHighestPriorityPheromone(position, _pheromones[player]);
         }
 
         /// <summary>
-        /// Gets the direction to the highest-priority return pheromone in range.
+        /// Gets the highest-priority return pheromone in range.
         /// </summary>
         /// <param name="position">The position to compare to.</param>
         /// <param name="player">The id of the current palyer, 0 or 1.</param>
-        /// <returns>A vector representing the direction or null if no pheromone is in range.</returns>
-        public Vector2? GetDirectionToReturnPheromone(Vector2 position, int player) {
-            return GetDirectionToHighestPriorityPheromone(position, _returnPheromones[player]);
+        /// <returns>The pheromone instance or null if no pheromone is in range.</returns>
+        public Pheromone GetReturnPheromone(Vector2 position, int player) {
+            return GetHighestPriorityPheromone(position, _returnPheromones[player]);
         }
 
         /// <summary>
@@ -132,8 +132,8 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="position">The position of the insect to consider.</param>
         /// <param name="pheromones">The pheromones to search through.</param>
-        /// <returns>Vector to the highest-priority pheromone in the list within range of the insect position.</returns>
-        private Vector2? GetDirectionToHighestPriorityPheromone(Vector2 position, List<Pheromone> pheromones) {
+        /// <returns>Highest-priority pheromone in the list within range of the insect position.</returns>
+        private Pheromone GetHighestPriorityPheromone(Vector2 position, List<Pheromone> pheromones) {
             int range = (int)(RANGE * _world.TileSize);
             int maxPrio = 0;
             Pheromone closest = null;
@@ -147,11 +147,7 @@ namespace TinyShopping.Game {
                     maxPrio = p.Priority;
                 }
             }
-            if (closest == null) {
-                return null;
-            }
-            Vector2 direction = closest.Position - position;
-            return direction;
+            return closest;
         }
     }
 }

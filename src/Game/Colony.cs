@@ -38,6 +38,8 @@ namespace TinyShopping.Game {
 
         private int _owner;
 
+        private InsectHandler _insectHandler;
+
         /// <summary>
         /// Creates a new colony.
         /// </summary>
@@ -48,7 +50,8 @@ namespace TinyShopping.Game {
         /// <param name="fruits">The fruit handler to use.</param>
         /// <param name="dropOff">The position the ants can drop off fruit.</param>
         /// <param name="owner">The id of the owning player, 0 or 1.</param>
-        public Colony(Vector2 spawn, int spawnRotation, World world, PheromoneHandler handler, FruitHandler fruits, Vector2 dropOff, int owner) {
+        /// <param name="insectHandler">The insect handler.</param>
+        public Colony(Vector2 spawn, int spawnRotation, World world, PheromoneHandler handler, FruitHandler fruits, Vector2 dropOff, int owner, InsectHandler insectHandler) {
             _spawn = spawn;
             _world = world;
             _handler = handler;
@@ -57,6 +60,7 @@ namespace TinyShopping.Game {
             _queue = 6;
             DropOff = dropOff;
             _owner = owner;
+            _insectHandler = insectHandler;
         }
 
         /// <summary>
@@ -86,9 +90,14 @@ namespace TinyShopping.Game {
                 Insect ant = new Insect(_world, _handler, _spawn, _spawnRotation, _fruits, _antTexture, _antFullTexture, this, _owner);
                 _insects.Add(ant);
             }
+            List<Insect> remaining = new List<Insect>(_insects.Count);
             foreach (Insect insect in _insects) {
-                insect.Update(gameTime);
+                if (insect.Health > 0) {
+                    insect.Update(gameTime);
+                    remaining.Add(insect);
+                }
             }
+            _insects = remaining;
         }
 
         /// <summary>
@@ -118,6 +127,34 @@ namespace TinyShopping.Game {
             }
             _collectedFruit -= 1;
             _queue += 1;
+        }
+
+        /// <summary>
+        /// Returns the closest enemy insect in range.
+        /// </summary>
+        /// <param name="position">The position to use.</param>
+        /// <returns>An insect instance or null.</returns>
+        public Insect GetClosestEnemy(Vector2 position) {
+            return _insectHandler.GetClosestEnemy(_owner, position);
+        }
+
+        /// <summary>
+        /// Gets the closest insect to the given position.
+        /// </summary>
+        /// <param name="position">The position to compare to.</param>
+        /// <param name="range">The range to consider.</param>
+        /// <returns>The closest insect.</returns>
+        public Insect GetClosestToInRange(Vector2 position, float range) {
+            float minDis = float.MaxValue;
+            Insect closest = null;
+            foreach (var i in _insects) {
+                float sqDis = Vector2.DistanceSquared(position, i.Position);
+                if (sqDis < range*range && sqDis < minDis) {
+                    closest = i;
+                    minDis = sqDis;
+                }
+            }
+            return closest;
         }
     }
 }

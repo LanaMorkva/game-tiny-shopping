@@ -23,6 +23,8 @@ namespace TinyShopping.Game {
 
         public int Priority { private set; get; }
 
+        public PheromoneType Type { private set; get; }
+
         /// <summary>
         /// Creates a new pheromone spot.
         /// </summary>
@@ -31,13 +33,15 @@ namespace TinyShopping.Game {
         /// <param name="font">The font to use.</param>
         /// <param name="world">The world to exist in.</param>
         /// <param name="priority">The starting priority. This will decrease for each passing milisecond.</param>
-        public Pheromone(Vector2 position, Texture2D texture, SpriteFont font, World world, int priority) {
+        /// <param name="type">The pheromone type.</param>
+        public Pheromone(Vector2 position, Texture2D texture, SpriteFont font, World world, int priority, PheromoneType type) {
             Position = position;
             _world = world;
             _textureSize = (int)_world.TileSize;
             _texture = texture;
             _font = font;
             Priority = priority;
+            Type = type;
         }
 
         /// <summary>
