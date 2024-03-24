@@ -30,6 +30,8 @@ namespace TinyShopping.Game {
 
         private int _returnPressed;
 
+        private int _fightPressed;
+
         private bool _newInsectPressed;
 
         private PheromoneHandler _handler;
@@ -94,6 +96,13 @@ namespace TinyShopping.Game {
             else if (_returnPressed > 0) {
                 _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN, _id, 5000 + _returnPressed * 2);
                 _returnPressed = 0;
+            }
+            if (_input.IsFightPressed()) {
+                _fightPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds); ;
+            }
+            else if (_fightPressed > 0) {
+                _handler.AddPheromone(_position, gameTime, PheromoneType.FIGHT, _id, 5000 + _fightPressed * 2);
+                _fightPressed = 0;
             }
             if (_input.IsNewInsectPressed()) {
                 _newInsectPressed = true;

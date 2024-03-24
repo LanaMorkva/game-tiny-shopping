@@ -32,6 +32,12 @@ namespace TinyShopping.Game {
         public abstract bool IsReturnPressed();
 
         /// <summary>
+        /// Checks if the fight pheromone button is pressed.
+        /// </summary>
+        /// <returns>True if the button is pressed, false otherwise.</returns>
+        public abstract bool IsFightPressed();
+
+        /// <summary>
         /// Checks if the new insect button is pressed.
         /// </summary>
         /// <returns>True if the button is pressed, false otherwise.</returns>
@@ -43,6 +49,8 @@ namespace TinyShopping.Game {
         private Buttons _discoverButton = Buttons.A;
 
         private Buttons _returnButton = Buttons.B;
+
+        private Buttons _fightButton = Buttons.X;
 
         private Buttons _newInsectButton = Buttons.Y;
 
@@ -60,20 +68,22 @@ namespace TinyShopping.Game {
             return motion;
         }
 
-        public override bool IsDiscoverPressed()
-        {
+        public override bool IsDiscoverPressed() {
             GamePadState cState = GamePad.GetState(_playerIndex);
             return cState.IsButtonDown(_discoverButton);
         }
 
-        public override bool IsReturnPressed()
-        {
+        public override bool IsReturnPressed() {
             GamePadState cState = GamePad.GetState(_playerIndex);
             return cState.IsButtonDown(_returnButton);
         }
 
-        public override bool IsNewInsectPressed()
-        {
+        public override bool IsFightPressed() {
+            GamePadState cState = GamePad.GetState(_playerIndex);
+            return cState.IsButtonDown(_fightButton);
+        }
+
+        public override bool IsNewInsectPressed() {
             GamePadState cState = GamePad.GetState(_playerIndex);
             return cState.IsButtonDown(_newInsectButton);
         }
@@ -93,10 +103,11 @@ namespace TinyShopping.Game {
 
         private Keys _returnKey = Keys.D2;
 
-        private Keys _newInsectKey = Keys.D3;
+        private Keys _fightKey = Keys.D3;
 
-        public KeyboardInput(PlayerIndex playerIndex)
-        {
+        private Keys _newInsectKey = Keys.D4;
+
+        public KeyboardInput(PlayerIndex playerIndex) {
             if (playerIndex < 0 || playerIndex > PlayerIndex.Two) {
                 throw new Exception("Invalid player index, maximum 2 players are allowed");
             }
@@ -107,7 +118,8 @@ namespace TinyShopping.Game {
                 _right = Keys.L;
                 _discoverKey = Keys.D7;
                 _returnKey = Keys.D8;
-                _newInsectKey = Keys.D9;
+                _fightKey = Keys.D9;
+                _newInsectKey = Keys.D0;
             }
             _playerIndex = playerIndex;
         }
@@ -138,10 +150,15 @@ namespace TinyShopping.Game {
             KeyboardState kState = Keyboard.GetState();
             return kState.IsKeyDown(_discoverKey);
         }
-        
+
         public override bool IsReturnPressed() {
             KeyboardState kState = Keyboard.GetState();
             return kState.IsKeyDown(_returnKey);
+        }
+
+        public override bool IsFightPressed() {
+            KeyboardState kState = Keyboard.GetState();
+            return kState.IsKeyDown(_fightKey);
         }
 
         public override bool IsNewInsectPressed() {
