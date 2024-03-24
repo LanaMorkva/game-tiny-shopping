@@ -63,10 +63,9 @@ namespace TinyShopping.Game {
         public void Draw(SpriteBatch batch, GameTime gameTime) {
             Rectangle bounds = new Rectangle((int)Position.X - PheromoneRange, (int)Position.Y - PheromoneRange,
                 _pheromoneSize, _pheromoneSize);
-
             float priority = (Priority + 500) / 1000;
 
-            int alpha = (int)(priority * 20) + 100;
+            int alpha = (int)(priority * 15) + 50;
             Color updateColor = new Color(_color, alpha);
             batch.Draw(_texture, bounds, updateColor);
         }

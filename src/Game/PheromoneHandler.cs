@@ -36,7 +36,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="contentManager">The content manager to use.</param>
         public void LoadContent(ContentManager contentManager) {
-            _texture = contentManager.Load<Texture2D>("pheromon");
+            _texture = contentManager.Load<Texture2D>("pheromone");
             _font = contentManager.Load<SpriteFont>("arial");
         }
 
