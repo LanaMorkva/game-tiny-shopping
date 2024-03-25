@@ -48,14 +48,13 @@ namespace TinyShopping.Game {
             base.Initialize();
         }
 
-        /// <summary>
         public override void LoadContent() {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _world.LoadContent(Content);
             _world.createWorld(new Rectangle(0, STAT_OFFSET, GraphicsDeviceManager.PreferredBackBufferWidth,
                 GraphicsDeviceManager.PreferredBackBufferHeight - STAT_OFFSET));
 
-            createStatisticsTexture();
+            CreateStatisticsTexture();
 
             _font = Content.Load<SpriteFont>("arial");
             _appleTexture = Content.Load<Texture2D>("apple");
@@ -68,11 +67,11 @@ namespace TinyShopping.Game {
             _colony1.LoadContent(Content);
             _colony2.LoadContent(Content);
 
-            PlayerInput input1 = createPlayerInput(PlayerIndex.One);
+            PlayerInput input1 = CreatePlayerInput(PlayerIndex.One);
             _player1 = new Player(_world, _pheromoneHandler, input1, _colony1, 0, _world.GetTopLeftOfTile(5, 3));
             _player1.LoadContent(Content);
 
-            PlayerInput input2 = createPlayerInput(PlayerIndex.Two);
+            PlayerInput input2 = CreatePlayerInput(PlayerIndex.Two);
             _player2 = new Player(_world, _pheromoneHandler, input2, _colony2, 1, _world.GetTopLeftOfTile(54, 35));
             _player2.LoadContent(Content);
 
@@ -103,13 +102,13 @@ namespace TinyShopping.Game {
             _fruitHandler.Draw(_spriteBatch, gameTime);
             _ui.Draw(_spriteBatch, gameTime);
 
-            drawStatistics();
+            DrawStatistics();
 
             _spriteBatch.End();
             base.Draw(gameTime);
         }
 
-        private void createStatisticsTexture() {
+        private void CreateStatisticsTexture() {
             _statsTexture = new Texture2D(GraphicsDevice, _world.WorldRegion.Width, STAT_OFFSET);
             Color[] data = new Color[_world.WorldRegion.Width * STAT_OFFSET];
             for (int i = 0; i < data.Length; i++) {
@@ -118,7 +117,7 @@ namespace TinyShopping.Game {
             _statsTexture.SetData(data);
         }
 
-        private void drawStatistics() {
+        private void DrawStatistics() {
             int offset = 15;
             int textureSize = 40;
             int offsetText = 35;
@@ -157,7 +156,7 @@ namespace TinyShopping.Game {
             _spriteBatch.DrawString(_font, FruitsNum2, new Vector2(offsetR, offsetText), Color.Black, 0, sizeFruits2, 0.8f, SpriteEffects.None, 0);
         }
 
-        private PlayerInput createPlayerInput(PlayerIndex playerIndex) {
+        private PlayerInput CreatePlayerInput(PlayerIndex playerIndex) {
             GamePadState state = GamePad.GetState(playerIndex);
             if (state.IsConnected) {
                 return new GamePadInput(playerIndex);
