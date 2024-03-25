@@ -30,13 +30,15 @@ namespace TinyShopping.Game {
 
         private int _returnPressed;
 
+        private int _fightPressed;
+
         private bool _newInsectPressed;
 
         private PheromoneHandler _handler;
 
         private PlayerInput _input;
 
-        private Colony _colony;
+        private InsectHandler _insectHandler;
 
         private int _id;
 
@@ -46,15 +48,15 @@ namespace TinyShopping.Game {
         /// <param name="world">The world to exist in.</param>
         /// <param name="handler">The pheromone handler to use.</param>
         /// <param name="input">The player input to use.</param>
-        /// <param name="colony">The colony controlled by this player.</param>
+        /// <param name="insects">The insect handler to use..</param>
         /// <param name="id">The palyer id, 0 or 1.</param>
         /// <param name="position">The cursor starting position</param>
-        public Player(World world, PheromoneHandler handler, PlayerInput input, Colony colony, int id, Vector2 position) {
+        public Player(World world, PheromoneHandler handler, PlayerInput input, InsectHandler insects, int id, Vector2 position) {
             _world = world;
             _position = position;
             _handler = handler;
             _input = input;
-            _colony = colony;
+            _insectHandler = insects;
             _id = id;
         }
 
@@ -95,12 +97,19 @@ namespace TinyShopping.Game {
                 _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN, _id, 5000 + _returnPressed * 2);
                 _returnPressed = 0;
             }
+            if (_input.IsFightPressed()) {
+                _fightPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds); ;
+            }
+            else if (_fightPressed > 0) {
+                _handler.AddPheromone(_position, gameTime, PheromoneType.FIGHT, _id, 5000 + _fightPressed * 2);
+                _fightPressed = 0;
+            }
             if (_input.IsNewInsectPressed()) {
                 _newInsectPressed = true;
             }
             else if (_newInsectPressed) {
                 _newInsectPressed = false;
-                _colony.BuyNewInsect();
+                _insectHandler.BuyNewInsect(_id);
             }
             _position.X += motion.X * (float)gameTime.ElapsedGameTime.TotalSeconds * SPEED;
             _position.Y += motion.Y * (float)gameTime.ElapsedGameTime.TotalSeconds * SPEED;

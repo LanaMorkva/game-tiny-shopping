@@ -14,6 +14,15 @@ namespace TinyShopping.Game {
         private Vector2 _direction;
 
         /// <summary>
+        /// The 2D position.
+        /// </summary>
+        public Vector2 Position {
+            get {
+                return _position;
+            }
+        }
+
+        /// <summary>
         /// The x coordinate of the current position.
         /// </summary>
         public int X {

@@ -20,11 +20,9 @@ namespace TinyShopping.Game {
 
         public static int STAT_OFFSET = 70;
 
+        private InsectHandler _insectHandler;
+
         private World _world;
-
-        private Colony _colony1;
-
-        private Colony _colony2;
 
         private Player _player1;
 
@@ -45,6 +43,7 @@ namespace TinyShopping.Game {
             _pheromoneHandler = new PheromoneHandler(_world);
             _fruitHandler = new FruitHandler(_world);
             _ui = new UIController();
+            _insectHandler = new InsectHandler(_world, _pheromoneHandler, _fruitHandler);
             base.Initialize();
         }
 
@@ -59,20 +58,14 @@ namespace TinyShopping.Game {
             _font = Content.Load<SpriteFont>("arial");
             _appleTexture = Content.Load<Texture2D>("apple");
             _antTexture = Content.Load<Texture2D>("ant_texture");
-
-            _colony1 = new Colony(_world.GetTopLeftOfTile(5, 0), 180, _world, _pheromoneHandler, _fruitHandler, _world.GetTopLeftOfTile(5, 3), 0);
-            _colony1.Initialize();
-            _colony2 = new Colony(_world.GetTopLeftOfTile(57, 35), 270, _world, _pheromoneHandler, _fruitHandler, _world.GetTopLeftOfTile(54, 35), 1);
-            _colony2.Initialize();
-            _colony1.LoadContent(Content);
-            _colony2.LoadContent(Content);
+            _insectHandler.LoadContent(Content);
 
             PlayerInput input1 = CreatePlayerInput(PlayerIndex.One);
-            _player1 = new Player(_world, _pheromoneHandler, input1, _colony1, 0, _world.GetTopLeftOfTile(5, 3));
+            _player1 = new Player(_world, _pheromoneHandler, input1, _insectHandler, 0, _world.GetTopLeftOfTile(5, 3));
             _player1.LoadContent(Content);
 
             PlayerInput input2 = CreatePlayerInput(PlayerIndex.Two);
-            _player2 = new Player(_world, _pheromoneHandler, input2, _colony2, 1, _world.GetTopLeftOfTile(54, 35));
+            _player2 = new Player(_world, _pheromoneHandler, input2, _insectHandler, 1, _world.GetTopLeftOfTile(54, 35));
             _player2.LoadContent(Content);
 
             _pheromoneHandler.LoadContent(Content);
@@ -82,8 +75,7 @@ namespace TinyShopping.Game {
         }
 
         public override void Update(GameTime gameTime) {
-            _colony1.Update(gameTime);
-            _colony2.Update(gameTime);
+            _insectHandler.Update(gameTime);
             _player1.Update(gameTime);
             _player2.Update(gameTime);
             _pheromoneHandler.Update(gameTime);
@@ -96,8 +88,7 @@ namespace TinyShopping.Game {
             _world.DrawFloor(_spriteBatch, gameTime);
             _pheromoneHandler.Draw(_spriteBatch, gameTime);
             _world.DrawObjects(_spriteBatch, gameTime);
-            _colony1.Draw(_spriteBatch, gameTime);
-            _colony2.Draw(_spriteBatch, gameTime);
+            _insectHandler.Draw(_spriteBatch, gameTime);
             _player1.Draw(_spriteBatch, gameTime);
             _player2.Draw(_spriteBatch, gameTime);
             _fruitHandler.Draw(_spriteBatch, gameTime);
@@ -133,11 +124,11 @@ namespace TinyShopping.Game {
 
             offsetL += textureSize + 5;
             offsetR -= 5;
-            String AntsNum1 = "x" + _colony1.AntsNum;
+            String AntsNum1 = "x" + _insectHandler.GetNumberOfAnts(0);
             Vector2 sizeAnts1 = _font.MeasureString(AntsNum1) / 2;
             _spriteBatch.DrawString(_font, AntsNum1, new Vector2(offsetL, offsetText), Color.Black, 0, sizeAnts1, 0.8f, SpriteEffects.None, 0);
 
-            String AntsNum2 = _colony2.AntsNum + "x";
+            String AntsNum2 = _insectHandler.GetNumberOfAnts(1) + "x";
             Vector2 sizeAnts2 = _font.MeasureString(AntsNum2) / 2;
             _spriteBatch.DrawString(_font, AntsNum2, new Vector2(offsetR, offsetText), Color.Black, 0, sizeAnts2, 0.8f, SpriteEffects.None, 0);
 
@@ -148,11 +139,11 @@ namespace TinyShopping.Game {
 
             offsetL += textureSize + 15;
             offsetR -= 15;
-            String FruitsNum1 = "x" + _colony1.FruitsNum;
+            String FruitsNum1 = "x" + _insectHandler.GetNumberOfFruits(0);
             Vector2 sizeFruits1 = _font.MeasureString(FruitsNum1) / 2;
             _spriteBatch.DrawString(_font, FruitsNum1, new Vector2(offsetL, offsetText), Color.Black, 0, sizeFruits1, 0.8f, SpriteEffects.None, 0);
 
-            String FruitsNum2 = _colony2.FruitsNum + "x";
+            String FruitsNum2 = _insectHandler.GetNumberOfFruits(1) + "x";
             Vector2 sizeFruits2 = _font.MeasureString(FruitsNum2) / 2;
             _spriteBatch.DrawString(_font, FruitsNum2, new Vector2(offsetR, offsetText), Color.Black, 0, sizeFruits2, 0.8f, SpriteEffects.None, 0);
         }

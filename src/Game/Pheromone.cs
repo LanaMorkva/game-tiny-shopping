@@ -27,6 +27,8 @@ namespace TinyShopping.Game {
         public int Priority { private set; get; }
         public int PheromoneRange => _pheromoneSize / 2;
 
+        public PheromoneType Type { private set; get; }
+
         /// <summary>
         /// Creates a new pheromone spot.
         /// </summary>
@@ -35,7 +37,8 @@ namespace TinyShopping.Game {
         /// <param name="font">The font to use.</param>
         /// <param name="world">The world to exist in.</param>
         /// <param name="priority">The starting priority. This will decrease for each passing milisecond.</param>
-        public Pheromone(Vector2 position, Texture2D texture, PheromoneType type, World world, int priority) {
+        /// <param name="type">The pheromone type.</param>
+        public Pheromone(Vector2 position, Texture2D texture, World world, int priority, PheromoneType type) {
             Position = position;
             _world = world;
             _tileSize = (int)_world.TileSize;
@@ -43,11 +46,15 @@ namespace TinyShopping.Game {
             _textureHeight = texture.Height;
             _texture = texture;
             Priority = priority;
+            Type = type;
             _pheromoneSize = RANGE * _tileSize * 2;
 
             switch (type) {
                 case PheromoneType.RETURN:
                     _color = Color.Blue;
+                    break;
+                case PheromoneType.FIGHT:
+                    _color = Color.Red;
                     break;
                 default:
                     _color = Color.Green;

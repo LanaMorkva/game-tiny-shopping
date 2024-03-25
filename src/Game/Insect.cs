@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using TinyShopping.Game.AI;
 
 namespace TinyShopping.Game {
 
@@ -21,37 +21,62 @@ namespace TinyShopping.Game {
 
         private Texture2D _textureFull;
 
-        private int _textureSize;
+        public int TextureSize { get; private set; }
 
         private double _nextUpdateTime;
 
         private InsectPos _position;
 
-        private bool _isRecovering;
+        public bool IsCarrying { get; set; }
 
-        private PheromoneHandler _handler;
+        public int Owner { get; private set; }
 
-        private FruitHandler _fruits;
+        public Vector2 Position {
+            get {
+                return _position.Position;
+            }
+        }
 
-        private bool _isSpawning;
+        public int TargetRotation {
+            get {
+                return _position.TargetRotation;
+            }
+            set {
+                _position.TargetRotation = value;
+            }
+        }
 
-        private bool _isCarrying;
+        public bool IsTurning {
+            get {
+                return _position.IsTurning;
+            }
+        }
 
-        private Colony _colony;
+        public Vector2 TargetDirection {
+            set {
+                _position.TargetDirection = value;
+            }
+        }
 
-        private int _owner;
+        public int Health { private set; get; }
+
+        private Task[] _ais;
 
         public Insect(World world, PheromoneHandler handler, Vector2 spawn, int spawnRotation, FruitHandler fruits, Texture2D texture, Texture2D textureFull, Colony colony, int owner) {
             _world = world;
-            _handler = handler;
             _position = new InsectPos((int)spawn.X, (int)spawn.Y, spawnRotation);
-            _fruits = fruits;
-            _isSpawning = true;
             _texture = texture;
             _textureFull = textureFull;
-            _textureSize = (int)_world.TileSize;
-            _colony = colony;
-            _owner = owner;
+            TextureSize = (int)_world.TileSize;
+            Owner = owner;
+            Health = 100;
+            _ais = new Task[] {
+                new Spawn(this, _world),
+                new Collide(this, _world),
+                new PickUp(this, _world, fruits),
+                new DropOff(this, _world, colony),
+                new FollowPheromone(this, _world, handler, colony),
+            };
         }
 
         /// <summary>
@@ -61,8 +86,8 @@ namespace TinyShopping.Game {
         /// <param name="gameTime">The current time information.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
             Vector2 origin = new(_texture.Width / 2f, _texture.Height / 2f);
-            Rectangle destination = new ((int)_position.X, (int)_position.Y, _textureSize, _textureSize);
-            batch.Draw(_isCarrying ? _textureFull : _texture, destination, null, Color.White, _position.Rotation, origin, SpriteEffects.None, 0);
+            Rectangle destination = new ((int)_position.X, (int)_position.Y, TextureSize, TextureSize);
+            batch.Draw(IsCarrying ? _textureFull : _texture, destination, null, Color.White, _position.Rotation, origin, SpriteEffects.None, 0);
         }
 
         /// <summary>
@@ -70,80 +95,13 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
-            // handle spawning
-            if (_isSpawning) {
-                if (_world.IsWalkable(_position.X, _position.Y, _textureSize / 2)) {
-                    _isSpawning = false;
-                }
-                Walk(gameTime);
-                return;
-            }
-            // handle collision
-            if (_isRecovering) {
-                RecoverCollision(gameTime);
-                return;
-            }
-            if (!_world.IsWalkable(_position.X, _position.Y, _textureSize / 2)) {
-                _isRecovering = true;
-                _position.TargetRotation += 180;
-                return;
-            }
-            // handle close-by fruit
-            if (!_isCarrying) {
-                Vector2? dir = _fruits.GetDirectionToClosestFruit(new Vector2(_position.X, _position.Y), out Fruit closestFruit);
-                if (dir != null && dir.Value.LengthSquared() <= (_world.TileSize * _world.TileSize) / 4) {
-                    _isCarrying = true;
-                    _fruits.RemoveFruit(closestFruit);
-                    return;
-                }
-                if (dir != null) {
-                    _position.TargetDirection = dir.Value;
-                    Walk(gameTime);
+            foreach (var ai in _ais) {
+                if (ai.Run(gameTime)) {
                     return;
                 }
             }
-            // handle fruit drop off
-            if (_isCarrying && Vector2.DistanceSquared(new Vector2(_position.X, _position.Y), _colony.DropOff) < _world.TileSize*_world.TileSize) {
-                _isCarrying = false;
-                _colony.IncreaseFruitCount();
-                return;
-            }
-            // handle pheromones
-            if (!_isCarrying) {
-                Vector2? dir = _handler.GetDirectionToForwardPheromone(new Vector2(_position.X, _position.Y), _owner);
-                if (dir != null) {
-                    _position.TargetDirection = dir.Value;
-                    Walk(gameTime);
-                    return;
-                }
-            }
-            else {
-                Vector2? dir = _handler.GetDirectionToReturnPheromone(new Vector2(_position.X, _position.Y), _owner);
-                if (dir != null) {
-                    _position.TargetDirection = dir.Value;
-                    Walk(gameTime);
-                    return;
-                }
-            }
-            // wander if nothing else was done
             Wander(gameTime);
             
-        }
-
-        /// <summary>
-        /// Recovers from a collision with the map by backing up and turning.
-        /// </summary>
-        /// <param name="gameTime">The current game time.</param>
-        private void RecoverCollision(GameTime gameTime) {
-            if (!_position.IsTurning) {
-                _isRecovering = false;
-            }
-            if (!_world.IsWalkable(_position.X, _position.Y, _textureSize/2)) {
-                _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * -SPEED);
-            }
-            else {
-                _position.Rotate((float)gameTime.ElapsedGameTime.TotalSeconds * ROTATION_SPEED);
-            }
         }
 
         /// <summary>
@@ -162,17 +120,41 @@ namespace TinyShopping.Game {
         /// Turns towards the target and walks towards it.
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
-        private void Walk(GameTime gameTime) {
+        public void Walk(GameTime gameTime) {
             if (_position.IsTurning) {
                 _position.Rotate((float)gameTime.ElapsedGameTime.TotalSeconds * ROTATION_SPEED);
                 _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * SPEED / 3);
             }
-            else if (_isCarrying) {
+            else if (IsCarrying) {
                 _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * SPEED * 3/5);
             }
             else {
                 _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * SPEED);
             }
+        }
+
+        /// <summary>
+        /// Rotates the ant without moving forward.
+        /// </summary>
+        /// <param name="gameTime">The current game time.</param>
+        public void Rotate(GameTime gameTime) {
+            _position.Rotate((float)gameTime.ElapsedGameTime.TotalSeconds * ROTATION_SPEED);
+        }
+
+        /// <summary>
+        /// Moves backwards.
+        /// </summary>
+        /// <param name="gameTime">The current game time.</param>
+        public void BackUp(GameTime gameTime) {
+            _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * -SPEED);
+        }
+
+        /// <summary>
+        /// Reduces the insect's health.
+        /// </summary>
+        /// <param name="damage">The damage to take.</param>
+        public void TakeDamage(int damage) {
+            Health -= damage;
         }
     }
 }
