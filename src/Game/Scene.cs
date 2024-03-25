@@ -79,12 +79,13 @@ namespace TinyShopping.Game {
 
         public override void Draw(GameTime gameTime) {
             _spriteBatch.Begin();
-            _world.Draw(_spriteBatch, gameTime);
+            _world.DrawFloor(_spriteBatch, gameTime);
+            _pheromoneHandler.Draw(_spriteBatch, gameTime);
+            _world.DrawObjects(_spriteBatch, gameTime);
             _colony1.Draw(_spriteBatch, gameTime);
             _colony2.Draw(_spriteBatch, gameTime);
             _player1.Draw(_spriteBatch, gameTime);
             _player2.Draw(_spriteBatch, gameTime);
-            _pheromoneHandler.Draw(_spriteBatch, gameTime);
             _fruitHandler.Draw(_spriteBatch, gameTime);
             _ui.Draw(_spriteBatch, gameTime);
 
