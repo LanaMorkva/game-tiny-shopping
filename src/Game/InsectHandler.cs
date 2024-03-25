@@ -109,5 +109,23 @@ namespace TinyShopping.Game {
         public void IncreaseFruitCount(int player) {
             _colonies[player].IncreaseFruitCount();
         }
+
+        /// <summary>
+        /// Gets the number of ants in the colony of the given player.
+        /// </summary>
+        /// <param name="player">The player to use.</param>
+        /// <returns>The number of ants.</returns>
+        public int GetNumberOfAnts(int player) {
+            return _colonies[player].AntsNum;
+        }
+
+        /// <summary>
+        /// Gets the number of fruits in the colony of the given player.
+        /// </summary>
+        /// <param name="player">The player to use.</param>
+        /// <returns>The number of fruits collected.</returns>
+        public int GetNumberOfFruits(int player) {
+            return _colonies[player].FruitsNum;
+        }
     }
 }

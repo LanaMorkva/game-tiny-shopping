@@ -2,10 +2,6 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TinyShopping.Game {
 
@@ -20,13 +16,13 @@ namespace TinyShopping.Game {
         private Texture2D _floorTexture;
         private Texture2D _objectsTexture;
 
-        private Rectangle _worldPosition;
+        private Rectangle _worldRegion;
 
         private Vector2 _offset;
 
-        private Vector2 _screen;
-
         private Rectangle[] _obstacles;
+
+        public Rectangle WorldRegion => _worldRegion;
 
 #if DEBUG
         private Texture2D _obstacleTexture;
@@ -43,10 +39,6 @@ namespace TinyShopping.Game {
             }
         }
 
-        public World(GraphicsDeviceManager device) {
-            _device = device;
-        }
-
         /// <summary>
         /// Loads necessary data from disk.
         /// </summary>
@@ -54,11 +46,14 @@ namespace TinyShopping.Game {
         public void LoadContent(ContentManager contentManager) {
             _floorTexture = contentManager.Load<Texture2D>("static_map_floor");
             _objectsTexture = contentManager.Load<Texture2D>("static_map_else");
-            CalculateWorldPosition();
-            CreateCollisionAreas();
 #if DEBUG
             _obstacleTexture = contentManager.Load<Texture2D>("obstacle");
 #endif
+        }
+
+        public void createWorld(Rectangle boundaries) {
+            CalculateWorldPosition(boundaries);
+            CreateCollisionAreas();
         }
 
         /// <summary>
@@ -67,11 +62,11 @@ namespace TinyShopping.Game {
         /// <param name="batch">The batch to draw to.</param>
         /// <param name="gameTime">The current time information.</param>
         public void DrawFloor(SpriteBatch batch, GameTime gameTime) {
-            batch.Draw(_floorTexture, _worldPosition, Color.White);
+            batch.Draw(_floorTexture, _worldRegion, Color.White);
         }
 
         public void DrawObjects(SpriteBatch batch, GameTime gameTime) {
-             batch.Draw(_objectsTexture, _worldPosition, Color.White);
+             batch.Draw(_objectsTexture, _worldRegion, Color.White);
 #if DEBUG
             foreach (var o in _obstacles) {
                 float x = o.X * TileSize + _offset.X;
@@ -87,22 +82,21 @@ namespace TinyShopping.Game {
         /// <summary>
         /// Calculates the position and size of the map such that it is fully on screen.
         /// </summary>
-        private void CalculateWorldPosition() {
-            _screen = new Vector2(_device.PreferredBackBufferWidth, _device.PreferredBackBufferHeight);
+        private void CalculateWorldPosition(Rectangle boundaries) {
             float ratio;
-            if (_floorTexture.Height / _screen.Y > _floorTexture.Width / _screen.X) {
-                ratio = _screen.Y / _floorTexture.Height;
+            if ((float)_floorTexture.Height / boundaries.Height > (float)_floorTexture.Width / boundaries.Width) {
+                ratio = (float)boundaries.Height / _floorTexture.Height;
             }
             else {
-                ratio = _screen.X / _floorTexture.Width;
+                ratio = (float)boundaries.Width / _floorTexture.Width;
             }
             int worldWidth = (int)(_floorTexture.Width * ratio);
             int worldHeight = (int)(_floorTexture.Height * ratio);
-            int xOffset = (int)((_screen.X - worldWidth) / 2.0);
-            int yOffset = (int)((_screen.Y - worldHeight) / 2.0);
+            int xOffset = (int)((boundaries.Width - worldWidth) / 2.0);
+            int yOffset = (int)((boundaries.Height - worldHeight) / 2.0) + boundaries.Y;
             _offset = new Vector2(xOffset, yOffset);
-            _worldPosition = new Rectangle(xOffset, yOffset, worldWidth, worldHeight);
-            _tileSize = _worldPosition.Width / (float)NUM_OF_SQUARES_WIDTH;
+            _worldRegion = new Rectangle(xOffset, yOffset, worldWidth, worldHeight);
+            _tileSize = _worldRegion.Width / (float)NUM_OF_SQUARES_WIDTH;
         }
 
         /// <summary>
