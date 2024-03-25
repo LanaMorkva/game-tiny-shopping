@@ -11,8 +11,6 @@ namespace TinyShopping.Game {
 
     internal class PheromoneHandler {
 
-        private static readonly int RANGE = 8;
-
         private World _world;
 
         private Texture2D _texture;
@@ -38,7 +36,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="contentManager">The content manager to use.</param>
         public void LoadContent(ContentManager contentManager) {
-            _texture = contentManager.Load<Texture2D>("circle");
+            _texture = contentManager.Load<Texture2D>("pheromone");
             _font = contentManager.Load<SpriteFont>("arial");
         }
 
@@ -52,7 +50,7 @@ namespace TinyShopping.Game {
         /// <param name="priority">The priority of the pheromone, given in miliseconds.</param>
         public void AddPheromone(Vector2 rawPosition, GameTime gameTime, PheromoneType type, int player, int priority) {
             Vector2 position = _world.AlignPositionToGridCenter(rawPosition);
-            Pheromone p = new Pheromone(position, _texture, _font, _world, priority);
+            Pheromone p = new Pheromone(position, _texture, type, _world, priority);
             if (type == PheromoneType.RETURN) {
                 _returnPheromones[player].Add(p);
             }
@@ -134,7 +132,6 @@ namespace TinyShopping.Game {
         /// <param name="pheromones">The pheromones to search through.</param>
         /// <returns>Vector to the highest-priority pheromone in the list within range of the insect position.</returns>
         private Vector2? GetDirectionToHighestPriorityPheromone(Vector2 position, List<Pheromone> pheromones) {
-            int range = (int)(RANGE * _world.TileSize);
             int maxPrio = 0;
             Pheromone closest = null;
             foreach (var p in pheromones) {
@@ -142,6 +139,7 @@ namespace TinyShopping.Game {
                     continue;
                 }
                 float sqDis = Vector2.DistanceSquared(position, p.Position);
+                int range = p.PheromoneRange;
                 if (sqDis < range * range) {
                     closest = p;
                     maxPrio = p.Priority;

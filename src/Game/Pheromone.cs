@@ -1,27 +1,31 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Linq.Expressions;
+//using System.Drawing;
 
 namespace TinyShopping.Game {
 
     internal class Pheromone {
-
+        private static readonly int RANGE = 8;
         public Vector2 Position { private set; get; }
 
         private World _world;
 
-        private int _textureSize;
+        private int _tileSize;
+        private int _pheromoneSize;
+
+        private int _textureWidth;
+        private int _textureHeight;
 
         private Texture2D _texture;
+        private Color _color;
 
-        private SpriteFont _font;
+        private int _numTextures = 5;
 
         public int Priority { private set; get; }
+        public int PheromoneRange => _pheromoneSize / 2;
 
         /// <summary>
         /// Creates a new pheromone spot.
@@ -31,13 +35,24 @@ namespace TinyShopping.Game {
         /// <param name="font">The font to use.</param>
         /// <param name="world">The world to exist in.</param>
         /// <param name="priority">The starting priority. This will decrease for each passing milisecond.</param>
-        public Pheromone(Vector2 position, Texture2D texture, SpriteFont font, World world, int priority) {
+        public Pheromone(Vector2 position, Texture2D texture, PheromoneType type, World world, int priority) {
             Position = position;
             _world = world;
-            _textureSize = (int)_world.TileSize;
+            _tileSize = (int)_world.TileSize;
+            _textureWidth = texture.Width;
+            _textureHeight = texture.Height;
             _texture = texture;
-            _font = font;
             Priority = priority;
+            _pheromoneSize = RANGE * _tileSize * 2;
+
+            switch (type) {
+                case PheromoneType.RETURN:
+                    _color = Color.Blue;
+                    break;
+                default:
+                    _color = Color.Green;
+                    break;
+            }
         }
 
         /// <summary>
@@ -46,11 +61,13 @@ namespace TinyShopping.Game {
         /// <param name="batch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
-            Rectangle bounds = new Rectangle((int)(Position.X - _textureSize / 2f), (int)(Position.Y - _textureSize / 2f), _textureSize, _textureSize);
-            batch.Draw(_texture, bounds, Color.White);
-            String message = ((Priority+500) / 1000).ToString();
-            Vector2 textSize = _font.MeasureString(message);
-            batch.DrawString(_font, message, Position, Color.Black, 0, textSize / 2, 0.5f, SpriteEffects.None, 0);
+            Rectangle bounds = new Rectangle((int)Position.X - PheromoneRange, (int)Position.Y - PheromoneRange,
+                _pheromoneSize, _pheromoneSize);
+            float priority = (Priority + 500) / 1000;
+
+            int alpha = (int)(priority * 15) + 50;
+            Color updateColor = new Color(_color, alpha);
+            batch.Draw(_texture, bounds, updateColor);
         }
 
         /// <summary>

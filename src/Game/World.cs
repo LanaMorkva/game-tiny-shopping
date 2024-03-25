@@ -11,7 +11,10 @@ namespace TinyShopping.Game {
 
         public static int NUM_OF_SQUARES_HEIGHT = 40;
 
-        private Texture2D _worldTexture;
+        private GraphicsDeviceManager _device;
+
+        private Texture2D _floorTexture;
+        private Texture2D _objectsTexture;
 
         private Rectangle _worldRegion;
 
@@ -41,7 +44,8 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="contentManager">The content manager of the main game.</param>
         public void LoadContent(ContentManager contentManager) {
-            _worldTexture = contentManager.Load<Texture2D>("static_map");
+            _floorTexture = contentManager.Load<Texture2D>("static_map_floor");
+            _objectsTexture = contentManager.Load<Texture2D>("static_map_else");
 #if DEBUG
             _obstacleTexture = contentManager.Load<Texture2D>("obstacle");
 #endif
@@ -57,8 +61,12 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="batch">The batch to draw to.</param>
         /// <param name="gameTime">The current time information.</param>
-        public void Draw(SpriteBatch batch, GameTime gameTime) {
-            batch.Draw(_worldTexture, _worldRegion, Color.White);
+        public void DrawFloor(SpriteBatch batch, GameTime gameTime) {
+            batch.Draw(_floorTexture, _worldRegion, Color.White);
+        }
+
+        public void DrawObjects(SpriteBatch batch, GameTime gameTime) {
+             batch.Draw(_objectsTexture, _worldRegion, Color.White);
 #if DEBUG
             foreach (var o in _obstacles) {
                 float x = o.X * TileSize + _offset.X;
@@ -68,6 +76,7 @@ namespace TinyShopping.Game {
                 batch.Draw(_obstacleTexture, new Rectangle((int)x, (int)y, (int)w, (int)h), Color.White);
             }
 #endif
+
         }
 
         /// <summary>
@@ -75,14 +84,14 @@ namespace TinyShopping.Game {
         /// </summary>
         private void CalculateWorldPosition(Rectangle boundaries) {
             float ratio;
-            if ((float)_worldTexture.Height / boundaries.Height > (float)_worldTexture.Width / boundaries.Width) {
-                ratio = (float)boundaries.Height / _worldTexture.Height;
+            if ((float)_floorTexture.Height / boundaries.Height > (float)_floorTexture.Width / boundaries.Width) {
+                ratio = (float)boundaries.Height / _floorTexture.Height;
             }
             else {
-                ratio = (float)boundaries.Width / _worldTexture.Width;
+                ratio = (float)boundaries.Width / _floorTexture.Width;
             }
-            int worldWidth = (int)(_worldTexture.Width * ratio);
-            int worldHeight = (int)(_worldTexture.Height * ratio);
+            int worldWidth = (int)(_floorTexture.Width * ratio);
+            int worldHeight = (int)(_floorTexture.Height * ratio);
             int xOffset = (int)((boundaries.Width - worldWidth) / 2.0);
             int yOffset = (int)((boundaries.Height - worldHeight) / 2.0) + boundaries.Y;
             _offset = new Vector2(xOffset, yOffset);
