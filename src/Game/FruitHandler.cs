@@ -3,9 +3,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TinyShopping.Game {
 
@@ -35,7 +32,7 @@ namespace TinyShopping.Game {
                 int tileY = Random.Shared.Next(World.NUM_OF_SQUARES_WIDTH);
                 Vector2 center = _world.GetCenterOfTile(tileX, tileY);
                 if (_world.IsWalkable((int)center.X, (int)center.Y, 0)) {
-                    _fruits.Add(new Fruit(center, _appleTexture, (int)(_world.TileSize*0.7)));
+                    _fruits.Add(new Fruit(center, _appleTexture, (int)(_world.TileSize*0.7), _world));
                 }
             }
         }

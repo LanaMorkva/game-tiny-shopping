@@ -1,10 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using TinyShopping.Game.AI;
 
 namespace TinyShopping.Game {
@@ -86,8 +82,7 @@ namespace TinyShopping.Game {
         /// <param name="gameTime">The current time information.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
             Vector2 origin = new(_texture.Width / 2f, _texture.Height / 2f);
-            Rectangle destination = new ((int)_position.X, (int)_position.Y, TextureSize, TextureSize);
-            batch.Draw(IsCarrying ? _textureFull : _texture, destination, null, Color.White, _position.Rotation, origin, SpriteEffects.None, 0);
+            _world.RenderInsect(batch, IsCarrying ? _textureFull : _texture, origin, _position.Position, TextureSize, _position.Rotation);
         }
 
         /// <summary>

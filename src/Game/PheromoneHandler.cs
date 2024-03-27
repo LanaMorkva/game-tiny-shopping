@@ -1,11 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TinyShopping.Game {
 
@@ -50,7 +46,7 @@ namespace TinyShopping.Game {
         /// <param name="priority">The priority of the pheromone, given in miliseconds.</param>
         public void AddPheromone(Vector2 rawPosition, GameTime gameTime, PheromoneType type, int player, int priority) {
             Vector2 position = _world.AlignPositionToGridCenter(rawPosition);
-            Pheromone p = new Pheromone(position, _texture, _world, priority, type);
+            Pheromone p = new Pheromone(position, _texture, _world, priority, type, player);
             if (type == PheromoneType.RETURN) {
                 _returnPheromones[player].Add(p);
             }

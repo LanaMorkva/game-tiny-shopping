@@ -1,9 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Diagnostics;
-using System.Linq.Expressions;
-//using System.Drawing;
 
 namespace TinyShopping.Game {
 
@@ -29,6 +26,8 @@ namespace TinyShopping.Game {
 
         public PheromoneType Type { private set; get; }
 
+        private int _owner;
+
         /// <summary>
         /// Creates a new pheromone spot.
         /// </summary>
@@ -38,7 +37,8 @@ namespace TinyShopping.Game {
         /// <param name="world">The world to exist in.</param>
         /// <param name="priority">The starting priority. This will decrease for each passing milisecond.</param>
         /// <param name="type">The pheromone type.</param>
-        public Pheromone(Vector2 position, Texture2D texture, World world, int priority, PheromoneType type) {
+        /// <param name="owner">The player placing the pheromone.</param>
+        public Pheromone(Vector2 position, Texture2D texture, World world, int priority, PheromoneType type, int owner) {
             Position = position;
             _world = world;
             _tileSize = (int)_world.TileSize;
@@ -47,6 +47,7 @@ namespace TinyShopping.Game {
             _texture = texture;
             Priority = priority;
             Type = type;
+            _owner = owner;
             _pheromoneSize = RANGE * _tileSize * 2;
 
             switch (type) {
@@ -74,7 +75,8 @@ namespace TinyShopping.Game {
 
             int alpha = (int)(priority * 15) + 50;
             Color updateColor = new Color(_color, alpha);
-            batch.Draw(_texture, bounds, updateColor);
+            //batch.Draw(_texture, bounds, updateColor);
+            _world.RenderPheromone(_owner, batch, _texture, bounds, updateColor);
         }
 
         /// <summary>

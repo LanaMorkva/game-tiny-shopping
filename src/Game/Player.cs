@@ -1,13 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TinyShopping.Game {
 
@@ -74,7 +68,8 @@ namespace TinyShopping.Game {
         /// <param name="spriteBatch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime) {
-            spriteBatch.Draw(_texture, new Rectangle((int)(_position.X - SIZE/2f), (int)(_position.Y - SIZE/2f), SIZE, SIZE), Color.White);
+            Vector2 pos = _world.ConvertToScreenPosition(_id, _position);
+            spriteBatch.Draw(_texture, new Rectangle((int)(pos.X - SIZE/2f), (int)(pos.Y - SIZE/2f), SIZE, SIZE), Color.White);
         }
 
         /// <summary>
@@ -113,6 +108,7 @@ namespace TinyShopping.Game {
             }
             _position.X += motion.X * (float)gameTime.ElapsedGameTime.TotalSeconds * SPEED;
             _position.Y += motion.Y * (float)gameTime.ElapsedGameTime.TotalSeconds * SPEED;
+            _world.UpdateCameraPosition(_id, _position);
         }
     }
 }
