@@ -78,11 +78,12 @@ namespace TinyShopping.Game {
         /// <summary>
         /// Draws the insect to the sprite batch.
         /// </summary>
-        /// <param name="batch">The batch to draw to.</param>
+        /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current time information.</param>
-        public void Draw(SpriteBatch batch, GameTime gameTime) {
-            Vector2 origin = new(_texture.Width / 2f, _texture.Height / 2f);
-            _world.RenderInsect(batch, IsCarrying ? _textureFull : _texture, origin, _position.Position, TextureSize, _position.Rotation);
+        public void Draw(SplitScreenHandler handler, GameTime gameTime) {
+            Texture2D texture = IsCarrying ? _textureFull : _texture;
+            Rectangle destination = new Rectangle(_position.X, _position.Y, TextureSize, TextureSize);
+            handler.RenderObject(texture, destination, _position.Rotation);
         }
 
         /// <summary>

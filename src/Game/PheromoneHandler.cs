@@ -86,17 +86,17 @@ namespace TinyShopping.Game {
         /// <summary>
         /// Draws the pheromones.
         /// </summary>
-        /// <param name="batch">The batch to draw to.</param>
+        /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SpriteBatch batch, GameTime gameTime) {
+        public void Draw(SplitScreenHandler handler, GameTime gameTime) {
             foreach (var ps in  _pheromones) {
                 foreach (var p in ps) {
-                    p.Draw(batch, gameTime);
+                    p.Draw(handler, gameTime);
                 }
             }
             foreach (var ps in _returnPheromones) {
                 foreach (var p in ps) {
-                    p.Draw(batch, gameTime);
+                    p.Draw(handler, gameTime);
                 }
             }
         }

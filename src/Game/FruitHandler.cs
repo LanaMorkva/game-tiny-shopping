@@ -40,11 +40,11 @@ namespace TinyShopping.Game {
         /// <summary>
         /// Draws the fruits.
         /// </summary>
-        /// <param name="batch">The batch to draw to.</param>
+        /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SpriteBatch batch, GameTime gameTime) {
+        public void Draw(SplitScreenHandler handler, GameTime gameTime) {
             foreach (var fruit in _fruits) {
-                fruit.Draw(batch, gameTime);
+                fruit.Draw(handler, gameTime);
             }
         }
 

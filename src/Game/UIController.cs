@@ -19,12 +19,12 @@ namespace TinyShopping.Game {
 
         private Texture2D _appleTexture;
 
-        private InsectHandler _insectHandler;
+        private SplitScreenHandler _handler;
 
-        public UIController(Rectangle drawArea, GraphicsDevice device, InsectHandler insectHandler) {
+        public UIController(Rectangle drawArea, GraphicsDevice device, SplitScreenHandler handler) {
             _drawArea = drawArea;
             _device = device;
-            _insectHandler = insectHandler;
+            _handler = handler;
         }
 
         public void LoadContent(ContentManager content) {
@@ -47,7 +47,7 @@ namespace TinyShopping.Game {
             DrawStatistics(batch);
 #if DEBUG
             int fps = (int) Math.Round((1000 / gameTime.ElapsedGameTime.TotalMilliseconds));
-            batch.DrawString(_font, "FPS: " + fps.ToString(), new Vector2(0, 0), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
+            batch.DrawString(_font, "FPS: " + fps.ToString(), new Vector2(0, 0), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
 #endif
         }
 
@@ -82,11 +82,11 @@ namespace TinyShopping.Game {
 
             offsetL += textureSize + 5;
             offsetR -= 5;
-            String AntsNum1 = "x" + _insectHandler.GetNumberOfAnts(0);
+            String AntsNum1 = "x" + _handler.GetNumberOfAnts(0);
             Vector2 sizeAnts1 = _font.MeasureString(AntsNum1) / 2;
             batch.DrawString(_font, AntsNum1, new Vector2(offsetL, offsetText), Color.Black, 0, sizeAnts1, 0.8f, SpriteEffects.None, 0);
 
-            String AntsNum2 = _insectHandler.GetNumberOfAnts(1) + "x";
+            String AntsNum2 = _handler.GetNumberOfAnts(1) + "x";
             Vector2 sizeAnts2 = _font.MeasureString(AntsNum2) / 2;
             batch.DrawString(_font, AntsNum2, new Vector2(offsetR, offsetText), Color.Black, 0, sizeAnts2, 0.8f, SpriteEffects.None, 0);
 
@@ -97,11 +97,11 @@ namespace TinyShopping.Game {
 
             offsetL += textureSize + 15;
             offsetR -= 15;
-            String FruitsNum1 = "x" + _insectHandler.GetNumberOfFruits(0);
+            String FruitsNum1 = "x" + _handler.GetNumberOfFruits(0);
             Vector2 sizeFruits1 = _font.MeasureString(FruitsNum1) / 2;
             batch.DrawString(_font, FruitsNum1, new Vector2(offsetL, offsetText), Color.Black, 0, sizeFruits1, 0.8f, SpriteEffects.None, 0);
 
-            String FruitsNum2 = _insectHandler.GetNumberOfFruits(1) + "x";
+            String FruitsNum2 = _handler.GetNumberOfFruits(1) + "x";
             Vector2 sizeFruits2 = _font.MeasureString(FruitsNum2) / 2;
             batch.DrawString(_font, FruitsNum2, new Vector2(offsetR, offsetText), Color.Black, 0, sizeFruits2, 0.8f, SpriteEffects.None, 0);
         }

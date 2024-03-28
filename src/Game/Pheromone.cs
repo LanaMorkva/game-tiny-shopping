@@ -5,7 +5,9 @@ using System;
 namespace TinyShopping.Game {
 
     internal class Pheromone {
+
         private static readonly int RANGE = 8;
+
         public Vector2 Position { private set; get; }
 
         private World _world;
@@ -13,13 +15,8 @@ namespace TinyShopping.Game {
         private int _tileSize;
         private int _pheromoneSize;
 
-        private int _textureWidth;
-        private int _textureHeight;
-
         private Texture2D _texture;
         private Color _color;
-
-        private int _numTextures = 5;
 
         public int Priority { private set; get; }
         public int PheromoneRange => _pheromoneSize / 2;
@@ -42,8 +39,6 @@ namespace TinyShopping.Game {
             Position = position;
             _world = world;
             _tileSize = (int)_world.TileSize;
-            _textureWidth = texture.Width;
-            _textureHeight = texture.Height;
             _texture = texture;
             Priority = priority;
             Type = type;
@@ -66,17 +61,14 @@ namespace TinyShopping.Game {
         /// <summary>
         /// Draws the pheromone spot.
         /// </summary>
-        /// <param name="batch">The sprite batch to draw to.</param>
+        /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SpriteBatch batch, GameTime gameTime) {
-            Rectangle bounds = new Rectangle((int)Position.X - PheromoneRange, (int)Position.Y - PheromoneRange,
-                _pheromoneSize, _pheromoneSize);
+        public void Draw(SplitScreenHandler handler, GameTime gameTime) {
+            Rectangle destination = new Rectangle((int)Position.X - PheromoneRange, (int)Position.Y - PheromoneRange, _pheromoneSize, _pheromoneSize);
             float priority = (Priority + 500) / 1000;
-
             int alpha = (int)(priority * 15) + 50;
             Color updateColor = new Color(_color, alpha);
-            //batch.Draw(_texture, bounds, updateColor);
-            _world.RenderPheromone(_owner, batch, _texture, bounds, updateColor);
+            handler.RenderObject(_texture, destination, _owner, updateColor);
         }
 
         /// <summary>

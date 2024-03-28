@@ -14,8 +14,6 @@ namespace TinyShopping.Game {
 
         private static readonly int SPEED = 200;
 
-        private World _world;
-
         private Vector2 _position;
 
         private Texture2D _texture;
@@ -39,14 +37,12 @@ namespace TinyShopping.Game {
         /// <summary>
         /// Creates a new player.
         /// </summary>
-        /// <param name="world">The world to exist in.</param>
         /// <param name="handler">The pheromone handler to use.</param>
         /// <param name="input">The player input to use.</param>
         /// <param name="insects">The insect handler to use..</param>
         /// <param name="id">The palyer id, 0 or 1.</param>
         /// <param name="position">The cursor starting position</param>
-        public Player(World world, PheromoneHandler handler, PlayerInput input, InsectHandler insects, int id, Vector2 position) {
-            _world = world;
+        public Player(PheromoneHandler handler, PlayerInput input, InsectHandler insects, int id, Vector2 position) {
             _position = position;
             _handler = handler;
             _input = input;
@@ -65,18 +61,19 @@ namespace TinyShopping.Game {
         /// <summary>
         /// Draws the player cursor.
         /// </summary>
-        /// <param name="spriteBatch">The sprite batch to draw to.</param>
+        /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SpriteBatch spriteBatch, GameTime gameTime) {
-            Vector2 pos = _world.ConvertToScreenPosition(_id, _position);
-            spriteBatch.Draw(_texture, new Rectangle((int)(pos.X - SIZE/2f), (int)(pos.Y - SIZE/2f), SIZE, SIZE), Color.White);
+        public void Draw(SplitScreenHandler handler, GameTime gameTime) {
+            Rectangle destination = new Rectangle((int)(_position.X - SIZE / 2f), (int)(_position.Y - SIZE / 2f), SIZE, SIZE);
+            handler.RenderObject(_texture, destination, _id);
         }
 
         /// <summary>
         /// Reads user input and updates the cursor position.
         /// </summary>
         /// <param name="gameTime"></param>
-        public void Update(GameTime gameTime) {
+        /// <param name="handler">The split screen handler to use.</param>
+        public void Update(GameTime gameTime, SplitScreenHandler handler) {
             Vector2 motion = _input.GetMotion();
             if (_input.IsDiscoverPressed()) {
                 _discoverPressed += (int) Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
@@ -106,9 +103,10 @@ namespace TinyShopping.Game {
                 _newInsectPressed = false;
                 _insectHandler.BuyNewInsect(_id);
             }
-            _position.X += motion.X * (float)gameTime.ElapsedGameTime.TotalSeconds * SPEED;
-            _position.Y += motion.Y * (float)gameTime.ElapsedGameTime.TotalSeconds * SPEED;
-            _world.UpdateCameraPosition(_id, _position);
+            int speed = (int) (gameTime.ElapsedGameTime.TotalSeconds * SPEED);
+            _position.X += motion.X * speed;
+            _position.Y += motion.Y * speed;
+            handler.UpdateCameraPosition(_id, _position, speed);
         }
     }
 }

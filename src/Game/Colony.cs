@@ -104,11 +104,11 @@ namespace TinyShopping.Game {
         /// <summary>
         /// Draws the insects.
         /// </summary>
-        /// <param name="spriteBatch">The sprite batch to draw to.</param>
+        /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SpriteBatch spriteBatch, GameTime gameTime) {
+        public void Draw(SplitScreenHandler handler, GameTime gameTime) {
             foreach (Insect insect in _insects) {
-                insect.Draw(spriteBatch, gameTime);
+                insect.Draw(handler, gameTime);
             }
         }
 

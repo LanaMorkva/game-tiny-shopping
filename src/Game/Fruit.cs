@@ -23,10 +23,11 @@ namespace TinyShopping.Game {
         /// <summary>
         /// Draws the fruit to the sprite batch.
         /// </summary>
-        /// <param name="batch">The batch to draw to.</param>
+        /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current time information.</param>
-        public void Draw(SpriteBatch batch, GameTime gameTime) {
-            _world.RenderObect(batch, _texture, Position, _size);
+        public void Draw(SplitScreenHandler handler, GameTime gameTime) {
+            Rectangle destination = new Rectangle((int)Position.X, (int)Position.Y, _size, _size);
+            handler.RenderObject(_texture, destination);
         }
     }
 }
