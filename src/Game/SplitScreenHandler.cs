@@ -39,6 +39,12 @@ namespace TinyShopping.Game {
 
         private RenderTarget2D _renderTarget2;
 
+        /// <summary>
+        /// Creates a new instance to handle rendering to two split screens.
+        /// </summary>
+        /// <param name="area1">The area where the first screen should be drawn.</param>
+        /// <param name="area2">The area where the second screen should be drawn.</param>
+        /// <param name="device">The device to render to.</param>
         public SplitScreenHandler(Rectangle area1, Rectangle area2, GraphicsDevice device) {
             _player1Area = area1;
             _player2Area = area2;
@@ -47,6 +53,9 @@ namespace TinyShopping.Game {
             _batch2 = new SpriteBatch(device);
         }
 
+        /// <summary>
+        /// Initializes the necessary data.
+        /// </summary>
         public void Initialize() {
             _world = new World();
             _pheromoneHandler = new PheromoneHandler(_world);
@@ -54,6 +63,10 @@ namespace TinyShopping.Game {
             _insectHandler = new InsectHandler(_world, _pheromoneHandler, _fruitHandler);
         }
 
+        /// <summary>
+        /// Loads the necessary content from disk.
+        /// </summary>
+        /// <param name="content">The content manager to use.</param>
         public void LoadContent(ContentManager content) {
             _world.LoadContent(content);
             _insectHandler.LoadContent(content);
@@ -72,9 +85,14 @@ namespace TinyShopping.Game {
             _player2Camera = new Rectangle(_world.Width - _player2Area.Width, _world.Height - _player2Area.Height, _player2Area.Width, _player2Area.Height);
             _renderTarget1 = new RenderTarget2D(_device, _player1Area.Width, _player1Area.Height);
             _renderTarget2 = new RenderTarget2D(_device, _player2Area.Width, _player2Area.Height);
-            CreateBorderTexture();
+
+            CreateBorderTexture(new Color(252, 239, 197), 3);
         }
 
+        /// <summary>
+        /// Updates the game objects.
+        /// </summary>
+        /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
             _insectHandler.Update(gameTime);
             _pheromoneHandler.Update(gameTime);
@@ -82,12 +100,48 @@ namespace TinyShopping.Game {
             _player2.Update(gameTime, this);
         }
 
+        /// <summary>
+        /// Draws the game objects to the two screens.
+        /// </summary>
+        /// <param name="batch">The main sprite batch.</param>
+        /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
-            // start batches
             _batch1.Begin();
             _batch2.Begin();
+            DrawAllGameObjects(gameTime);
+            DrawBatchesToTextures();
+            DrawTexturesToScreen(batch);
+            batch.Draw(_borderTexture, _player1Area, Color.White);
+            batch.Draw(_borderTexture, _player2Area, Color.White);
+        }
 
-            // draw all objects
+        /// <summary>
+        /// Draws the two predrawn textures to the main batch and thereby to the screen.
+        /// </summary>
+        /// <param name="batch">The main screen sprite batch.</param>
+        private void DrawTexturesToScreen(SpriteBatch batch) {
+            _device.SetRenderTarget(null);
+            batch.Draw(_renderTarget1, _player1Area, Color.White);
+            batch.Draw(_renderTarget2, _player2Area, Color.White);
+        }
+
+        /// <summary>
+        /// Draws the two sprite batches to two textures.
+        /// </summary>
+        private void DrawBatchesToTextures() {
+            _device.SetRenderTarget(_renderTarget1);
+            _device.Clear(Color.Black);
+            _batch1.End();
+            _device.SetRenderTarget(_renderTarget2);
+            _device.Clear(Color.Black);
+            _batch2.End();
+        }
+
+        /// <summary>
+        /// Draws all game objects to the two player's sprite batches.
+        /// </summary>
+        /// <param name="gameTime">The current game time.</param>
+        private void DrawAllGameObjects(GameTime gameTime) {
             _world.DrawFloor(_batch1, new Rectangle(0, 0, _player1Area.Width, _player1Area.Height), _player1Camera);
             _world.DrawFloor(_batch2, new Rectangle(0, 0, _player2Area.Width, _player2Area.Height), _player2Camera);
             _insectHandler.Draw(this, gameTime);
@@ -97,54 +151,40 @@ namespace TinyShopping.Game {
             _world.DrawObjects(_batch2, new Rectangle(0, 0, _player2Area.Width, _player2Area.Height), _player2Camera);
             _player1.Draw(this, gameTime);
             _player2.Draw(this, gameTime);
-
-            // draw debug info
 #if DEBUG
             _world.DrawDebugInfo(this);
 #endif
-
-            // draw player 1 area to texture
-            _device.SetRenderTarget(_renderTarget1);
-            _device.Clear(Color.Black);
-            _batch1.End();
-
-            // draw player 2 area to texture
-            _device.SetRenderTarget(_renderTarget2);
-            _device.Clear(Color.Black);
-            _batch2.End();
-
-            // draw player 1 + 2 textures to screen
-            _device.SetRenderTarget(null);
-            batch.Draw(_renderTarget1, _player1Area, Color.White);
-            batch.Draw(_renderTarget2, _player2Area, Color.White);
-
-            // draw border overlay
-            batch.Draw(_borderTexture, _player1Area, Color.White);
-            batch.Draw(_borderTexture, _player2Area, Color.White);
         }
 
         /// <summary>
         /// Creates black rectangles to place around the player views.
         /// </summary>
-        private void CreateBorderTexture() {
+        private void CreateBorderTexture(Color color, int width) {
             _borderTexture = new Texture2D(_device, _player1Area.Width, _player1Area.Height);
             Color[] data = new Color[_player1Area.Width * _player1Area.Height];
-            for (int i = 0; i < data.Length; i++) {
-                data[i] = new Color(0, 0, 0, 0);
-            }
-            for (int i = 0; i < _player1Area.Width; i++) {
-                data[i] = Color.Black;
-                data[i + _player1Area.Width] = Color.Black;
-                data[i + (_player1Area.Width * (_player1Area.Height - 2))] = Color.Black;
-                data[i + (_player1Area.Width * (_player1Area.Height - 1))] = Color.Black;
-            }
-            for (int i = 0; i < _player1Area.Height; i++) {
-                data[0 + _player1Area.Width * i] = Color.Black;
-                data[1 + _player1Area.Width * i] = Color.Black;
-                data[_player1Area.Width - 2 + _player1Area.Width * i] = Color.Black;
-                data[_player1Area.Width - 1 + _player1Area.Width * i] = Color.Black;
-            }
+            FillTextureRect(data, 0, 0, _player1Area.Width, _player2Area.Height, new Color(0, 0, 0, 0));
+            FillTextureRect(data, 0, 0, _player1Area.Width, width, color);
+            FillTextureRect(data, 0, _player1Area.Height - width, _player1Area.Width, width, color);
+            FillTextureRect(data, 0, 0, width, _player1Area.Height, color);
+            FillTextureRect(data, _player1Area.Width - width, 0, width, _player1Area.Height, color);
             _borderTexture.SetData(data);
+        }
+
+        /// <summary>
+        /// Fills the given rectangle of a data array with the given color.
+        /// </summary>
+        /// <param name="data">The array to fill.</param>
+        /// <param name="x">The x coordinate of the rectangle.</param>
+        /// <param name="y">The y coordinate of the rectangle.</param>
+        /// <param name="width">The width of the rectangle.</param>
+        /// <param name="height">The height of the rectangle.</param>
+        /// <param name="color">The color to use.</param>
+        private void FillTextureRect(Color[] data, int x, int y, int width, int height, Color color) {
+            for (int j = y; j < y + height; ++j) {
+                for (int i = x; i < x + width; ++i) {
+                    data[i + j * _player1Area.Width] = color;
+                }
+            }
         }
 
         /// <summary>
@@ -234,16 +274,16 @@ namespace TinyShopping.Game {
             if (player == 1) {
                 c = _player2Camera;
             }
-            if (c.X + c.Width - cursorPos.X < 50) {
+            if (c.X + c.Width - cursorPos.X < 50 && c.X + c.Width < _world.Width) {
                 c.X += speed;
             }
-            if (cursorPos.X - c.X < 50) {
+            if (cursorPos.X - c.X < 50 && c.X > 0) {
                 c.X -= speed;
             }
-            if (c.Y + c.Height - cursorPos.Y < 50) {
+            if (c.Y + c.Height - cursorPos.Y < 50 && c.Y + c.Height < _world.Height) {
                 c.Y += speed;
             }
-            if (cursorPos.Y - c.Y < 50) {
+            if (cursorPos.Y - c.Y < 50 && c.Y > 0) {
                 c.Y -= speed;
             }
             if (player == 0) {
@@ -253,6 +293,16 @@ namespace TinyShopping.Game {
                 _player2Camera = c;
             }
         }
+
+        /// <summary>
+        /// Returns the bounds of the camera of the given player.
+        /// </summary>
+        /// <param name="player">The player to get the camera bounds.</param>
+        /// <returns>A rectangle in world coordinates.</returns>
+        public Rectangle GetPlayerCameraBounds(int player) {
+            return player == 0 ? _player1Camera : _player2Camera;
+        }
+
 
         /// <summary>
         /// Gets the number of ants in the colony of the given player.
