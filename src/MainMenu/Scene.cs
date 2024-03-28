@@ -3,11 +3,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TinyShopping.MainMenu
 {
@@ -16,8 +11,6 @@ namespace TinyShopping.MainMenu
         private Texture2D _background;
 
         private SpriteFont _font;
-
-        private Vector2 _offset;
 
         private Rectangle _backgroundPosition;
 
@@ -69,7 +62,6 @@ namespace TinyShopping.MainMenu
             int worldHeight = (int)(_background.Height * ratio);
             int xOffset = (int)((screen.X - worldWidth) / 2.0);
             int yOffset = (int)((screen.Y - worldHeight) / 2.0);
-            _offset = new Vector2(xOffset, yOffset);
             _backgroundPosition = new Rectangle(xOffset, yOffset, worldWidth, worldHeight);
         }
     }

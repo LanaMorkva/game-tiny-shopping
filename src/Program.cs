@@ -1,5 +1,4 @@
-﻿using TinyShopping.Game;
-using System;
+﻿using System;
 
 namespace TinyShopping {
 
