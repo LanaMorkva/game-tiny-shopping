@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using System;
 
 namespace TinyShopping.Game {
@@ -63,9 +64,9 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SplitScreenHandler handler, GameTime gameTime) {
+        public void Draw(SpriteBatch batch, GameTime gameTime) {
             Rectangle destination = new Rectangle((int)(_position.X - SIZE / 2f), (int)(_position.Y - SIZE / 2f), SIZE, SIZE);
-            handler.RenderObject(_texture, destination, _id);
+            batch.Draw(_texture, destination, Color.White);
         }
 
         /// <summary>
@@ -78,7 +79,7 @@ namespace TinyShopping.Game {
             PlacePheromones(gameTime);
             UpdatePosition(speed);
             handler.UpdateCameraPosition(_id, _position, speed);
-            ClipToCamera(handler);
+            ClipToCamera(handler); // do we need this?
         }
 
         /// <summary>
@@ -91,14 +92,14 @@ namespace TinyShopping.Game {
             if (cursor.X < camera.X) {
                 _position.X = camera.X + SIZE / 2f;
             }
-            if (cursor.X + cursor.Width > camera.X + camera.Width) {
+            if (cursor.Right > camera.Right) {
                 _position.X = camera.X + camera.Width - SIZE / 2f;
 
             }
             if (cursor.Y < camera.Y) {
                 _position.Y = camera.Y + SIZE / 2f;
             }
-            if (cursor.Y + cursor.Height > camera.Y + camera.Height) {
+            if (cursor.Bottom > camera.Bottom) {
                 _position.Y = camera.Y + camera.Height - SIZE / 2f;
             }
         }

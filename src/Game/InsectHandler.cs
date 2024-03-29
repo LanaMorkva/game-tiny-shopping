@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TinyShopping.Game {
 
@@ -59,9 +60,9 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SplitScreenHandler handler, GameTime gameTime) {
+        public void Draw(SpriteBatch batch, GameTime gameTime) {
             foreach(var colony in _colonies) {
-                colony.Draw(handler, gameTime);
+                colony.Draw(batch, gameTime);
             }
         }
 

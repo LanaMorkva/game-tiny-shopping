@@ -80,10 +80,12 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current time information.</param>
-        public void Draw(SplitScreenHandler handler, GameTime gameTime) {
+        public void Draw(SpriteBatch batch, GameTime gameTime) {
             Texture2D texture = IsCarrying ? _textureFull : _texture;
             Rectangle destination = new Rectangle(_position.X, _position.Y, TextureSize, TextureSize);
-            handler.RenderObject(texture, destination, _position.Rotation);
+
+            Vector2 origin = new Vector2(texture.Width / 2f, texture.Height / 2f);
+            batch.Draw(texture, destination, null, Color.White, _position.Rotation, origin, SpriteEffects.None, 0);
         }
 
         /// <summary>

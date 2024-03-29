@@ -51,8 +51,12 @@ namespace TinyShopping.Game {
 
         public override void Draw(GameTime gameTime) {
             _spriteBatch.Begin();
+            
+            Viewport original = GraphicsDevice.Viewport;
             _splitScreenHandler.Draw(_spriteBatch, gameTime);
             _ui.Draw(_spriteBatch, gameTime);
+            GraphicsDevice.Viewport = original;
+            
             _spriteBatch.End();
             base.Draw(gameTime);
         }

@@ -25,9 +25,9 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current time information.</param>
-        public void Draw(SplitScreenHandler handler, GameTime gameTime) {
+        public void Draw(SpriteBatch batch, GameTime gameTime) {
             Rectangle destination = new Rectangle((int)Position.X, (int)Position.Y, _size, _size);
-            handler.RenderObject(_texture, destination);
+            batch.Draw(_texture, destination, Color.White);
         }
     }
 }

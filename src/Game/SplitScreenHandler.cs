@@ -1,7 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+
+using MonoGame.Extended;
+using MonoGame.Extended.ViewportAdapters;
 
 namespace TinyShopping.Game {
 
@@ -10,10 +14,6 @@ namespace TinyShopping.Game {
         private Rectangle _player1Area;
 
         private Rectangle _player2Area;
-
-        private Rectangle _player1Camera;
-
-        private Rectangle _player2Camera;
 
         private GraphicsDevice _device;
 
@@ -31,12 +31,15 @@ namespace TinyShopping.Game {
 
         private Player _player2;
 
-        private SpriteBatch _batch1;
+        private SpriteBatch _batch;
 
-        private SpriteBatch _batch2;
+        private OrthographicCamera _camera1;
+        private OrthographicCamera _camera2;
+
+        private Viewport _viewport1;
+        private Viewport _viewport2;
 
         private RenderTarget2D _renderTarget1;
-
         private RenderTarget2D _renderTarget2;
 
         /// <summary>
@@ -49,8 +52,7 @@ namespace TinyShopping.Game {
             _player1Area = area1;
             _player2Area = area2;
             _device = device;
-            _batch1 = new SpriteBatch(device);
-            _batch2 = new SpriteBatch(device);
+            _batch = new SpriteBatch(device);
         }
 
         /// <summary>
@@ -61,6 +63,14 @@ namespace TinyShopping.Game {
             _pheromoneHandler = new PheromoneHandler(_world);
             _fruitHandler = new FruitHandler(_world);
             _insectHandler = new InsectHandler(_world, _pheromoneHandler, _fruitHandler);
+
+            _camera1 = new OrthographicCamera(_device);
+            _camera2 = new OrthographicCamera(_device);
+            _viewport1 = new Viewport(_player1Area);
+            _viewport2 = new Viewport(_player2Area);
+
+            _renderTarget1 = new RenderTarget2D(_device, _player1Area.Width, _player1Area.Height);
+            _renderTarget2 = new RenderTarget2D(_device, _player2Area.Width, _player2Area.Height);
         }
 
         /// <summary>
@@ -68,23 +78,23 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager to use.</param>
         public void LoadContent(ContentManager content) {
-            _world.LoadContent(content);
+            _world.LoadContent(content, _device);
             _insectHandler.LoadContent(content);
             _fruitHandler.LoadContent(content);
             _pheromoneHandler.LoadContent(content);
 
             PlayerInput input1 = CreatePlayerInput(PlayerIndex.One);
-            _player1 = new Player(_pheromoneHandler, input1, _insectHandler, 0, _world.GetTopLeftOfTile(5, 3));
+            _player1 = new Player(_pheromoneHandler, input1, _insectHandler, 0, _world.GetTopLeftOfTile(3, 5));
             _player1.LoadContent(content);
+
+            _camera1.LookAt(_world.GetTopLeftOfTile(24, 14));
+            _camera1.ZoomOut(0.5f);
 
             PlayerInput input2 = CreatePlayerInput(PlayerIndex.Two);
             _player2 = new Player(_pheromoneHandler, input2, _insectHandler, 1, _world.GetTopLeftOfTile(54, 35));
             _player2.LoadContent(content);
-
-            _player1Camera = new Rectangle(0, 0, _player1Area.Width, _player1Area.Height);
-            _player2Camera = new Rectangle(_world.Width - _player2Area.Width, _world.Height - _player2Area.Height, _player2Area.Width, _player2Area.Height);
-            _renderTarget1 = new RenderTarget2D(_device, _player1Area.Width, _player1Area.Height);
-            _renderTarget2 = new RenderTarget2D(_device, _player2Area.Width, _player2Area.Height);
+            _camera2.LookAt(_world.GetTopLeftOfTile(57, 27));
+            _camera2.ZoomOut(0.5f);
 
             CreateBorderTexture(new Color(252, 239, 197), 3);
         }
@@ -106,53 +116,47 @@ namespace TinyShopping.Game {
         /// <param name="batch">The main sprite batch.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
-            _batch1.Begin();
-            _batch2.Begin();
-            DrawAllGameObjects(gameTime);
-            DrawBatchesToTextures();
-            DrawTexturesToScreen(batch);
-            batch.Draw(_borderTexture, _player1Area, Color.White);
-            batch.Draw(_borderTexture, _player2Area, Color.White);
-        }
 
-        /// <summary>
-        /// Draws the two predrawn textures to the main batch and thereby to the screen.
-        /// </summary>
-        /// <param name="batch">The main screen sprite batch.</param>
-        private void DrawTexturesToScreen(SpriteBatch batch) {
+            Matrix viewMatrix = _camera1.GetViewMatrix();
+
+            _device.Viewport = _viewport1;
+            _device.SetRenderTarget(_renderTarget1);
+            _batch.Begin(transformMatrix: viewMatrix);
+            DrawAllGameObjects(_batch, 0, viewMatrix, gameTime);
+            _batch.End();
+            
+            viewMatrix = _camera2.GetViewMatrix();
+            _device.Viewport = _viewport2;
+            _device.SetRenderTarget(_renderTarget2);
+            _batch.Begin(transformMatrix: viewMatrix);
+            DrawAllGameObjects(_batch, 1, viewMatrix, gameTime);
+            _batch.End();
+
             _device.SetRenderTarget(null);
             batch.Draw(_renderTarget1, _player1Area, Color.White);
             batch.Draw(_renderTarget2, _player2Area, Color.White);
-        }
-
-        /// <summary>
-        /// Draws the two sprite batches to two textures.
-        /// </summary>
-        private void DrawBatchesToTextures() {
-            _device.SetRenderTarget(_renderTarget1);
-            _device.Clear(Color.Black);
-            _batch1.End();
-            _device.SetRenderTarget(_renderTarget2);
-            _device.Clear(Color.Black);
-            _batch2.End();
+            batch.Draw(_borderTexture, _player1Area, Color.White);
+            batch.Draw(_borderTexture, _player2Area, Color.White);
         }
 
         /// <summary>
         /// Draws all game objects to the two player's sprite batches.
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
-        private void DrawAllGameObjects(GameTime gameTime) {
-            _world.DrawFloor(_batch1, new Rectangle(0, 0, _player1Area.Width, _player1Area.Height), _player1Camera);
-            _world.DrawFloor(_batch2, new Rectangle(0, 0, _player2Area.Width, _player2Area.Height), _player2Camera);
-            _insectHandler.Draw(this, gameTime);
-            _fruitHandler.Draw(this, gameTime);
-            _pheromoneHandler.Draw(this, gameTime);
-            _world.DrawObjects(_batch1, new Rectangle(0, 0, _player1Area.Width, _player1Area.Height), _player1Camera);
-            _world.DrawObjects(_batch2, new Rectangle(0, 0, _player2Area.Width, _player2Area.Height), _player2Camera);
-            _player1.Draw(this, gameTime);
-            _player2.Draw(this, gameTime);
+        private void DrawAllGameObjects(SpriteBatch batch, int playerId, Matrix viewMatrix, GameTime gameTime) {
+            _world.DrawFloor(batch, Vector2.Zero);
+            _pheromoneHandler.Draw(batch, playerId, gameTime);
+            _insectHandler.Draw(batch, gameTime);
+            _fruitHandler.Draw(batch, gameTime);
+            _world.DrawObjects(batch, Vector2.Zero);
+            if (playerId == 0) {
+                _player1.Draw(batch, gameTime);
+            } else {
+                _player2.Draw(batch, gameTime);
+            }
+            
 #if DEBUG
-            _world.DrawDebugInfo(this);
+            _world.DrawDebugInfo(batch);
 #endif
         }
 
@@ -202,95 +206,37 @@ namespace TinyShopping.Game {
         }
 
         /// <summary>
-        /// Renders an object to the corresponding slpit screen(s).
-        /// </summary>
-        /// <param name="texture">The texture to use.</param>
-        /// <param name="destination">The destination location in world coordinates.</param>
-        public void RenderObject(Texture2D texture, Rectangle destination) {
-            if (destination.Intersects(_player1Camera)) {
-                Rectangle screen = new Rectangle(destination.X - _player1Camera.X, destination.Y - _player1Camera.Y, destination.Width, destination.Height);
-                _batch1.Draw(texture, screen, Color.White);
-            }
-            if (destination.Intersects(_player2Camera)) {
-                Rectangle screen = new Rectangle(destination.X - _player2Camera.X, destination.Y - _player2Camera.Y, destination.Width, destination.Height);
-                _batch2.Draw(texture, screen, Color.White);
-            }
-        }
-
-        /// <summary>
-        /// Renders an object to the corresponding slpit screen(s).
-        /// </summary>
-        /// <param name="texture">The texture to use.</param>
-        /// <param name="destination">The destination location in world coordinates.</param>
-        /// <param name="rotation">The rotation to apply to the texture.</param>
-        public void RenderObject(Texture2D texture, Rectangle destination, float rotation) {
-            Vector2 origin = new Vector2(texture.Width / 2f, texture.Height / 2f);
-            if (destination.Intersects(_player1Camera)) {
-                Rectangle screen = new Rectangle(destination.X - _player1Camera.X, destination.Y - _player1Camera.Y, destination.Width, destination.Height);
-                _batch1.Draw(texture, screen, null, Color.White, rotation, origin, SpriteEffects.None, 0);
-            }
-            if (destination.Intersects(_player2Camera)) {
-                Rectangle screen = new Rectangle(destination.X - _player2Camera.X, destination.Y - _player2Camera.Y, destination.Width, destination.Height);
-                _batch2.Draw(texture, screen, null, Color.White, rotation, origin, SpriteEffects.None, 0);
-            }
-        }
-
-        /// <summary>
-        /// Renders an object to the screen of the given player.
-        /// </summary>
-        /// <param name="texture">The texture to use.</param>
-        /// <param name="destination">The destination location in world coordinates.</param>
-        /// <param name="player">The player that should see the object.</param>
-        /// <param name="color">The color to use.</param>
-        public void RenderObject(Texture2D texture, Rectangle destination, int player, Color color) {
-            if (player == 0 && destination.Intersects(_player1Camera)) {
-                Rectangle screen = new Rectangle(destination.X - _player1Camera.X, destination.Y - _player1Camera.Y, destination.Width, destination.Height);
-                _batch1.Draw(texture, screen, color);
-            }
-            if (player == 1 && destination.Intersects(_player2Camera)) {
-                Rectangle screen = new Rectangle(destination.X - _player2Camera.X, destination.Y - _player2Camera.Y, destination.Width, destination.Height);
-                _batch2.Draw(texture, screen, color);
-            }
-        }
-
-        /// <summary>
-        /// Renders an object to the screen of the given player.
-        /// </summary>
-        /// <param name="texture">The texture to use.</param>
-        /// <param name="destination">The destination location in world coordinates.</param>
-        /// <param name="player">The player that should see the object.</param>
-        public void RenderObject(Texture2D texture, Rectangle destination, int player) {
-            RenderObject(texture, destination, player, Color.White);
-        }
-
-        /// <summary>
         /// Updates the given player's camera position.
         /// </summary>
         /// <param name="player">The current player.</param>
         /// <param name="cursorPos">The cursor world position.</param>
         /// <param name="speed">The speed of the scrolling.</param>
         public void UpdateCameraPosition(int player, Vector2 cursorPos, int speed) {
-            Rectangle c = _player1Camera;
+            RectangleF cameraRect = _camera1.BoundingRectangle;
+            Vector2 cameraMoveDirection = Vector2.Zero;
             if (player == 1) {
-                c = _player2Camera;
+                cameraRect = _camera2.BoundingRectangle;
             }
-            if (c.X + c.Width - cursorPos.X < 50 && c.X + c.Width < _world.Width) {
-                c.X += speed;
+
+            cameraRect.Size = _viewport1.Bounds.Size;
+
+            if (Math.Abs(cursorPos.X - cameraRect.Right) < 50 && cameraRect.Right < _world.Width) {
+                cameraMoveDirection.X += speed;
             }
-            if (cursorPos.X - c.X < 50 && c.X > 0) {
-                c.X -= speed;
+            if (Math.Abs(cursorPos.X - cameraRect.Left) < 50 && cameraRect.Left > 0) {
+                cameraMoveDirection.X -= speed;
             }
-            if (c.Y + c.Height - cursorPos.Y < 50 && c.Y + c.Height < _world.Height) {
-                c.Y += speed;
+            if (Math.Abs(cursorPos.Y - cameraRect.Top) < 50 && cameraRect.Y > 0) {
+                cameraMoveDirection.Y -= speed;
             }
-            if (cursorPos.Y - c.Y < 50 && c.Y > 0) {
-                c.Y -= speed;
+            if (Math.Abs(cursorPos.Y - cameraRect.Bottom) < 50 && cameraRect.Bottom < _world.Height) {
+                cameraMoveDirection.Y += speed;
             }
+
             if (player == 0) {
-                _player1Camera = c;
-            }
-            else {
-                _player2Camera = c;
+                _camera1.Move(cameraMoveDirection);
+            } else {
+                _camera2.Move(cameraMoveDirection);
             }
         }
 
@@ -300,7 +246,9 @@ namespace TinyShopping.Game {
         /// <param name="player">The player to get the camera bounds.</param>
         /// <returns>A rectangle in world coordinates.</returns>
         public Rectangle GetPlayerCameraBounds(int player) {
-            return player == 0 ? _player1Camera : _player2Camera;
+            RectangleF rect = player == 0 ? _camera1.BoundingRectangle :  _camera2.BoundingRectangle;
+            rect.Size = _viewport1.Bounds.Size;
+            return rect.ToRectangle();
         }
 
 

@@ -23,7 +23,7 @@ namespace TinyShopping.Game {
 
         public PheromoneType Type { private set; get; }
 
-        private int _owner;
+        public int Owner { private set; get; }
 
         /// <summary>
         /// Creates a new pheromone spot.
@@ -42,7 +42,7 @@ namespace TinyShopping.Game {
             _texture = texture;
             Priority = priority;
             Type = type;
-            _owner = owner;
+            Owner = owner;
             _pheromoneSize = RANGE * _tileSize * 2;
 
             switch (type) {
@@ -63,12 +63,12 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SplitScreenHandler handler, GameTime gameTime) {
+        public void Draw(SpriteBatch batch, GameTime gameTime) {
             Rectangle destination = new Rectangle((int)Position.X - PheromoneRange, (int)Position.Y - PheromoneRange, _pheromoneSize, _pheromoneSize);
             float priority = (Priority + 500) / 1000;
             int alpha = (int)(priority * 15) + 50;
             Color updateColor = new Color(_color, alpha);
-            handler.RenderObject(_texture, destination, _owner, updateColor);
+            batch.Draw(_texture, destination, updateColor);
         }
 
         /// <summary>

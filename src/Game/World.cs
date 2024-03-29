@@ -39,12 +39,15 @@ namespace TinyShopping.Game {
         /// Loads necessary data from disk.
         /// </summary>
         /// <param name="contentManager">The content manager of the main game.</param>
-        public void LoadContent(ContentManager contentManager) {
-            _floorTexture = contentManager.Load<Texture2D>("static_map_floor_small");
+        public void LoadContent(ContentManager contentManager, GraphicsDevice device) {
+            
+            _floorTexture = contentManager.Load<Texture2D>("static_map_floor");
+
             Width = _floorTexture.Width;
             Height = _floorTexture.Height;
             _tileSize = _floorTexture.Width / (float)NUM_OF_SQUARES_WIDTH;
-            _objectsTexture = contentManager.Load<Texture2D>("static_map_else_small");
+
+            _objectsTexture = contentManager.Load<Texture2D>("static_map_else");
             CreateCollisionAreas();
 #if DEBUG
             _obstacleTexture = contentManager.Load<Texture2D>("obstacle");
@@ -57,8 +60,8 @@ namespace TinyShopping.Game {
         /// <param name="batch">The batch to draw to.</param>
         /// <param name="destination">The destination to draw to.</param>
         /// <param name="source">The source rectangle on the texture to use.</param>
-        public void DrawFloor(SpriteBatch batch, Rectangle destination, Rectangle source) {
-            batch.Draw(_floorTexture, destination, source, Color.White);
+        public void DrawFloor(SpriteBatch batch, Vector2 position) {
+            batch.Draw(_floorTexture, position, Color.White);
         }
 
         /// <summary>
@@ -66,8 +69,8 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="batch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void DrawObjects(SpriteBatch batch, Rectangle destination, Rectangle source) {
-            batch.Draw(_objectsTexture, destination, source, Color.White);
+        public void DrawObjects(SpriteBatch batch, Vector2 position) {
+            batch.Draw(_objectsTexture, position, Color.White);
         }
 
 #if DEBUG
@@ -75,15 +78,16 @@ namespace TinyShopping.Game {
         /// Draws red rectangles around obstacles.
         /// </summary>
         /// <param name="handler">The split screen handler to use.</param>
-        public void DrawDebugInfo(SplitScreenHandler handler) {
-            foreach (var o in _obstacles) {
-                float x = o.X * TileSize;
-                float y = o.Y * TileSize;
-                float w = o.Width * TileSize;
-                float h = o.Height * TileSize;
-                Rectangle r = new Rectangle((int)x, (int)y, (int)w, (int)h);
-                handler.RenderObject(_obstacleTexture, r);
-            }
+        public void DrawDebugInfo(SpriteBatch batch) {
+            // Note: temporaly not valid, since obstacles are hardcoded, will update later
+            // foreach (var o in _obstacles) {
+            //     float x = o.X * TileSize;
+            //     float y = o.Y * TileSize;
+            //     float w = o.Width * TileSize;
+            //     float h = o.Height * TileSize;
+            //     Rectangle r = new Rectangle((int)x, (int)y, (int)w, (int)h);
+            //     batch.Draw(_obstacleTexture, r, Color.White);
+            // }
         }
 #endif
 

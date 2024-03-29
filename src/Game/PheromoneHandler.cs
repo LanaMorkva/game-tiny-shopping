@@ -88,15 +88,19 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SplitScreenHandler handler, GameTime gameTime) {
+        public void Draw(SpriteBatch batch,int ownerId, GameTime gameTime) {
             foreach (var ps in  _pheromones) {
                 foreach (var p in ps) {
-                    p.Draw(handler, gameTime);
+                    if (ownerId == p.Owner) {
+                        p.Draw(batch, gameTime);
+                    }
                 }
             }
             foreach (var ps in _returnPheromones) {
                 foreach (var p in ps) {
-                    p.Draw(handler, gameTime);
+                    if (ownerId == p.Owner) {
+                        p.Draw(batch, gameTime);
+                    }
                 }
             }
         }
