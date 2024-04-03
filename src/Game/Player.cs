@@ -13,7 +13,7 @@ namespace TinyShopping.Game {
 
         private static readonly int SIZE = 50;
 
-        private static readonly int SPEED = 200;
+        private static readonly int SPEED = 400;
 
         private Vector2 _position;
 
@@ -33,6 +33,8 @@ namespace TinyShopping.Game {
 
         private InsectHandler _insectHandler;
 
+        private World _world;
+
         private int _id;
 
         /// <summary>
@@ -43,11 +45,12 @@ namespace TinyShopping.Game {
         /// <param name="insects">The insect handler to use..</param>
         /// <param name="id">The palyer id, 0 or 1.</param>
         /// <param name="position">The cursor starting position</param>
-        public Player(PheromoneHandler handler, PlayerInput input, InsectHandler insects, int id, Vector2 position) {
+        public Player(PheromoneHandler handler, PlayerInput input, InsectHandler insects, World world, int id, Vector2 position) {
             _position = position;
             _handler = handler;
             _input = input;
             _insectHandler = insects;
+            _world = world;
             _id = id;
         }
 
@@ -79,28 +82,26 @@ namespace TinyShopping.Game {
             PlacePheromones(gameTime);
             UpdatePosition(speed);
             handler.UpdateCameraPosition(_id, _position, speed);
-            ClipToCamera(handler); // do we need this?
+            ClipCursorToWorld();
         }
 
         /// <summary>
-        /// Updates the position to make sure the cursor stays within the player camera's view.
+        /// Clip the cursor position to the world.
         /// </summary>
-        /// <param name="handler">The split screen handler to use.</param>
-        private void ClipToCamera(SplitScreenHandler handler) {
+        private void ClipCursorToWorld() {
             Rectangle cursor = new Rectangle((int)(_position.X - SIZE / 2f), (int)(_position.Y - SIZE / 2f), SIZE, SIZE);
-            Rectangle camera = handler.GetPlayerCameraBounds(_id);
-            if (cursor.X < camera.X) {
-                _position.X = camera.X + SIZE / 2f;
-            }
-            if (cursor.Right > camera.Right) {
-                _position.X = camera.X + camera.Width - SIZE / 2f;
 
+            if (cursor.X < 0) {
+                _position.X = SIZE / 2f;
             }
-            if (cursor.Y < camera.Y) {
-                _position.Y = camera.Y + SIZE / 2f;
+            if (cursor.Right > _world.Width) {
+                _position.X = _world.Width - SIZE / 2f;
             }
-            if (cursor.Bottom > camera.Bottom) {
-                _position.Y = camera.Y + camera.Height - SIZE / 2f;
+            if (cursor.Y < 0) {
+                _position.Y = 0 + SIZE / 2f;
+            }
+            if (cursor.Bottom > _world.Height) {
+                _position.Y = _world.Height - SIZE / 2f;
             }
         }
 

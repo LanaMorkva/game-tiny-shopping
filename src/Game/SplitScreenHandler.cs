@@ -63,12 +63,13 @@ namespace TinyShopping.Game {
             _pheromoneHandler = new PheromoneHandler(_world);
             _fruitHandler = new FruitHandler(_world);
             _insectHandler = new InsectHandler(_world, _pheromoneHandler, _fruitHandler);
-
+            
             _camera1 = new OrthographicCamera(_device);
             _camera2 = new OrthographicCamera(_device);
+
             _viewport1 = new Viewport(_player1Area);
             _viewport2 = new Viewport(_player2Area);
-
+            
             _renderTarget1 = new RenderTarget2D(_device, _player1Area.Width, _player1Area.Height);
             _renderTarget2 = new RenderTarget2D(_device, _player2Area.Width, _player2Area.Height);
         }
@@ -84,17 +85,15 @@ namespace TinyShopping.Game {
             _pheromoneHandler.LoadContent(content);
 
             PlayerInput input1 = CreatePlayerInput(PlayerIndex.One);
-            _player1 = new Player(_pheromoneHandler, input1, _insectHandler, 0, _world.GetTopLeftOfTile(3, 5));
+            _player1 = new Player(_pheromoneHandler, input1, _insectHandler, _world, 0, _world.GetTopLeftOfTile(3, 5));
             _player1.LoadContent(content);
 
-            _camera1.LookAt(_world.GetTopLeftOfTile(24, 14));
-            _camera1.ZoomOut(0.5f);
+            // _camera1.LookAt(_world.GetTopLeftOfTile(24, 14));
 
             PlayerInput input2 = CreatePlayerInput(PlayerIndex.Two);
-            _player2 = new Player(_pheromoneHandler, input2, _insectHandler, 1, _world.GetTopLeftOfTile(54, 35));
+            _player2 = new Player(_pheromoneHandler, input2, _insectHandler, _world, 1, _world.GetTopLeftOfTile(54, 35));
             _player2.LoadContent(content);
             _camera2.LookAt(_world.GetTopLeftOfTile(57, 27));
-            _camera2.ZoomOut(0.5f);
 
             CreateBorderTexture(new Color(252, 239, 197), 3);
         }
@@ -118,7 +117,6 @@ namespace TinyShopping.Game {
         public void Draw(SpriteBatch batch, GameTime gameTime) {
 
             Matrix viewMatrix = _camera1.GetViewMatrix();
-
             _device.Viewport = _viewport1;
             _device.SetRenderTarget(_renderTarget1);
             _batch.Begin(transformMatrix: viewMatrix);
@@ -202,8 +200,8 @@ namespace TinyShopping.Game {
                 return new GamePadInput(playerIndex);
             }
             return new KeyboardInput(playerIndex);
-
         }
+
 
         /// <summary>
         /// Updates the given player's camera position.
@@ -212,24 +210,26 @@ namespace TinyShopping.Game {
         /// <param name="cursorPos">The cursor world position.</param>
         /// <param name="speed">The speed of the scrolling.</param>
         public void UpdateCameraPosition(int player, Vector2 cursorPos, int speed) {
-            RectangleF cameraRect = _camera1.BoundingRectangle;
-            Vector2 cameraMoveDirection = Vector2.Zero;
-            if (player == 1) {
+            RectangleF cameraRect;
+            if  (player == 0) {
+                cameraRect = _camera1.BoundingRectangle;
+                cameraRect.Size = _player1Area.Size.ToVector2();
+            } else {
                 cameraRect = _camera2.BoundingRectangle;
+                cameraRect.Size = _player2Area.Size.ToVector2();
             }
 
-            cameraRect.Size = _viewport1.Bounds.Size;
-
-            if (Math.Abs(cursorPos.X - cameraRect.Right) < 50 && cameraRect.Right < _world.Width) {
+            Vector2 cameraMoveDirection = Vector2.Zero;
+            if (cameraRect.Right - cursorPos.X < 50 && cameraRect.Right < _world.Width) {
                 cameraMoveDirection.X += speed;
             }
-            if (Math.Abs(cursorPos.X - cameraRect.Left) < 50 && cameraRect.Left > 0) {
-                cameraMoveDirection.X -= speed;
+            if (cursorPos.X - cameraRect.Left < 50 && cameraRect.Left > 0) {
+                cameraMoveDirection.X -= speed; 
             }
-            if (Math.Abs(cursorPos.Y - cameraRect.Top) < 50 && cameraRect.Y > 0) {
+            if (cursorPos.Y - cameraRect.Top < 50 && cameraRect.Y > 0) {
                 cameraMoveDirection.Y -= speed;
             }
-            if (Math.Abs(cursorPos.Y - cameraRect.Bottom) < 50 && cameraRect.Bottom < _world.Height) {
+            if (cameraRect.Bottom - cursorPos.Y < 50 && cameraRect.Bottom < _world.Height) {
                 cameraMoveDirection.Y += speed;
             }
 
@@ -239,18 +239,6 @@ namespace TinyShopping.Game {
                 _camera2.Move(cameraMoveDirection);
             }
         }
-
-        /// <summary>
-        /// Returns the bounds of the camera of the given player.
-        /// </summary>
-        /// <param name="player">The player to get the camera bounds.</param>
-        /// <returns>A rectangle in world coordinates.</returns>
-        public Rectangle GetPlayerCameraBounds(int player) {
-            RectangleF rect = player == 0 ? _camera1.BoundingRectangle :  _camera2.BoundingRectangle;
-            rect.Size = _viewport1.Bounds.Size;
-            return rect.ToRectangle();
-        }
-
 
         /// <summary>
         /// Gets the number of ants in the colony of the given player.
