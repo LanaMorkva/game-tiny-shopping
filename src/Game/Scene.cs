@@ -20,19 +20,23 @@ namespace TinyShopping.Game {
 
         private Rectangle _statsArea;
 
+        public bool IsOver { get; set; }
+
+        public int Height {  get; private set; }
+
         public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game) :
             base(content, graphics, manager, game) {
         }
 
         public override void Initialize() {
             int width = GraphicsDeviceManager.PreferredBackBufferWidth;
-            int height = GraphicsDeviceManager.PreferredBackBufferHeight;
+            Height = GraphicsDeviceManager.PreferredBackBufferHeight;
             _statsArea = new Rectangle(0, 0, width, STAT_OFFSET);
-            _player1Area = new Rectangle(0, STAT_OFFSET, width / 2, height - STAT_OFFSET);
-            _player2Area = new Rectangle(width / 2, STAT_OFFSET, width / 2, height - STAT_OFFSET);
+            _player1Area = new Rectangle(0, STAT_OFFSET, width / 2, Height - STAT_OFFSET);
+            _player2Area = new Rectangle(width / 2, STAT_OFFSET, width / 2, Height - STAT_OFFSET);
             _splitScreenHandler = new SplitScreenHandler(_player1Area, _player2Area, GraphicsDevice);
             _splitScreenHandler.Initialize();
-            _ui = new UIController(_statsArea, GraphicsDevice, _splitScreenHandler);
+            _ui = new UIController(_statsArea, GraphicsDevice, _splitScreenHandler, this);
             base.Initialize();
         }
 
@@ -44,7 +48,9 @@ namespace TinyShopping.Game {
         }
 
         public override void Update(GameTime gameTime) {
-            _splitScreenHandler.Update(gameTime);
+            if (!IsOver) {
+                _splitScreenHandler.Update(gameTime);
+            }
             _ui.Update(gameTime);
             base.Update(gameTime);
         }

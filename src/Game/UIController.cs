@@ -7,6 +7,8 @@ namespace TinyShopping.Game {
 
     internal class UIController {
 
+        private static readonly int TIME_LIMIT_S = 5 * 60;
+
         private SpriteFont _font;
 
         private GraphicsDevice _device;
@@ -21,34 +23,29 @@ namespace TinyShopping.Game {
 
         private SplitScreenHandler _handler;
 
-        public UIController(Rectangle drawArea, GraphicsDevice device, SplitScreenHandler handler) {
+        private Scene _scene;
+
+        private double _runtimeMs;
+
+        private int _winner;
+
+        public UIController(Rectangle drawArea, GraphicsDevice device, SplitScreenHandler handler, Scene scene) {
             _drawArea = drawArea;
             _device = device;
             _handler = handler;
+            _runtimeMs = 0;
+            _scene = scene;
         }
 
+        /// <summary>
+        /// Loads the necessary data.
+        /// </summary>
+        /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
             _font = content.Load<SpriteFont>("Arial");
             _appleTexture = content.Load<Texture2D>("apple");
             _antTexture = content.Load<Texture2D>("ant_texture");
             CreateStatisticsTexture();
-        }
-
-        public void Update(GameTime gameTime) {
-
-        }
-
-        /// <summary>
-        /// Draws the statistics and fps counter.
-        /// </summary>
-        /// <param name="batch">The sprite batch to draw to.</param>
-        /// <param name="gameTime">The current game time.</param>
-        public void Draw(SpriteBatch batch, GameTime gameTime) {
-            DrawStatistics(batch);
-#if DEBUG
-            int fps = (int) Math.Round((1000 / gameTime.ElapsedGameTime.TotalMilliseconds));
-            batch.DrawString(_font, "FPS: " + fps.ToString(), new Vector2(0, 0), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
-#endif
         }
 
         /// <summary>
@@ -61,6 +58,76 @@ namespace TinyShopping.Game {
                 data[i] = new Color(252, 239, 197);
             }
             _statsTexture.SetData(data);
+        }
+
+        /// <summary>
+        /// Updates the UI.
+        /// </summary>
+        /// <param name="gameTime">The current game time.</param>
+        public void Update(GameTime gameTime) {
+            _runtimeMs += gameTime.ElapsedGameTime.TotalMilliseconds;
+            if (_runtimeMs > TIME_LIMIT_S * 1000) {
+                _scene.IsOver = true;
+                if (_handler.GetNumberOfFruits(0) > _handler.GetNumberOfFruits(1)) {
+                    _winner = 1;
+                }
+                if (_handler.GetNumberOfFruits(0) < _handler.GetNumberOfFruits(1)) {
+                    _winner = 2;
+                }
+            }
+            if (_handler.GetNumberOfAnts(0) == 0 && _handler.GetNumberOfFruits(0) == 0) {
+                _scene.IsOver = true;
+                _winner = 1;
+            }
+            if (_handler.GetNumberOfAnts(1) == 0 && _handler.GetNumberOfFruits(1) == 0) {
+                _scene.IsOver = true;
+                _winner = 2;
+            }
+        }
+
+        /// <summary>
+        /// Draws the statistics and fps counter.
+        /// </summary>
+        /// <param name="batch">The sprite batch to draw to.</param>
+        /// <param name="gameTime">The current game time.</param>
+        public void Draw(SpriteBatch batch, GameTime gameTime) {
+            DrawStatistics(batch);
+            DrawRemainingTime(batch);
+            if (_scene.IsOver) {
+                DrawWinMessage(batch, gameTime);
+            }
+#if DEBUG
+            int fps = (int) Math.Round((1000 / gameTime.ElapsedGameTime.TotalMilliseconds));
+            batch.DrawString(_font, "FPS: " + fps.ToString(), new Vector2(0, 0), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
+#endif
+        }
+
+        private void DrawWinMessage(SpriteBatch batch, GameTime gameTime) {
+            string text = "It's a draw!";
+            if (_winner !=  0) {
+                text = "Player " + _winner + " wins this round!";
+            }
+            Vector2 origin = _font.MeasureString(text) / 2;
+            batch.DrawString(_font, text, new Vector2(_drawArea.Width / 2, _scene.Height / 2), Color.Black, 0, origin, 0.8f, SpriteEffects.None, 0);
+        }
+
+        /// <summary>
+        /// Draws the tiem countdown.
+        /// </summary>
+        /// <param name="batch"></param>
+        private void DrawRemainingTime(SpriteBatch batch) {
+            int offsetTop = 35;
+            int secs = TIME_LIMIT_S - (int) (_runtimeMs / 1000);
+            int mins = secs / 60;
+            secs %= 60;
+            string minStr = (mins < 10 ? "0" : "") + mins;
+            string secStr = (secs < 10 ? "0" : "") + secs;
+            string time = minStr + ":" + secStr;
+            if (secs < 0) {
+                time = "00:00";
+            }
+            Vector2 origin = _font.MeasureString(time) / 2;
+            batch.DrawString(_font, time, new Vector2(_drawArea.Width / 2, offsetTop), Color.Black, 0, origin, 0.8f, SpriteEffects.None, 0);
         }
 
         /// <summary>
