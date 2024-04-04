@@ -10,6 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
+/reference:..\Libs\MonoGame.Extended.Content.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -79,6 +80,21 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:crosshair.png
+
+#begin map/Grocery_store_48x48.tsx
+/importer:TiledMapTilesetImporter
+/processor:TiledMapTilesetProcessor
+/build:map/Grocery_store_48x48.tsx
+
+#begin map/map_48x48.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:map/map_48x48.tmx
+
+#begin map/Room_Builder_48x48.tsx
+/importer:TiledMapTilesetImporter
+/processor:TiledMapTilesetProcessor
+/build:map/Room_Builder_48x48.tsx
 
 #begin obstacle.png
 /importer:TextureImporter
