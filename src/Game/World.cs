@@ -3,18 +3,30 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 
+using MonoGame.Extended.Tiled;
+using MonoGame.Extended.Tiled.Renderers;
+
 namespace TinyShopping.Game {
 
     internal class World {
+
+        enum LayerName {
+            Floor = 0,
+            FloorShadow,
+            Walls,
+            InteriorBackground,
+            InteriorForeground,
+            Decorations,
+        };
 
         public static int NUM_OF_SQUARES_WIDTH = 57;
 
         public static int NUM_OF_SQUARES_HEIGHT = 40;
 
-        private Texture2D _floorTexture;
-        private Texture2D _objectsTexture;
-
         private Rectangle[] _obstacles;
+
+        public TiledMap _tiledMap;
+        public TiledMapRenderer _tiledMapRenderer;
 
         public int Width { get; private set; }
 
@@ -40,14 +52,12 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="contentManager">The content manager of the main game.</param>
         public void LoadContent(ContentManager contentManager, GraphicsDevice device) {
-            
-            _floorTexture = contentManager.Load<Texture2D>("static_map_floor");
+            _tiledMap = contentManager.Load<TiledMap>("map/map_48x48");
+            _tiledMapRenderer = new TiledMapRenderer(device, _tiledMap);
+            Width = _tiledMap.WidthInPixels;
+            Height = _tiledMap.HeightInPixels;
+            _tileSize =_tiledMap.TileWidth;
 
-            Width = _floorTexture.Width;
-            Height = _floorTexture.Height;
-            _tileSize = _floorTexture.Width / (float)NUM_OF_SQUARES_WIDTH;
-
-            _objectsTexture = contentManager.Load<Texture2D>("static_map_else");
             CreateCollisionAreas();
 #if DEBUG
             _obstacleTexture = contentManager.Load<Texture2D>("obstacle");
@@ -60,8 +70,9 @@ namespace TinyShopping.Game {
         /// <param name="batch">The batch to draw to.</param>
         /// <param name="destination">The destination to draw to.</param>
         /// <param name="source">The source rectangle on the texture to use.</param>
-        public void DrawFloor(SpriteBatch batch, Vector2 position) {
-            batch.Draw(_floorTexture, position, Color.White);
+        public void DrawFloor(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
+            _tiledMapRenderer.Draw((int)LayerName.Floor, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.FloorShadow, viewMatrix);
         }
 
         /// <summary>
@@ -69,8 +80,11 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="batch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void DrawObjects(SpriteBatch batch, Vector2 position) {
-            batch.Draw(_objectsTexture, position, Color.White);
+        public void DrawObjects(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
+            _tiledMapRenderer.Draw((int)LayerName.Walls, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.InteriorBackground, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.InteriorBackground, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.Decorations, viewMatrix);
         }
 
 #if DEBUG
