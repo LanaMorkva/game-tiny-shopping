@@ -65,7 +65,9 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
-            _runtimeMs += gameTime.ElapsedGameTime.TotalMilliseconds;
+            if (!_scene.IsOver) {
+                _runtimeMs += gameTime.ElapsedGameTime.TotalMilliseconds;
+            }
             if (_runtimeMs > TIME_LIMIT_S * 1000) {
                 _scene.IsOver = true;
                 if (_handler.GetNumberOfFruits(0) > _handler.GetNumberOfFruits(1)) {
@@ -102,6 +104,11 @@ namespace TinyShopping.Game {
 #endif
         }
 
+        /// <summary>
+        /// Writes the game over and win text to the screen.
+        /// </summary>
+        /// <param name="batch">The batch to use.</param>
+        /// <param name="gameTime">The current game time.</param>
         private void DrawWinMessage(SpriteBatch batch, GameTime gameTime) {
             string text = "It's a draw!";
             if (_winner !=  0) {
