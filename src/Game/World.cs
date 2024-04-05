@@ -34,10 +34,6 @@ namespace TinyShopping.Game {
 
         public int Height { get; private set; }
 
-#if DEBUG
-        private Texture2D _obstacleTexture;
-#endif
-
         public float TileSize {
             get {
                 if (_tiledMap.TileWidth == 0) {
@@ -57,11 +53,7 @@ namespace TinyShopping.Game {
             Width = _tiledMap.WidthInPixels;
             Height = _tiledMap.HeightInPixels;
 
-
             CreateCollisionAreas();
-#if DEBUG
-            _obstacleTexture = contentManager.Load<Texture2D>("obstacle");
-#endif
         }
 
         /// <summary>

@@ -44,7 +44,7 @@ namespace TinyShopping.Game {
         public void LoadContent(ContentManager content) {
             _font = content.Load<SpriteFont>("Arial");
             _appleTexture = content.Load<Texture2D>("apple");
-            _antTexture = content.Load<Texture2D>("ant_texture");
+            _antTexture = content.Load<Texture2D>("ants/ant_texture");
             CreateStatisticsTexture();
         }
 

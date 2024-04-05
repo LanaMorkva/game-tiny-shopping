@@ -75,8 +75,8 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
-            _antTexture = content.Load<Texture2D>("ant_texture");
-            _antFullTexture = content.Load<Texture2D>("ant_full_texture");
+            _antTexture = content.Load<Texture2D>("ants/ant_texture");
+            _antFullTexture = content.Load<Texture2D>("ants/ant_full_texture");
         }
 
         /// <summary>
