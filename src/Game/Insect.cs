@@ -7,7 +7,7 @@ namespace TinyShopping.Game {
 
     internal class Insect {
 
-        private static readonly int SPEED = 50;
+        private static readonly int SPEED = 70;
 
         private static readonly int ROTATION_SPEED = 100;
 

@@ -13,7 +13,7 @@ namespace TinyShopping.Game {
 
         private static readonly int SIZE = 50;
 
-        private static readonly int SPEED = 400;
+        private static readonly int SPEED = 600;
 
         private Vector2 _position;
 
