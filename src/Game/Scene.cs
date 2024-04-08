@@ -20,6 +20,7 @@ namespace TinyShopping.Game {
 
         private Rectangle _statsArea;
 
+        public bool IsStarted {get; set; }
         public bool IsOver { get; set; }
 
         public int Height {  get; private set; }
@@ -48,7 +49,7 @@ namespace TinyShopping.Game {
         }
 
         public override void Update(GameTime gameTime) {
-            if (!IsOver) {
+            if (!IsOver && IsStarted) {
                 _splitScreenHandler.Update(gameTime);
             }
             _ui.Update(gameTime);

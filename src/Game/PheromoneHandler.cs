@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
@@ -17,6 +18,8 @@ namespace TinyShopping.Game {
 
         private List<Pheromone>[] _returnPheromones;
 
+        private List<SoundEffect> _soundEffects;
+
         /// <summary>
         /// Creates a new pheromone handler for two players.
         /// </summary>
@@ -25,6 +28,7 @@ namespace TinyShopping.Game {
             _world = world;
             _pheromones = new List<Pheromone>[] { new (), new () };
             _returnPheromones = new List<Pheromone>[] { new(), new() };
+            _soundEffects = new List<SoundEffect>();
         }
 
         /// <summary>
@@ -34,6 +38,7 @@ namespace TinyShopping.Game {
         public void LoadContent(ContentManager contentManager) {
             _texture = contentManager.Load<Texture2D>("pheromone");
             _font = contentManager.Load<SpriteFont>("arial");
+            _soundEffects.Add(contentManager.Load<SoundEffect>("sounds/glass_knock"));
         }
 
         /// <summary>
@@ -53,6 +58,7 @@ namespace TinyShopping.Game {
             else {
                 _pheromones[player].Add(p);
             }
+            _soundEffects[0].Play();
         }
 
         /// <summary>
