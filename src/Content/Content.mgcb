@@ -96,6 +96,36 @@
 /processorParam:TextureFormat=Color
 /build:pheromone.png
 
+#begin sounds/cash_register.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/cash_register.mp3
+
+#begin sounds/countdown_3_seconds.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/countdown_3_seconds.wav
+
+#begin sounds/final_whistle.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/final_whistle.wav
+
+#begin sounds/glass_knock.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/glass_knock.mp3
+
+#begin sounds/insect_dying.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/insect_dying.mp3
+
 #begin teaser.png
 /importer:TextureImporter
 /processor:TextureProcessor

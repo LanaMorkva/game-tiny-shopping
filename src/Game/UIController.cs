@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 
 namespace TinyShopping.Game {
 
@@ -23,6 +25,8 @@ namespace TinyShopping.Game {
 
         private SplitScreenHandler _handler;
 
+        private List<SoundEffect> _soundEffects;
+
         private Scene _scene;
 
         private double _runtimeMs;
@@ -35,6 +39,7 @@ namespace TinyShopping.Game {
             _handler = handler;
             _runtimeMs = 0;
             _scene = scene;
+            _soundEffects = new List<SoundEffect>();
         }
 
         /// <summary>
@@ -45,6 +50,8 @@ namespace TinyShopping.Game {
             _font = content.Load<SpriteFont>("Arial");
             _appleTexture = content.Load<Texture2D>("apple");
             _antTexture = content.Load<Texture2D>("ants/ant_texture");
+            _soundEffects.Add(content.Load<SoundEffect>("sounds/countdown_3_seconds"));
+            _soundEffects.Add(content.Load<SoundEffect>("sounds/final_whistle"));
             CreateStatisticsTexture();
         }
 
@@ -65,26 +72,45 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
-            if (!_scene.IsOver) {
+            bool isOverBefore = _scene.IsOver;
+            if (!_scene.IsStarted) {
+                if (_runtimeMs == 0) {
+                    _soundEffects[0].Play();
+                }
                 _runtimeMs += gameTime.ElapsedGameTime.TotalMilliseconds;
-            }
-            if (_runtimeMs > TIME_LIMIT_S * 1000) {
-                _scene.IsOver = true;
-                if (_handler.GetNumberOfFruits(0) > _handler.GetNumberOfFruits(1)) {
+                if (_runtimeMs >= 4000) {
+                    _runtimeMs = 0.0;
+                    _scene.IsStarted = true;
+                }
+            } else {
+                if (!_scene.IsOver) {
+                    _runtimeMs += gameTime.ElapsedGameTime.TotalMilliseconds;
+                }
+
+                if (_runtimeMs > TIME_LIMIT_S * 1000) {
+                    _scene.IsOver = true;
+                    if (_handler.GetNumberOfFruits(0) > _handler.GetNumberOfFruits(1)) {
+                        _winner = 1;
+                    }
+                    if (_handler.GetNumberOfFruits(0) < _handler.GetNumberOfFruits(1)) {
+                        _winner = 2;
+                    }
+                }
+                if (_handler.GetNumberOfAnts(0) == 0 && _handler.GetNumberOfFruits(0) == 0) {
+                    _scene.IsOver = true;
                     _winner = 1;
                 }
-                if (_handler.GetNumberOfFruits(0) < _handler.GetNumberOfFruits(1)) {
+                if (_handler.GetNumberOfAnts(1) == 0 && _handler.GetNumberOfFruits(1) == 0) {
+                    _scene.IsOver = true;
                     _winner = 2;
                 }
+
             }
-            if (_handler.GetNumberOfAnts(0) == 0 && _handler.GetNumberOfFruits(0) == 0) {
-                _scene.IsOver = true;
-                _winner = 1;
+
+            if (!isOverBefore && _scene.IsOver) {
+                _soundEffects[1].Play();
             }
-            if (_handler.GetNumberOfAnts(1) == 0 && _handler.GetNumberOfFruits(1) == 0) {
-                _scene.IsOver = true;
-                _winner = 2;
-            }
+
         }
 
         /// <summary>
@@ -95,6 +121,9 @@ namespace TinyShopping.Game {
         public void Draw(SpriteBatch batch, GameTime gameTime) {
             DrawStatistics(batch);
             DrawRemainingTime(batch);
+            if (!_scene.IsStarted) {
+                DrawCountdown(batch);
+            }
             if (_scene.IsOver) {
                 DrawWinMessage(batch, gameTime);
             }
@@ -124,7 +153,12 @@ namespace TinyShopping.Game {
         /// <param name="batch"></param>
         private void DrawRemainingTime(SpriteBatch batch) {
             int offsetTop = 35;
-            int secs = TIME_LIMIT_S - (int) (_runtimeMs / 1000);
+            int secs;
+            if (_scene.IsStarted) {
+                secs = TIME_LIMIT_S - (int) (_runtimeMs / 1000);
+            } else {
+                secs = TIME_LIMIT_S;
+            }
             int mins = secs / 60;
             secs %= 60;
             string minStr = (mins < 10 ? "0" : "") + mins;
@@ -135,6 +169,20 @@ namespace TinyShopping.Game {
             }
             Vector2 origin = _font.MeasureString(time) / 2;
             batch.DrawString(_font, time, new Vector2(_drawArea.Width / 2, offsetTop), Color.Black, 0, origin, 0.8f, SpriteEffects.None, 0);
+        }
+
+        /// <summary>
+        /// Draw Countdown at the start of the game
+        /// </summary>
+        /// <param name="batch">The sprite batch to write to.</param>
+        private void DrawCountdown(SpriteBatch batch) {
+            int secs = 3 - (int) (_runtimeMs / 1000);
+            string secStr = "" + secs;
+            if (secs == 0) {
+                secStr = "Go!";
+            }
+            Vector2 origin = _font.MeasureString(secStr) / 2;
+            batch.DrawString(_font, secStr, new Vector2(_drawArea.Width / 2, _scene.Height / 2), Color.Black, 0, origin, 3f, SpriteEffects.None, 0);
         }
 
         /// <summary>

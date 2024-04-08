@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Audio;
 
 namespace TinyShopping.Game {
 
@@ -40,6 +41,8 @@ namespace TinyShopping.Game {
 
         public int AntsNum => _insects.Count;
 
+        List<SoundEffect> _soundEffects;
+
 
         /// <summary>
         /// Creates a new colony.
@@ -62,6 +65,7 @@ namespace TinyShopping.Game {
             DropOff = dropOff;
             _owner = owner;
             _insectHandler = insectHandler;
+            _soundEffects = new List<SoundEffect>();
         }
 
         /// <summary>
@@ -77,6 +81,8 @@ namespace TinyShopping.Game {
         public void LoadContent(ContentManager content) {
             _antTexture = content.Load<Texture2D>("ants/ant_texture");
             _antFullTexture = content.Load<Texture2D>("ants/ant_full_texture");
+            _soundEffects.Add(content.Load<SoundEffect>("sounds/cash_register"));
+            _soundEffects.Add(content.Load<SoundEffect>("sounds/insect_dying"));
         }
 
         /// <summary>
@@ -96,6 +102,8 @@ namespace TinyShopping.Game {
                 if (insect.Health > 0) {
                     insect.Update(gameTime);
                     remaining.Add(insect);
+                } else {
+                    _soundEffects[1].Play();
                 }
             }
             _insects = remaining;
@@ -117,6 +125,7 @@ namespace TinyShopping.Game {
         /// </summary>
         public void IncreaseFruitCount() {
             _collectedFruit += 1;
+            _soundEffects[0].Play();
         }
 
         /// <summary>
