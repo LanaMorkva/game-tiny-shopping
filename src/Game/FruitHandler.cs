@@ -9,6 +9,7 @@ namespace TinyShopping.Game {
     internal class FruitHandler {
 
         private static readonly int RANGE = 2;
+        private static readonly int FRUITS_NUM = 50;
 
         private World _world;
 
@@ -27,12 +28,19 @@ namespace TinyShopping.Game {
         /// <param name="contentManager">The content manager to use.</param>
         public void LoadContent(ContentManager content) {
             _appleTexture = content.Load<Texture2D>("apple");
-            for (int i = 0; i < 50; i++) {
+            GenerateFruits();
+        }
+
+        private void GenerateFruits() {
+            float halfFruitSize = _world.TileSize * 0.35f;
+            for (int i = 0; i < FRUITS_NUM; i++) {
                 int tileX = Random.Shared.Next(World.NUM_OF_SQUARES_WIDTH);
                 int tileY = Random.Shared.Next(World.NUM_OF_SQUARES_WIDTH);
                 Vector2 center = _world.GetCenterOfTile(tileX, tileY);
-                if (_world.IsWalkable((int)center.X, (int)center.Y, 0)) {
-                    _fruits.Add(new Fruit(center, _appleTexture, (int)(_world.TileSize*0.7), _world));
+                if (_world.IsWalkable((int)center.X, (int)center.Y, (int)halfFruitSize)) {
+                    Vector2 position = new Vector2(center.X - halfFruitSize, center.Y - halfFruitSize);
+                    int size = (int)(halfFruitSize * 2);
+                    _fruits.Add(new Fruit(position, _appleTexture, size, _world));
                 }
             }
         }

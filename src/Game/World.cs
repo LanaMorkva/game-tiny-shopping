@@ -3,10 +3,8 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 
-using MonoGame.Extended;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
-using System.Collections.Generic;
 
 namespace TinyShopping.Game {
 
@@ -21,13 +19,13 @@ namespace TinyShopping.Game {
             Decorations,
         };
 
+        private ObstacleLayer _obstacleLayer;
+
         public static int NUM_OF_SQUARES_WIDTH = 57;
 
         public static int NUM_OF_SQUARES_HEIGHT = 40;
 
-        private List<Rectangle> _obstacles;
-
-        public TiledMap _tiledMap;
+        private float _tileWidth = 0;
         public TiledMapRenderer _tiledMapRenderer;
 
         public int Width { get; private set; }
@@ -36,10 +34,10 @@ namespace TinyShopping.Game {
 
         public float TileSize {
             get {
-                if (_tiledMap.TileWidth == 0) {
+                if (_tileWidth == 0) {
                     throw new Exception("Tile size is not yet known, call LoadContent first!");
                 }
-                return _tiledMap.TileWidth;;
+                return _tileWidth;
             }
         }
 
@@ -48,12 +46,13 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="contentManager">The content manager of the main game.</param>
         public void LoadContent(ContentManager contentManager, GraphicsDevice device) {
-            _tiledMap = contentManager.Load<TiledMap>("map/map_48x48");
-            _tiledMapRenderer = new TiledMapRenderer(device, _tiledMap);
-            Width = _tiledMap.WidthInPixels;
-            Height = _tiledMap.HeightInPixels;
+            TiledMap tiledMap = contentManager.Load<TiledMap>("map/map_48x48");
+            _tiledMapRenderer = new TiledMapRenderer(device, tiledMap);
+            _obstacleLayer = new ObstacleLayer(tiledMap);
+            _tileWidth = tiledMap.TileWidth;
+            Width = tiledMap.WidthInPixels;
+            Height = tiledMap.HeightInPixels;
 
-            CreateCollisionAreas();
         }
 
         /// <summary>
@@ -85,26 +84,9 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="handler">The split screen handler to use.</param>
         public void DrawDebugInfo(SpriteBatch batch) {
-            foreach (var o in _obstacles) {
-                batch.DrawRectangle(o, Color.Red, 2f);
-            }
+            _obstacleLayer.Draw(batch);
         }
 #endif
-
-        /// <summary>
-        /// Creates obstacles that are considered not walkable.
-        /// </summary>
-        private void CreateCollisionAreas() {
-            _obstacles = new List<Rectangle>();
-            Console.WriteLine(_tiledMap.ObjectLayers[0].Name);
-            foreach (TiledMapObject obj in _tiledMap.ObjectLayers[0].Objects){
-                Rectangle rect = new Rectangle();
-                rect.Location = obj.Position.ToPoint();
-                rect.Size = (Point)obj.Size;
-                _obstacles.Add(rect);
-            }
-
-        }
 
         /// <summary>
         /// Checks if the given position +- range is walkable.
@@ -114,12 +96,7 @@ namespace TinyShopping.Game {
         /// <param name="range">The range to include in the check.</param>
         /// <returns>True if walkable, false otherwise.</returns>
         public bool IsWalkable(int x, int y, int range) {
-            foreach (Rectangle obstacle  in _obstacles) {
-                if (x - range < obstacle.Right && x + range > obstacle.Left && y - range < obstacle.Bottom && y + range > obstacle.Top) {
-                    return false;
-                }
-            }
-            return true;
+            return !_obstacleLayer.HasCollision(x, y, range);
         }
 
         /// <summary>
@@ -162,109 +139,6 @@ namespace TinyShopping.Game {
         /// <returns>A position in screen coordinates.</returns>
         public Vector2 ConvertToScreenPosition(int player, Vector2 worldPosition) {
             return worldPosition;
-            //if (player == 0) {
-            //    return worldPosition - new Vector2(_player1Camera.X, _player1Camera.Y) + new Vector2(_player1Area.X, _player1Area.Y);
-            //}
-            //else {
-            //    return worldPosition - new Vector2(_player2Camera.X, _player2Camera.Y) + new Vector2(_player2Area.X, _player2Area.Y);
-            //}
-        }
-
-        /// <summary>
-        /// Updates the given player's camera position.
-        /// </summary>
-        /// <param name="player">The current player.</param>
-        /// <param name="cursorPos">The cursor world position.</param>
-        public void UpdateCameraPosition(int player, Vector2 cursorPos) {
-            //Rectangle c = _player1Camera;
-            //if (player == 1) {
-            //    c = _player2Camera;
-            //}
-            //if (c.X + c.Width - cursorPos.X < 50) {
-            //    c.X += SCROLL_SPEED;
-            //}
-            //if (cursorPos.X -  c.X < 50) {
-            //    c.X -= SCROLL_SPEED;
-            //}
-            //if (c.Y + c.Height - cursorPos.Y < 50) {
-            //    c.Y += SCROLL_SPEED;
-            //}
-            //if (cursorPos.Y - c.Y < 50) {
-            //    c.Y -= SCROLL_SPEED;
-            //}
-            //if (player == 0) {
-            //    _player1Camera = c;
-            //}
-            //else {
-            //    _player2Camera = c;
-            //}
-        }
-
-        /// <summary>
-        /// Renders an insect to the split screen.
-        /// </summary>
-        /// <param name="batch">The sprite batch to use.</param>
-        /// <param name="texture">The texture to use.</param>
-        /// <param name="origin">The texture origin to use for rotation.</param>
-        /// <param name="position">The texture world position.</param>
-        /// <param name="size">The texture size.</param>
-        /// <param name="rotation">The rotation to use.</param>
-        public void RenderInsect(SpriteBatch batch, Texture2D texture, Vector2 origin, Vector2 position, int size, float rotation) {
-            //Rectangle bounds = new Rectangle((int)position.X, (int)position.Y, size, size);
-            //if (bounds.Intersects(_player1Camera)) {
-            //    Vector2 pos = ConvertToScreenPosition(0, position);
-            //    Rectangle destination = new((int)pos.X, (int)pos.Y, size, size);
-            //    batch.Draw(texture, destination, null, Color.White, rotation, origin, SpriteEffects.None, 0);
-            //}
-            //if (bounds.Intersects(_player2Camera)) {
-            //    Vector2 pos = ConvertToScreenPosition(1, position);
-            //    Rectangle destination = new((int)pos.X, (int)pos.Y, size, size);
-            //    batch.Draw(texture, destination, null, Color.White, rotation, origin, SpriteEffects.None, 0);
-            //}
-        }
-
-        /// <summary>
-        /// Renders an object to the split screen.
-        /// </summary>
-        /// <param name="batch">The sprite batch to use.</param>
-        /// <param name="texture">The texture to use.</param>
-        /// <param name="position">The world position.</param>
-        /// <param name="size">The texture size.</param>
-        public void RenderObect(SpriteBatch batch, Texture2D texture, Vector2 position, int size) {
-            //Rectangle location = new Rectangle((int)(position.X - size / 2), (int)(position.Y - size / 2), size, size);
-            //if (location.Intersects(_player1Camera)) {
-            //    Vector2 pos = ConvertToScreenPosition(0, position);
-            //    Rectangle destination = new((int)pos.X, (int)pos.Y, size, size);
-            //    batch.Draw(texture, destination, Color.White);
-            //}
-            //if (location.Intersects(_player2Camera)) {
-            //    Vector2 pos = ConvertToScreenPosition(1, position);
-            //    Rectangle destination = new((int)pos.X, (int)pos.Y, size, size);
-            //    batch.Draw(texture, destination, Color.White);
-            //}
-        }
-
-        /// <summary>
-        /// Renders a pheromone to the owner's screen.
-        /// </summary>
-        /// <param name="player">The owner of the pheromone.</param>
-        /// <param name="batch">The sprite batch to use.</param>
-        /// <param name="texture">The texture to use.</param>
-        /// <param name="bounds">The bounds to draw to.</param>
-        /// <param name="color">The color to use for the pheromone.</param>
-        public void RenderPheromone(int player, SpriteBatch batch, Texture2D texture, Rectangle bounds, Color color) {
-            //if (player == 0 && bounds.Intersects(_player1Camera)) {
-            //    Vector2 pos = ConvertToScreenPosition(0, new Vector2(bounds.X, bounds.Y));
-            //    bounds.X = (int)pos.X;
-            //    bounds.Y = (int)pos.Y;
-            //    batch.Draw(texture, bounds, color);
-            //}
-            //if (player == 1 && bounds.Intersects(_player2Camera)) {
-            //    Vector2 pos = ConvertToScreenPosition(1, new Vector2(bounds.X, bounds.Y));
-            //    bounds.X = (int)pos.X;
-            //    bounds.Y = (int)pos.Y;
-            //    batch.Draw(texture, bounds, color);
-            //}
         }
     }
 }
