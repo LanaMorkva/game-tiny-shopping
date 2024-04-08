@@ -10,10 +10,11 @@
 
 #-------------------------------- References --------------------------------#
 
+/reference:..\Libs\MonoGame.Extended.Content.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
-#begin ant_full_texture.png
+#begin ants/ant_full_texture.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -23,9 +24,9 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:ant_full_texture.png
+/build:ants/ant_full_texture.png
 
-#begin ant_texture.png
+#begin ants/ant_texture.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -35,7 +36,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:ant_texture.png
+/build:ants/ant_texture.png
 
 #begin apple.png
 /importer:TextureImporter
@@ -56,18 +57,6 @@
 /processorParam:TextureFormat=Compressed
 /build:Arial.spritefont
 
-#begin circle.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:circle.png
-
 #begin crosshair.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -80,17 +69,20 @@
 /processorParam:TextureFormat=Color
 /build:crosshair.png
 
-#begin obstacle.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:obstacle.png
+#begin map/Grocery_store_48x48.tsx
+/importer:TiledMapTilesetImporter
+/processor:TiledMapTilesetProcessor
+/build:map/Grocery_store_48x48.tsx
+
+#begin map/map_48x48.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:map/map_48x48.tmx
+
+#begin map/Room_Builder_48x48.tsx
+/importer:TiledMapTilesetImporter
+/processor:TiledMapTilesetProcessor
+/build:map/Room_Builder_48x48.tsx
 
 #begin pheromone.png
 /importer:TextureImporter
@@ -133,30 +125,6 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:sounds/insect_dying.mp3
-
-#begin static_map_else.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:static_map_else.png
-
-#begin static_map_floor.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:static_map_floor.png
 
 #begin teaser.png
 /importer:TextureImporter

@@ -3,35 +3,43 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 
+using MonoGame.Extended;
+using MonoGame.Extended.Tiled;
+using MonoGame.Extended.Tiled.Renderers;
+using System.Collections.Generic;
+
 namespace TinyShopping.Game {
 
     internal class World {
+
+        enum LayerName {
+            Floor = 0,
+            FloorShadow,
+            Walls,
+            InteriorBackground,
+            InteriorForeground,
+            Decorations,
+        };
 
         public static int NUM_OF_SQUARES_WIDTH = 57;
 
         public static int NUM_OF_SQUARES_HEIGHT = 40;
 
-        private Texture2D _floorTexture;
-        private Texture2D _objectsTexture;
+        private List<Rectangle> _obstacles;
 
-        private Rectangle[] _obstacles;
+        public TiledMap _tiledMap;
+        public TiledMapRenderer _tiledMapRenderer;
 
         public int Width { get; private set; }
 
         public int Height { get; private set; }
 
-#if DEBUG
-        private Texture2D _obstacleTexture;
-#endif
-
-        private float _tileSize;
-
         public float TileSize {
             get {
-                if (_tileSize == 0) {
+                if (_tiledMap.TileWidth == 0) {
                     throw new Exception("Tile size is not yet known, call LoadContent first!");
                 }
-                return _tileSize;
+                return _tiledMap.TileWidth;;
             }
         }
 
@@ -40,18 +48,12 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="contentManager">The content manager of the main game.</param>
         public void LoadContent(ContentManager contentManager, GraphicsDevice device) {
-            
-            _floorTexture = contentManager.Load<Texture2D>("static_map_floor");
+            _tiledMap = contentManager.Load<TiledMap>("map/map_48x48");
+            _tiledMapRenderer = new TiledMapRenderer(device, _tiledMap);
+            Width = _tiledMap.WidthInPixels;
+            Height = _tiledMap.HeightInPixels;
 
-            Width = _floorTexture.Width;
-            Height = _floorTexture.Height;
-            _tileSize = _floorTexture.Width / (float)NUM_OF_SQUARES_WIDTH;
-
-            _objectsTexture = contentManager.Load<Texture2D>("static_map_else");
             CreateCollisionAreas();
-#if DEBUG
-            _obstacleTexture = contentManager.Load<Texture2D>("obstacle");
-#endif
         }
 
         /// <summary>
@@ -60,8 +62,9 @@ namespace TinyShopping.Game {
         /// <param name="batch">The batch to draw to.</param>
         /// <param name="destination">The destination to draw to.</param>
         /// <param name="source">The source rectangle on the texture to use.</param>
-        public void DrawFloor(SpriteBatch batch, Vector2 position) {
-            batch.Draw(_floorTexture, position, Color.White);
+        public void DrawFloor(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
+            _tiledMapRenderer.Draw((int)LayerName.Floor, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.FloorShadow, viewMatrix);
         }
 
         /// <summary>
@@ -69,8 +72,11 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="batch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void DrawObjects(SpriteBatch batch, Vector2 position) {
-            batch.Draw(_objectsTexture, position, Color.White);
+        public void DrawObjects(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
+            _tiledMapRenderer.Draw((int)LayerName.Walls, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.InteriorBackground, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.InteriorForeground, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.Decorations, viewMatrix);
         }
 
 #if DEBUG
@@ -79,15 +85,9 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="handler">The split screen handler to use.</param>
         public void DrawDebugInfo(SpriteBatch batch) {
-            // Note: temporaly not valid, since obstacles are hardcoded, will update later
-            // foreach (var o in _obstacles) {
-            //     float x = o.X * TileSize;
-            //     float y = o.Y * TileSize;
-            //     float w = o.Width * TileSize;
-            //     float h = o.Height * TileSize;
-            //     Rectangle r = new Rectangle((int)x, (int)y, (int)w, (int)h);
-            //     batch.Draw(_obstacleTexture, r, Color.White);
-            // }
+            foreach (var o in _obstacles) {
+                batch.DrawRectangle(o, Color.Red, 2f);
+            }
         }
 #endif
 
@@ -95,28 +95,15 @@ namespace TinyShopping.Game {
         /// Creates obstacles that are considered not walkable.
         /// </summary>
         private void CreateCollisionAreas() {
-            _obstacles = new Rectangle[] { 
-                new Rectangle(0, 0, 1, NUM_OF_SQUARES_HEIGHT), // left wall
-                new Rectangle(0, 0, NUM_OF_SQUARES_WIDTH, 2), // top wall
-                new Rectangle(NUM_OF_SQUARES_WIDTH-1, 0, 1, NUM_OF_SQUARES_HEIGHT), // right wall
-                new Rectangle(0, NUM_OF_SQUARES_HEIGHT-1, NUM_OF_SQUARES_WIDTH, 1), // bottom wall
-                new Rectangle(4, 0, 2, 3), // top counter
-                new Rectangle(NUM_OF_SQUARES_WIDTH-3, NUM_OF_SQUARES_HEIGHT-6, 3, 2), // bottom counter
-                new Rectangle(18, 0, 2, 11),
-                new Rectangle(0, 15, 18, 3),
-                new Rectangle(11, 18, 2, 8),
-                new Rectangle(1, 28, 8, 3),
-                new Rectangle(7, 31, 2, 3),
-                new Rectangle(17, 24, 9, 3),
-                new Rectangle(24, 22, 2, 2),
-                new Rectangle(33, 25, 2, 14),
-                new Rectangle(24, 30, 9, 3),
-                new Rectangle(37, 18, 19, 3),
-                new Rectangle(45, 10, 2, 8),
-                new Rectangle(28, 11, 10, 3),
-                new Rectangle(28, 14, 2, 4),
-                new Rectangle(31, 2, 2, 4),
-            };
+            _obstacles = new List<Rectangle>();
+            Console.WriteLine(_tiledMap.ObjectLayers[0].Name);
+            foreach (TiledMapObject obj in _tiledMap.ObjectLayers[0].Objects){
+                Rectangle rect = new Rectangle();
+                rect.Location = obj.Position.ToPoint();
+                rect.Size = (Point)obj.Size;
+                _obstacles.Add(rect);
+            }
+
         }
 
         /// <summary>
@@ -128,11 +115,7 @@ namespace TinyShopping.Game {
         /// <returns>True if walkable, false otherwise.</returns>
         public bool IsWalkable(int x, int y, int range) {
             foreach (Rectangle obstacle  in _obstacles) {
-                float rightBorder = TileSize * obstacle.X + TileSize * obstacle.Width;
-                float leftBorder = TileSize * obstacle.X;
-                float topBorder = TileSize * obstacle.Y;
-                float bottomBorder = TileSize * obstacle.Y + TileSize * obstacle.Height;
-                if (x-range < rightBorder && x+range > leftBorder && y-range < bottomBorder && y+range > topBorder) {
+                if (x - range < obstacle.Right && x + range > obstacle.Left && y - range < obstacle.Bottom && y + range > obstacle.Top) {
                     return false;
                 }
             }

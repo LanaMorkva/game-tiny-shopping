@@ -49,7 +49,7 @@ namespace TinyShopping.Game {
         public void LoadContent(ContentManager content) {
             _font = content.Load<SpriteFont>("Arial");
             _appleTexture = content.Load<Texture2D>("apple");
-            _antTexture = content.Load<Texture2D>("ant_texture");
+            _antTexture = content.Load<Texture2D>("ants/ant_texture");
             _soundEffects.Add(content.Load<SoundEffect>("sounds/countdown_3_seconds"));
             _soundEffects.Add(content.Load<SoundEffect>("sounds/final_whistle"));
             CreateStatisticsTexture();
@@ -83,7 +83,9 @@ namespace TinyShopping.Game {
                     _scene.IsStarted = true;
                 }
             } else {
-                _runtimeMs += gameTime.ElapsedGameTime.TotalMilliseconds;
+                if (!_scene.IsOver) {
+                    _runtimeMs += gameTime.ElapsedGameTime.TotalMilliseconds;
+                }
 
                 if (_runtimeMs > TIME_LIMIT_S * 1000) {
                     _scene.IsOver = true;
@@ -131,6 +133,11 @@ namespace TinyShopping.Game {
 #endif
         }
 
+        /// <summary>
+        /// Writes the game over and win text to the screen.
+        /// </summary>
+        /// <param name="batch">The batch to use.</param>
+        /// <param name="gameTime">The current game time.</param>
         private void DrawWinMessage(SpriteBatch batch, GameTime gameTime) {
             string text = "It's a draw!";
             if (_winner !=  0) {

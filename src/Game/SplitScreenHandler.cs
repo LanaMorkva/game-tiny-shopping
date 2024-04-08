@@ -142,11 +142,11 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         private void DrawAllGameObjects(SpriteBatch batch, int playerId, Matrix viewMatrix, GameTime gameTime) {
-            _world.DrawFloor(batch, Vector2.Zero);
+            _world.DrawFloor(batch, viewMatrix, Vector2.Zero);
             _pheromoneHandler.Draw(batch, playerId, gameTime);
             _insectHandler.Draw(batch, gameTime);
             _fruitHandler.Draw(batch, gameTime);
-            _world.DrawObjects(batch, Vector2.Zero);
+            _world.DrawObjects(batch, viewMatrix, Vector2.Zero);
             if (playerId == 0) {
                 _player1.Draw(batch, gameTime);
             } else {

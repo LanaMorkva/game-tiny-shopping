@@ -9,17 +9,16 @@ namespace TinyShopping {
         private Scene _scene;
 
         public Renderer() {
-            _graphics = new GraphicsDeviceManager(this);
+            _graphics = new GraphicsDeviceManager(this); 
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
         }
 
         protected override void Initialize() {
-
-            _graphics.PreferredBackBufferWidth = 1400;
-            _graphics.PreferredBackBufferHeight = 1024;
-            //_graphics.ToggleFullScreen();
+            _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
             _graphics.ApplyChanges();
+            _graphics.ToggleFullScreen();
 
             _scene = new MainMenu.Scene(Content, GraphicsDevice, _graphics, this);
             _scene.Initialize();
