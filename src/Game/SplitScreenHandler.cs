@@ -133,8 +133,6 @@ namespace TinyShopping.Game {
             _device.SetRenderTarget(null);
             batch.Draw(_renderTarget1, _player1Area, Color.White);
             batch.Draw(_renderTarget2, _player2Area, Color.White);
-            batch.Draw(_borderTexture, _player1Area, Color.White);
-            batch.Draw(_borderTexture, _player2Area, Color.White);
         }
 
         /// <summary>
