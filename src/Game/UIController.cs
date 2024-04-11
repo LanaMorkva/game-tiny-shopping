@@ -16,6 +16,7 @@ namespace TinyShopping.Game {
 
         private SpriteFont _font;
         private SpriteFont _fontBig;
+        private SpriteFont _fontGeneral;
 
         private Texture2D _appleTexture;
 
@@ -49,8 +50,10 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
-            _font = content.Load<SpriteFont>("Arial");
-            _fontBig = content.Load<SpriteFont>("ArialBig");
+            _font = content.Load<SpriteFont>("Fun");
+            _fontBig = content.Load<SpriteFont>("FunBig");
+            _fontGeneral = content.Load<SpriteFont>("General");
+
             _appleTexture = content.Load<Texture2D>("stats/apple");
             _circleTexture = content.Load<Texture2D>("stats/circle");
             _antsCharachterTexture = content.Load<Texture2D>("stats/Ant_Icon");
@@ -153,12 +156,16 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="batch">The batch to use.</param>
         private void DrawWinMessage(SpriteBatch batch) {
-            string text = "It's a draw!";
+            string text = "IT'S A DRAW!";
             if (_winner !=  0) {
-                text = "Player " + _winner + " wins this round!";
+                text = "PLAYER " + _winner + " WINS THIS ROUND!";
             }
             DrawDimScreen(batch);
-            DrawBoldString(batch, text, new Vector2(_scene.Width / 2, _scene.Height / 2));
+
+            var pos = new Vector2(_scene.Width / 2, _scene.Height / 2);
+            Vector2 origin = _fontGeneral.MeasureString(text) / 2;
+            batch.DrawString(_fontGeneral, text, pos - new Vector2(3, 3), Color.Black, 0, origin, 1.3f, SpriteEffects.None, 0);
+            batch.DrawString(_fontGeneral, text, pos, _textColor, 0, origin, 1.3f, SpriteEffects.None, 0);
         }
 
         /// <summary>
@@ -195,7 +202,7 @@ namespace TinyShopping.Game {
                 secStr = "Go!";
             }
             DrawDimScreen(batch);
-            DrawBoldString(batch, secStr, new Vector2(_scene.Width / 2, _scene.Height / 2));
+            DrawBoldString(batch, secStr, new Vector2(_scene.Width / 2, _scene.Height / 2), 1.5f, 0.06f);
         }
 
         private void DrawDimScreen(SpriteBatch batch) {
@@ -205,11 +212,24 @@ namespace TinyShopping.Game {
             Vector2 origin = _font.MeasureString(text) / 2;
             batch.DrawString(_font, text, position, _textColor, 0, origin, 0.95f, SpriteEffects.None, 0);
         }
-        private void DrawBoldString(SpriteBatch batch, String text, Vector2 position) {
+        private void DrawBoldString(SpriteBatch batch, String text, Vector2 position, float scale, float border = .005f) {
             Vector2 origin = _fontBig.MeasureString(text) / 2;
 
-            batch.DrawString(_fontBig, text, position, Color.Black, 0, origin, 1.55f, SpriteEffects.None, 0);
-            batch.DrawString(_fontBig, text, position, _textColor, 0, origin, 1.5f, SpriteEffects.None, 0);
+            batch.DrawString(_fontBig, text, position, Color.Black, 0, origin, scale + border, SpriteEffects.None, 0);
+            batch.DrawString(_fontBig, text, position, _textColor, 0, origin, scale, SpriteEffects.None, 0);
+        }
+
+        private void DrawOutlinedTexture(SpriteBatch batch, Texture2D texture, Rectangle rect, Color color, int border = 5, bool flipped = false) {
+            var rectBig = rect;
+            rectBig.Inflate(border, border);
+
+            if (!flipped) {
+                batch.Draw(texture, rectBig, _textColor);
+                batch.Draw(texture, rect, color);
+            } else {
+                batch.Draw(texture, rectBig, null, _textColor, 0, new Vector2(0, 0), SpriteEffects.FlipHorizontally, 0);
+                batch.Draw(texture, rect, null, color, 0, new Vector2(0, 0), SpriteEffects.FlipHorizontally, 0);
+            }
         }
 
         /// <summary>
@@ -217,21 +237,20 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="batch">The sprite batch to write to.</param>
         private void DrawStatistics(SpriteBatch batch) {
+            DrawOutlinedTexture(batch, _antsCharachterTexture, new Rectangle(30, 30, 160, 160), Color.White);
+            DrawOutlinedTexture(batch, _termiteCharachterTexture, new Rectangle(_scene.Width - 180, 30, 160, 160), Color.White);
+
             var appleRect1 = new Rectangle(145, 90, 80, 80);
-            var antsRect1 = new Rectangle(95, 130, 75, 75);
+            var antsRect1 = new Rectangle(100, 130, 70, 70);
 
             var appleRect2 = new Rectangle(_scene.Width - 225, 90, 80, 80);
-            var antsRect2 = new Rectangle(_scene.Width - 170, 130, 75, 75);
+            var antsRect2 = new Rectangle(_scene.Width - 170, 130, 70, 70);
 
-            batch.Draw(_antsCharachterTexture, new Rectangle(30, 30, 160, 160), Color.White);
-            batch.Draw(_termiteCharachterTexture, new Rectangle(_scene.Width - 180, 30, 160, 160), Color.White);
+            DrawOutlinedTexture(batch, _appleTexture, appleRect1, Color.White, 3);
+            DrawOutlinedTexture(batch, _circleTexture, antsRect1, new Color(240, 137, 55), 2);
 
-            batch.Draw(_appleTexture, appleRect1, null, Color.White, 0, new Vector2(0, 0), SpriteEffects.None, 0);
-            batch.Draw(_circleTexture, antsRect1, new Color(240, 137, 55));
-
-            batch.Draw(_appleTexture, appleRect2, null, Color.White, 0, new Vector2(0, 0), 
-                SpriteEffects.FlipHorizontally, 0);
-            batch.Draw(_circleTexture, antsRect2, new Color(240, 137, 55));
+            DrawOutlinedTexture(batch, _appleTexture, appleRect2, Color.White, 3, true);
+            DrawOutlinedTexture(batch, _circleTexture, antsRect2, new Color(240, 137, 55), 2);
 
             String AntsNum1 = "x" + _handler.GetNumberOfAnts(0);
             DrawString(batch, AntsNum1, antsRect1.Center.ToVector2());
