@@ -38,7 +38,7 @@ namespace TinyShopping.Game {
         public Pheromone(Vector2 position, Texture2D texture, World world, int priority, PheromoneType type, int owner) {
             Position = position;
             _world = world;
-            _tileSize = (int)_world.TileSize;
+            _tileSize = (int)_world.TileWidth;
             _texture = texture;
             Priority = priority;
             Type = type;

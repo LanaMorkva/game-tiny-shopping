@@ -19,26 +19,14 @@ namespace TinyShopping.Game {
 
         private ObstacleLayer _obstacleLayer;
 
-        public static int NUM_OF_SQUARES_WIDTH = 57;
-
-        public static int NUM_OF_SQUARES_HEIGHT = 40;
-
-        private float _tileWidth = 0;
+        public float TileWidth {get; private set;}
+        public float TileHeight {get; private set;}
         private TiledMapRenderer _tiledMapRenderer;
         private TiledMap _tiledMap;
 
         public int Width { get; private set; }
 
         public int Height { get; private set; }
-
-        public float TileSize {
-            get {
-                if (_tileWidth == 0) {
-                    throw new Exception("Tile size is not yet known, call LoadContent first!");
-                }
-                return _tileWidth;
-            }
-        }
 
         /// <summary>
         /// Loads necessary data from disk.
@@ -48,9 +36,10 @@ namespace TinyShopping.Game {
             _tiledMap = contentManager.Load<TiledMap>("map_isometric/map-angled");
             _tiledMapRenderer = new TiledMapRenderer(device, _tiledMap);
             _obstacleLayer = new ObstacleLayer(_tiledMap);
-            _tileWidth = _tiledMap.TileWidth;
-            Width = _tiledMap.WidthInPixels;
-            Height = _tiledMap.HeightInPixels;
+            TileWidth = _tiledMap.TileWidth;
+            TileHeight = _tiledMap.TileHeight;
+            Width = _tiledMap.Width;
+            Height = _tiledMap.Height;
         }
 
         /// <summary>
@@ -100,10 +89,10 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="position">The position to align.</param>
         public Vector2 AlignPositionToGridCenter(Vector2 position) {
-            int xRaw = (int) MathF.Floor((position.X) / TileSize);
-            int yRaw = (int) MathF.Floor((position.Y) / TileSize);
-            float x = xRaw * TileSize + TileSize / 2;
-            float y = yRaw * TileSize + TileSize / 2;
+            int xRaw = (int) MathF.Floor((position.X) / TileWidth);
+            int yRaw = (int) MathF.Floor((position.Y) / TileHeight);
+            float x = xRaw * TileWidth + TileWidth / 2;
+            float y = yRaw * TileHeight + TileHeight / 2;
             return new Vector2(x, y);
         }
 
@@ -114,8 +103,9 @@ namespace TinyShopping.Game {
         /// <param name="tileY">Y coordinate of the tile.</param>
         /// <returns>The center of the tile in screen pixel coordinates.</returns>
         public Vector2 GetCenterOfTile(int tileX, int tileY) {
-            return new Vector2(TileSize * tileX + TileSize / 2, TileSize * tileY + TileSize / 2);
-        }
+            Vector2 tile = GetTopLeftOfTile(tileX, tileY);
+            return new Vector2(tile.X + TileWidth / 2, tile.Y + TileHeight / 2);
+        } 
 
         /// <summary>
         /// Calculates the top left of the given tile.
@@ -133,8 +123,8 @@ namespace TinyShopping.Game {
         /// </summary>
         public Rectangle GetWorldBoundary() {
             // in Monogame world (0,0) corresponds to screen (0,0), in tiled screen (0,0) is top left corner of canvas,
-            // so we need to offset our origin
-            Vector2 leftTop = new Vector2(-_tiledMap.HeightInPixels, 0); // it just works, dont ask why
+            // so we need to offset our origin to match coordinates
+            Vector2 leftTop = new Vector2(-_tiledMap.HeightInPixels, 0); //this offset works, dont ask why :)
             Vector2 rightBottom = ConvertTileToScreenPosition(new Vector2(70, 20)) + new Vector2(_tiledMap.HeightInPixels, 0);
             return new Rectangle(leftTop.ToPoint(), rightBottom.ToPoint());
         }
