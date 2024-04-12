@@ -26,7 +26,8 @@ namespace TinyShopping.Game {
         public static int NUM_OF_SQUARES_HEIGHT = 40;
 
         private float _tileWidth = 0;
-        public TiledMapRenderer _tiledMapRenderer;
+        private TiledMapRenderer _tiledMapRenderer;
+        private TiledMap _tiledMap;
 
         public int Width { get; private set; }
 
@@ -46,13 +47,12 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="contentManager">The content manager of the main game.</param>
         public void LoadContent(ContentManager contentManager, GraphicsDevice device) {
-            TiledMap tiledMap = contentManager.Load<TiledMap>("map/map_48x48");
-            _tiledMapRenderer = new TiledMapRenderer(device, tiledMap);
-            _obstacleLayer = new ObstacleLayer(tiledMap);
-            _tileWidth = tiledMap.TileWidth;
-            Width = tiledMap.WidthInPixels;
-            Height = tiledMap.HeightInPixels;
-
+            _tiledMap = contentManager.Load<TiledMap>("map_isometric/map-angled");
+            _tiledMapRenderer = new TiledMapRenderer(device, _tiledMap);
+            _obstacleLayer = new ObstacleLayer(_tiledMap);
+            _tileWidth = _tiledMap.TileWidth;
+            Width = _tiledMap.WidthInPixels;
+            Height = _tiledMap.HeightInPixels;
         }
 
         /// <summary>
@@ -73,9 +73,9 @@ namespace TinyShopping.Game {
         /// <param name="gameTime">The current game time.</param>
         public void DrawObjects(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
             _tiledMapRenderer.Draw((int)LayerName.Walls, viewMatrix);
-            _tiledMapRenderer.Draw((int)LayerName.InteriorBackground, viewMatrix);
-            _tiledMapRenderer.Draw((int)LayerName.InteriorForeground, viewMatrix);
-            _tiledMapRenderer.Draw((int)LayerName.Decorations, viewMatrix);
+            // _tiledMapRenderer.Draw((int)LayerName.InteriorBackground, viewMatrix);
+            // _tiledMapRenderer.Draw((int)LayerName.InteriorForeground, viewMatrix);
+            // _tiledMapRenderer.Draw((int)LayerName.Decorations, viewMatrix);
         }
 
 #if DEBUG
@@ -128,7 +128,8 @@ namespace TinyShopping.Game {
         /// <param name="tileY">Y coordinate of the tile.</param>
         /// <returns>The top left position of the given tile.</returns>
         public Vector2 GetTopLeftOfTile(int tileX, int tileY) {
-            return new Vector2(TileSize * tileX, TileSize * tileY);
+            TiledMapTile tile = _tiledMap.GetLayer<TiledMapTileLayer>("Floor").GetTile((ushort)tileX, (ushort)tileY);
+            return new Vector2(tile.X, tile.Y);
         }
 
         /// <summary>
@@ -137,8 +138,8 @@ namespace TinyShopping.Game {
         /// <param name="player">The player for which the coordinates should be calculated.</param>
         /// <param name="worldPosition">The world position to convert.</param>
         /// <returns>A position in screen coordinates.</returns>
-        public Vector2 ConvertToScreenPosition(int player, Vector2 worldPosition) {
-            return worldPosition;
+        public Vector2 ConvertToScreenPosition(Vector2 worldPosition) {
+            return Utilities.worldToScreen(worldPosition, _tiledMap.TileHeight, _tiledMap.TileWidth);
         }
     }
 }

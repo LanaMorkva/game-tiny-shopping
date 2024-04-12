@@ -82,7 +82,7 @@ namespace TinyShopping.Game {
             PlacePheromones(gameTime);
             UpdatePosition(speed);
             handler.UpdateCameraPosition(_id, _position, speed);
-            ClipCursorToWorld();
+            // ClipCursorToWorld();
         }
 
         /// <summary>
@@ -113,6 +113,9 @@ namespace TinyShopping.Game {
             Vector2 motion = _input.GetMotion();
             _position.X += motion.X * speed;
             _position.Y += motion.Y * speed;
+            if (_id == 0) {
+                Console.WriteLine("Cursor pos: {0}", _position.ToString());
+            }
         }
 
         /// <summary>
