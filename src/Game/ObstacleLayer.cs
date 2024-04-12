@@ -45,13 +45,13 @@ namespace TinyShopping.Game {
             foreach (TiledMapObject obj in tiledMap.ObjectLayers[0].Objects) {
                 if (obj is TiledMapPolygonObject polygon) {
                     for (int i = 0; i < polygon.Points.Length; i++) {
-                        polygon.Points[i] = Utilities.worldToScreen(polygon.Points[i], tiledMap.TileHeight, tiledMap.TileWidth);
+                        polygon.Points[i] = Utilities.worldPosToScreen(polygon.Points[i], tiledMap.TileHeight, tiledMap.TileWidth);
                     }
-                    var position = Utilities.worldToScreen(polygon.Position, tiledMap.TileHeight, tiledMap.TileWidth);
+                    var position = Utilities.worldPosToScreen(polygon.Position, tiledMap.TileHeight, tiledMap.TileWidth);
                     _obstacles.Add(new Obstacle(position, polygon.Points));
                 } else {
                     //TODO check if it works
-                    var position = Utilities.worldToScreen(obj.Position, tiledMap.TileHeight, tiledMap.TileWidth);
+                    var position = Utilities.worldPosToScreen(obj.Position, tiledMap.TileHeight, tiledMap.TileWidth);
                     _obstacles.Add(new Obstacle(position, obj.Size));
                 }
             }

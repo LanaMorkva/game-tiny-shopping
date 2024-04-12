@@ -5,6 +5,7 @@ using System;
 
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
+using MonoGame.Extended;
 
 namespace TinyShopping.Game {
 
@@ -12,11 +13,8 @@ namespace TinyShopping.Game {
 
         enum LayerName {
             Floor = 0,
-            FloorShadow,
             Walls,
-            InteriorBackground,
-            InteriorForeground,
-            Decorations,
+            Objects,
         };
 
         private ObstacleLayer _obstacleLayer;
@@ -63,7 +61,6 @@ namespace TinyShopping.Game {
         /// <param name="source">The source rectangle on the texture to use.</param>
         public void DrawFloor(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
             _tiledMapRenderer.Draw((int)LayerName.Floor, viewMatrix);
-            _tiledMapRenderer.Draw((int)LayerName.FloorShadow, viewMatrix);
         }
 
         /// <summary>
@@ -73,9 +70,7 @@ namespace TinyShopping.Game {
         /// <param name="gameTime">The current game time.</param>
         public void DrawObjects(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
             _tiledMapRenderer.Draw((int)LayerName.Walls, viewMatrix);
-            // _tiledMapRenderer.Draw((int)LayerName.InteriorBackground, viewMatrix);
-            // _tiledMapRenderer.Draw((int)LayerName.InteriorForeground, viewMatrix);
-            // _tiledMapRenderer.Draw((int)LayerName.Decorations, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.Objects, viewMatrix);
         }
 
 #if DEBUG
@@ -85,6 +80,7 @@ namespace TinyShopping.Game {
         /// <param name="handler">The split screen handler to use.</param>
         public void DrawDebugInfo(SpriteBatch batch) {
             _obstacleLayer.Draw(batch);
+            batch.DrawRectangle(GetWorldBoundary(), Color.RoyalBlue, 5);
         }
 #endif
 
@@ -129,17 +125,29 @@ namespace TinyShopping.Game {
         /// <returns>The top left position of the given tile.</returns>
         public Vector2 GetTopLeftOfTile(int tileX, int tileY) {
             TiledMapTile tile = _tiledMap.GetLayer<TiledMapTileLayer>("Floor").GetTile((ushort)tileX, (ushort)tileY);
-            return new Vector2(tile.X, tile.Y);
+            return ConvertTileToScreenPosition(new Vector2(tile.X, tile.Y));
+        }
+
+        /// <summary>
+        /// Return world boundary in screen coordinates
+        /// </summary>
+        public Rectangle GetWorldBoundary() {
+            // in Monogame world (0,0) corresponds to screen (0,0), in tiled screen (0,0) is top left corner of canvas,
+            // so we need to offset our origin
+            Vector2 leftTop = new Vector2(-_tiledMap.HeightInPixels, 0); // it just works, dont ask why
+            Vector2 rightBottom = ConvertTileToScreenPosition(new Vector2(70, 20)) + new Vector2(_tiledMap.HeightInPixels, 0);
+            return new Rectangle(leftTop.ToPoint(), rightBottom.ToPoint());
         }
 
         /// <summary>
         /// Converts the given world position to a screen position.
         /// </summary>
-        /// <param name="player">The player for which the coordinates should be calculated.</param>
-        /// <param name="worldPosition">The world position to convert.</param>
-        /// <returns>A position in screen coordinates.</returns>
-        public Vector2 ConvertToScreenPosition(Vector2 worldPosition) {
-            return Utilities.worldToScreen(worldPosition, _tiledMap.TileHeight, _tiledMap.TileWidth);
+        public Vector2 ConvertPosToScreenPosition(Vector2 worldPosition) {
+            return Utilities.worldPosToScreen(worldPosition, _tiledMap.TileHeight, _tiledMap.TileWidth);
+        }
+
+        public Vector2 ConvertTileToScreenPosition(Vector2 tileIdx) {
+            return Utilities.worldTileToScreen(tileIdx, _tiledMap.TileHeight, _tiledMap.TileWidth);
         }
     }
 }

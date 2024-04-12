@@ -85,15 +85,15 @@ namespace TinyShopping.Game {
             _pheromoneHandler.LoadContent(content);
 
             PlayerInput input1 = CreatePlayerInput(PlayerIndex.One);
-            _player1 = new Player(_pheromoneHandler, input1, _insectHandler, _world, 0, _world.GetTopLeftOfTile(3, 5));
+            _player1 = new Player(_pheromoneHandler, input1, _insectHandler, _world, 0, _world.GetTopLeftOfTile(3, 33));
             _player1.LoadContent(content);
 
-            // _camera1.LookAt(_world.GetTopLeftOfTile(24, 14));
+            _camera1.LookAt(_world.GetTopLeftOfTile(15, 30));
 
             PlayerInput input2 = CreatePlayerInput(PlayerIndex.Two);
-            _player2 = new Player(_pheromoneHandler, input2, _insectHandler, _world, 1, _world.GetTopLeftOfTile(54, 35));
+            _player2 = new Player(_pheromoneHandler, input2, _insectHandler, _world, 1, _world.GetTopLeftOfTile(48, 3));
             _player2.LoadContent(content);
-            _camera2.LookAt(_world.GetTopLeftOfTile(57, 27));
+            _camera2.LookAt(_world.GetTopLeftOfTile(49, 12));
 
             CreateBorderTexture(new Color(252, 239, 197), 3);
         }
@@ -218,16 +218,17 @@ namespace TinyShopping.Game {
             }
 
             Vector2 cameraMoveDirection = Vector2.Zero;
-            if (cameraRect.Right - cursorPos.X < 50 && cameraRect.Right < _world.Width) {
-                cameraMoveDirection.X += speed;
+            Rectangle worldRect = _world.GetWorldBoundary();
+            if (cameraRect.Right - cursorPos.X < 50 && cameraRect.Right < worldRect.Right) {
+                cameraMoveDirection.X += speed; 
             }
-            if (cursorPos.X - cameraRect.Left < 50 && cameraRect.Left > 0) {
+            if (cursorPos.X - cameraRect.Left < 50 && cameraRect.Left > worldRect.Left) {
                 cameraMoveDirection.X -= speed; 
             }
-            if (cursorPos.Y - cameraRect.Top < 50 && cameraRect.Y > 0) {
+            if (cursorPos.Y - cameraRect.Top < 50 && cameraRect.Y > worldRect.Top) { 
                 cameraMoveDirection.Y -= speed;
             }
-            if (cameraRect.Bottom - cursorPos.Y < 50 && cameraRect.Bottom < _world.Height) {
+            if (cameraRect.Bottom - cursorPos.Y < 50 && cameraRect.Bottom < worldRect.Bottom) {
                 cameraMoveDirection.Y += speed;
             }
 

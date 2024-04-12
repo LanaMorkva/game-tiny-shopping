@@ -82,7 +82,7 @@ namespace TinyShopping.Game {
             PlacePheromones(gameTime);
             UpdatePosition(speed);
             handler.UpdateCameraPosition(_id, _position, speed);
-            // ClipCursorToWorld();
+            ClipCursorToWorld();
         }
 
         /// <summary>
@@ -90,18 +90,18 @@ namespace TinyShopping.Game {
         /// </summary>
         private void ClipCursorToWorld() {
             Rectangle cursor = new Rectangle((int)(_position.X - SIZE / 2f), (int)(_position.Y - SIZE / 2f), SIZE, SIZE);
-
-            if (cursor.X < 0) {
-                _position.X = SIZE / 2f;
+            Rectangle worldRect = _world.GetWorldBoundary();
+            if (cursor.X < worldRect.Left) {
+                _position.X = worldRect.Left + SIZE / 2f;
             }
-            if (cursor.Right > _world.Width) {
-                _position.X = _world.Width - SIZE / 2f;
+            if (cursor.Right > worldRect.Right) {
+                _position.X = worldRect.Right - SIZE / 2f;
             }
-            if (cursor.Y < 0) {
-                _position.Y = 0 + SIZE / 2f;
+            if (cursor.Y < worldRect.Top) {
+                _position.Y = worldRect.Top + SIZE / 2f;
             }
-            if (cursor.Bottom > _world.Height) {
-                _position.Y = _world.Height - SIZE / 2f;
+            if (cursor.Bottom > worldRect.Bottom) {
+                _position.Y = worldRect.Bottom - SIZE / 2f;
             }
         }
 
