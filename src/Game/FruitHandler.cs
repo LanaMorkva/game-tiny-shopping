@@ -32,7 +32,7 @@ namespace TinyShopping.Game {
         }
 
         private void GenerateFruits() {
-            float halfFruitSize = _world.TileWidth * 0.35f;
+            float halfFruitSize = _world.TileWidth * 0.2f;
             for (int i = 0; i < FRUITS_NUM; i++) {
                 int tileX = Random.Shared.Next(_world.Width);
                 int tileY = Random.Shared.Next(_world.Height);

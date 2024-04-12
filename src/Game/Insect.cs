@@ -63,7 +63,7 @@ namespace TinyShopping.Game {
             _position = new InsectPos((int)spawn.X, (int)spawn.Y, spawnRotation);
             _texture = texture;
             _textureFull = textureFull;
-            TextureSize = (int)_world.TileWidth;
+            TextureSize = (int)_world.TileWidth / 2;
             Owner = owner;
             Health = 100;
             _ais = new Task[] {

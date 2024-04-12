@@ -43,7 +43,7 @@ namespace TinyShopping.Game {
             Priority = priority;
             Type = type;
             Owner = owner;
-            _pheromoneSize = RANGE * _tileSize * 2;
+            _pheromoneSize = RANGE * _tileSize;
 
             switch (type) {
                 case PheromoneType.RETURN:
