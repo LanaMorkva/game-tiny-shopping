@@ -144,6 +144,11 @@ namespace TinyShopping.Game {
             _pheromoneHandler.Draw(batch, playerId, gameTime);
             _insectHandler.Draw(batch, gameTime);
             _fruitHandler.Draw(batch, gameTime);
+
+            // need to flush sprites before rendering tiled map objects, to ensure that fruits, ants are drawn before map objects
+            // this is needed, because tiled draws directly to the graphics device, while SpriteBatch draw only at the End() call
+            batch.End();
+            _batch.Begin(transformMatrix: viewMatrix);
             _world.DrawObjects(batch, viewMatrix, Vector2.Zero);
             if (playerId == 0) {
                 _player1.Draw(batch, gameTime);
