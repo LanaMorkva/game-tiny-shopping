@@ -83,17 +83,19 @@ namespace TinyShopping.Game {
             _insectHandler.LoadContent(content);
             _fruitHandler.LoadContent(content);
             _pheromoneHandler.LoadContent(content);
+            
+            var spawnPositions = _world.GetSpawnPositions();
 
             PlayerInput input1 = CreatePlayerInput(PlayerIndex.One);
-            _player1 = new Player(_pheromoneHandler, input1, _insectHandler, _world, 0, _world.GetTopLeftOfTile(3, 33));
+            _player1 = new Player(_pheromoneHandler, input1, _insectHandler, _world, 0, spawnPositions[0]);
             _player1.LoadContent(content);
 
-            _camera1.LookAt(_world.GetTopLeftOfTile(15, 30));
+            _camera1.LookAt(spawnPositions[0]);
 
             PlayerInput input2 = CreatePlayerInput(PlayerIndex.Two);
-            _player2 = new Player(_pheromoneHandler, input2, _insectHandler, _world, 1, _world.GetTopLeftOfTile(48, 3));
+            _player2 = new Player(_pheromoneHandler, input2, _insectHandler, _world, 1, spawnPositions[1]);
             _player2.LoadContent(content);
-            _camera2.LookAt(_world.GetTopLeftOfTile(49, 12));
+            _camera2.LookAt(spawnPositions[1]);
 
             CreateBorderTexture(new Color(252, 239, 197), 3);
         }

@@ -6,6 +6,7 @@ using System;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using MonoGame.Extended;
+using System.Collections.Generic;
 
 namespace TinyShopping.Game {
 
@@ -14,6 +15,7 @@ namespace TinyShopping.Game {
         enum LayerName {
             Floor = 0,
             Walls,
+            Walls2,
             Objects,
         };
 
@@ -59,6 +61,7 @@ namespace TinyShopping.Game {
         /// <param name="gameTime">The current game time.</param>
         public void DrawObjects(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
             _tiledMapRenderer.Draw((int)LayerName.Walls, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.Walls2, viewMatrix);
             _tiledMapRenderer.Draw((int)LayerName.Objects, viewMatrix);
         }
 
@@ -118,6 +121,24 @@ namespace TinyShopping.Game {
             return ConvertTileToScreenPosition(new Vector2(tile.X, tile.Y));
         }
 
+        public List<Vector2> GetSpawnPositions() {
+            TiledMapObject[] spawns = _tiledMap.GetLayer<TiledMapObjectLayer>("spawns").Objects;
+            List<Vector2> spawnPositions = new List<Vector2>();
+            foreach (TiledMapObject obj in spawns) {
+                spawnPositions.Add(ConvertPosToScreenPosition(obj.Position));
+            }
+            return spawnPositions;
+        }
+
+        public List<Vector2> GetDropOffPositions() {
+            TiledMapObject[] spawns = _tiledMap.GetLayer<TiledMapObjectLayer>("dropoffs").Objects;
+            List<Vector2> spawnPositions = new List<Vector2>();
+            foreach (TiledMapObject obj in spawns) {
+                spawnPositions.Add(ConvertPosToScreenPosition(obj.Position));
+            }
+            return spawnPositions;
+        }
+
         /// <summary>
         /// Return world boundary in screen coordinates
         /// </summary>
@@ -125,7 +146,7 @@ namespace TinyShopping.Game {
             // in Monogame world (0,0) corresponds to screen (0,0), in tiled screen (0,0) is top left corner of canvas,
             // so we need to offset our origin to match coordinates
             Vector2 leftTop = new Vector2(-_tiledMap.HeightInPixels, 0); //this offset works, dont ask why :)
-            Vector2 rightBottom = ConvertTileToScreenPosition(new Vector2(70, 20)) + new Vector2(_tiledMap.HeightInPixels, 0);
+            Vector2 rightBottom = ConvertTileToScreenPosition(new Vector2(100, 30)) + new Vector2(_tiledMap.HeightInPixels, 0);
             return new Rectangle(leftTop.ToPoint(), rightBottom.ToPoint());
         }
 

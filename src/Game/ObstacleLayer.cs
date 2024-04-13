@@ -42,7 +42,7 @@ namespace TinyShopping.Game {
 
         public ObstacleLayer(TiledMap tiledMap) {
             _obstacles = new List<Obstacle>();
-            foreach (TiledMapObject obj in tiledMap.ObjectLayers[0].Objects) {
+            foreach (TiledMapObject obj in tiledMap.GetLayer<TiledMapObjectLayer>("obstacles").Objects) {
                 if (obj is TiledMapPolygonObject polygon) {
                     for (int i = 0; i < polygon.Points.Length; i++) {
                         polygon.Points[i] = Utilities.worldPosToScreen(polygon.Points[i], tiledMap.TileHeight, tiledMap.TileWidth);
