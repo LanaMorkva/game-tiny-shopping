@@ -14,9 +14,10 @@ namespace TinyShopping.Game {
 
         enum LayerName {
             Floor = 0,
+            Objects,
             Walls,
             Walls2,
-            Objects,
+            Objects2,
         };
 
         private ObstacleLayer _obstacleLayer;
@@ -36,6 +37,8 @@ namespace TinyShopping.Game {
         /// <param name="contentManager">The content manager of the main game.</param>
         public void LoadContent(ContentManager contentManager, GraphicsDevice device) {
             _tiledMap = contentManager.Load<TiledMap>("map_isometric/map-angled");
+            _tiledMap.GetLayer("Walls").Offset = new Vector2(0, -96);
+            _tiledMap.GetLayer("Objects").Offset = new Vector2(0, -32);
             _tiledMapRenderer = new TiledMapRenderer(device, _tiledMap);
             _obstacleLayer = new ObstacleLayer(_tiledMap);
             TileWidth = _tiledMap.TileWidth;
@@ -52,6 +55,7 @@ namespace TinyShopping.Game {
         /// <param name="source">The source rectangle on the texture to use.</param>
         public void DrawFloor(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
             _tiledMapRenderer.Draw((int)LayerName.Floor, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.Objects, viewMatrix);
         }
 
         /// <summary>
@@ -61,8 +65,8 @@ namespace TinyShopping.Game {
         /// <param name="gameTime">The current game time.</param>
         public void DrawObjects(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
             _tiledMapRenderer.Draw((int)LayerName.Walls, viewMatrix);
-            _tiledMapRenderer.Draw((int)LayerName.Walls2, viewMatrix);
-            _tiledMapRenderer.Draw((int)LayerName.Objects, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.Walls2, viewMatrix);  
+            _tiledMapRenderer.Draw((int)LayerName.Objects2, viewMatrix);
         }
 
 #if DEBUG

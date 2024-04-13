@@ -83,16 +83,6 @@
 /processorParam:TextureFormat=Compressed
 /build:General.spritefont
 
-#begin map_isometric/asset-diagonal-tomatos.tsx
-/importer:TiledMapTilesetImporter
-/processor:TiledMapTilesetProcessor
-/build:map_isometric/asset-diagonal-tomatos.tsx
-
-#begin map_isometric/flooring.tsx
-/importer:TiledMapTilesetImporter
-/processor:TiledMapTilesetProcessor
-/build:map_isometric/flooring.tsx
-
 #begin map_isometric/map-angled.tmx
 /importer:TiledMapImporter
 /processor:TiledMapProcessor
