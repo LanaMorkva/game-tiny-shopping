@@ -89,8 +89,7 @@ namespace TinyShopping.Game {
             PlayerInput input1 = CreatePlayerInput(PlayerIndex.One);
             _player1 = new Player(_pheromoneHandler, input1, _insectHandler, _world, 0, spawnPositions[0]);
             _player1.LoadContent(content);
-
-            _camera1.LookAt(spawnPositions[0]);
+            _camera1.LookAt(_world.GetTopLeftOfTile(19,38));
 
             PlayerInput input2 = CreatePlayerInput(PlayerIndex.Two);
             _player2 = new Player(_pheromoneHandler, input2, _insectHandler, _world, 1, spawnPositions[1]);

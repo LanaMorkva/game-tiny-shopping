@@ -33,15 +33,15 @@ namespace TinyShopping.Game {
 
         private void GenerateFruits() {
             float halfFruitSize = _world.TileWidth * 0.2f;
-            for (int i = 0; i < FRUITS_NUM; i++) {
+            for (int i = 0; i < FRUITS_NUM; ) {
                 int tileX = Random.Shared.Next(_world.Width);
                 int tileY = Random.Shared.Next(_world.Height);
                 Vector2 center = _world.GetCenterOfTile(tileX, tileY);
                 if (_world.IsWalkable((int)center.X, (int)center.Y, (int)halfFruitSize)) {
                     Vector2 position = new Vector2(center.X - halfFruitSize, center.Y - halfFruitSize);
                     int size = (int)(halfFruitSize * 2);
-                    Console.WriteLine("Fruit pos: {0}", position.ToString());
                     _fruits.Add(new Fruit(position, _appleTexture, size, _world));
+                    i++;
                 }
             }
         }
