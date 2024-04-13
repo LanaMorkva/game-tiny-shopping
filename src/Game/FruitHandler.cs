@@ -9,7 +9,7 @@ namespace TinyShopping.Game {
     internal class FruitHandler {
 
         private static readonly int RANGE = 2;
-        private static readonly int FRUITS_NUM = 50;
+        private static readonly int FRUITS_NUM = 30;
 
         private World _world;
 
@@ -32,7 +32,7 @@ namespace TinyShopping.Game {
         }
 
         private void GenerateFruits() {
-            float halfFruitSize = _world.TileWidth * 0.2f;
+            float halfFruitSize = _world.TileWidth * 0.15f;
             for (int i = 0; i < FRUITS_NUM; ) {
                 int tileX = Random.Shared.Next(_world.Width);
                 int tileY = Random.Shared.Next(_world.Height);

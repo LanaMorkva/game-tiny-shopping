@@ -16,7 +16,6 @@ namespace TinyShopping.Game {
             Floor = 0,
             Objects,
             Walls,
-            Walls2,
             Objects2,
         };
 
@@ -65,7 +64,6 @@ namespace TinyShopping.Game {
         /// <param name="gameTime">The current game time.</param>
         public void DrawObjects(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
             _tiledMapRenderer.Draw((int)LayerName.Walls, viewMatrix);
-            _tiledMapRenderer.Draw((int)LayerName.Walls2, viewMatrix);  
             _tiledMapRenderer.Draw((int)LayerName.Objects2, viewMatrix);
         }
 
