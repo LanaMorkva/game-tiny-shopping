@@ -12,8 +12,6 @@ namespace TinyShopping.Game {
 
         private Texture2D _texture;
 
-        private SpriteFont _font;
-
         private List<Pheromone>[] _pheromones;
 
         private List<Pheromone>[] _returnPheromones;
@@ -37,7 +35,6 @@ namespace TinyShopping.Game {
         /// <param name="contentManager">The content manager to use.</param>
         public void LoadContent(ContentManager contentManager) {
             _texture = contentManager.Load<Texture2D>("pheromone");
-            _font = contentManager.Load<SpriteFont>("arial");
             _soundEffects.Add(contentManager.Load<SoundEffect>("sounds/glass_knock"));
         }
 

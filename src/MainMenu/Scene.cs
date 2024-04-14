@@ -27,8 +27,14 @@ namespace TinyShopping.MainMenu {
         }
 
         public override void LoadContent() {
+<<<<<<< HEAD
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _selectMenu.LoadContent(Content);
+=======
+            _background = Content.Load<Texture2D>("teaser");
+            _font = Content.Load<SpriteFont>("General");
+            CalculateBackgroundPosition();
+>>>>>>> development
             base.LoadContent();
         }
 
@@ -38,6 +44,7 @@ namespace TinyShopping.MainMenu {
         }
 
         public override void Draw(GameTime gameTime) {
+<<<<<<< HEAD
 
             _spriteBatch.Begin();
             
@@ -46,6 +53,16 @@ namespace TinyShopping.MainMenu {
             GraphicsDevice.Viewport = original;
             
             _spriteBatch.End();
+=======
+            SpriteBatch.Begin();
+            SpriteBatch.Draw(_background, _backgroundPosition, Color.White);
+            Vector2 pos = new Vector2(GraphicsDeviceManager.PreferredBackBufferWidth/2, GraphicsDeviceManager.PreferredBackBufferHeight*5/6);
+            String message = "PRESS ANY KEY TO CONTINUE";
+            Vector2 textSize = _font.MeasureString(message) / 2;
+            SpriteBatch.DrawString(_font, message, pos - new Vector2(5,5), Color.Black, 0, textSize, 0.9f, SpriteEffects.None, 0);
+            SpriteBatch.DrawString(_font, message, pos, Color.White, 0, textSize, 0.9f, SpriteEffects.None, 0);
+            SpriteBatch.End();
+>>>>>>> development
             base.Draw(gameTime);
         }
 

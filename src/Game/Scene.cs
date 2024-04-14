@@ -8,8 +8,6 @@ namespace TinyShopping.Game {
 
         private SpriteBatch _spriteBatch;
 
-        public static int STAT_OFFSET = 70;
-
         private UIController _ui;
 
         private SplitScreenHandler _splitScreenHandler;
@@ -18,26 +16,24 @@ namespace TinyShopping.Game {
 
         private Rectangle _player2Area;
 
-        private Rectangle _statsArea;
-
         public bool IsStarted {get; set; }
         public bool IsOver { get; set; }
 
         public int Height {  get; private set; }
+        public int Width { get; private set; }
 
         public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game) :
             base(content, graphics, manager, game) {
         }
 
         public override void Initialize() {
-            int width = GraphicsDeviceManager.PreferredBackBufferWidth;
+            Width = GraphicsDeviceManager.PreferredBackBufferWidth;
             Height = GraphicsDeviceManager.PreferredBackBufferHeight;
-            _statsArea = new Rectangle(0, 0, width, STAT_OFFSET);
-            _player1Area = new Rectangle(0, STAT_OFFSET, width / 2, Height - STAT_OFFSET);
-            _player2Area = new Rectangle(width / 2, STAT_OFFSET, width / 2, Height - STAT_OFFSET);
+            _player1Area = new Rectangle(0, 0, Width / 2, Height);
+            _player2Area = new Rectangle(Width / 2, 0, Width / 2, Height);
             _splitScreenHandler = new SplitScreenHandler(_player1Area, _player2Area, GraphicsDevice);
             _splitScreenHandler.Initialize();
-            _ui = new UIController(_statsArea, GraphicsDevice, _splitScreenHandler, this);
+            _ui = new UIController(GraphicsDevice, _splitScreenHandler, this);
             base.Initialize();
         }
 

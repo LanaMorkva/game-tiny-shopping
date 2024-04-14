@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 
@@ -10,18 +11,22 @@ namespace TinyShopping.Game {
     internal class UIController {
 
         private static readonly int TIME_LIMIT_S = 5 * 60;
+        private static readonly Color _borderColor = new Color(247, 140, 52);
+        private static readonly Color _textColor = new Color(69, 49, 33);
 
         private SpriteFont _font;
-
-        private GraphicsDevice _device;
-
-        private Rectangle _drawArea;
-
-        private Texture2D _statsTexture;
-
-        private Texture2D _antTexture;
+        private SpriteFont _fontBig;
+        private SpriteFont _fontGeneral;
 
         private Texture2D _appleTexture;
+
+        private Texture2D _circleTexture;
+
+        private Texture2D _roundRectTexture;
+
+        private Texture2D _antsCharachterTexture;
+
+        private Texture2D _termiteCharachterTexture;
 
         private SplitScreenHandler _handler;
 
@@ -33,9 +38,7 @@ namespace TinyShopping.Game {
 
         private int _winner;
 
-        public UIController(Rectangle drawArea, GraphicsDevice device, SplitScreenHandler handler, Scene scene) {
-            _drawArea = drawArea;
-            _device = device;
+        public UIController(GraphicsDevice device, SplitScreenHandler handler, Scene scene) {
             _handler = handler;
             _runtimeMs = 0;
             _scene = scene;
@@ -47,24 +50,18 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
-            _font = content.Load<SpriteFont>("Arial");
-            _appleTexture = content.Load<Texture2D>("apple");
-            _antTexture = content.Load<Texture2D>("ants/ant_texture");
+            _font = content.Load<SpriteFont>("Fun");
+            _fontBig = content.Load<SpriteFont>("FunBig");
+            _fontGeneral = content.Load<SpriteFont>("General");
+
+            _appleTexture = content.Load<Texture2D>("stats/apple");
+            _circleTexture = content.Load<Texture2D>("stats/circle");
+            _antsCharachterTexture = content.Load<Texture2D>("stats/Ant_Icon");
+            _termiteCharachterTexture = content.Load<Texture2D>("stats/Termite_Icon");
+            _roundRectTexture = content.Load<Texture2D>("stats/rounded_rectangle");
+
             _soundEffects.Add(content.Load<SoundEffect>("sounds/countdown_3_seconds"));
             _soundEffects.Add(content.Load<SoundEffect>("sounds/final_whistle"));
-            CreateStatisticsTexture();
-        }
-
-        /// <summary>
-        /// Creates the statistics background texture.
-        /// </summary>
-        private void CreateStatisticsTexture() {
-            _statsTexture = new Texture2D(_device, _drawArea.Width, _drawArea.Height);
-            Color[] data = new Color[_drawArea.Width * _drawArea.Height];
-            for (int i = 0; i < data.Length; i++) {
-                data[i] = new Color(252, 239, 197);
-            }
-            _statsTexture.SetData(data);
         }
 
         /// <summary>
@@ -119,32 +116,56 @@ namespace TinyShopping.Game {
         /// <param name="batch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
+            DrawBorder(batch);
             DrawStatistics(batch);
             DrawRemainingTime(batch);
             if (!_scene.IsStarted) {
                 DrawCountdown(batch);
             }
             if (_scene.IsOver) {
-                DrawWinMessage(batch, gameTime);
+                DrawWinMessage(batch);
             }
 #if DEBUG
             int fps = (int) Math.Round((1000 / gameTime.ElapsedGameTime.TotalMilliseconds));
-            batch.DrawString(_font, "FPS: " + fps.ToString(), new Vector2(0, 0), Color.Black, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
+            DrawString(batch, "FPS: " + fps.ToString(), new Vector2(80, 20));
 #endif
+        }
+
+        /// <summary>
+        /// Draws screen separation
+        /// </summary>
+        /// <param name="batch">The batch to use.</param>
+        private void DrawBorder(SpriteBatch batch) {
+            var splitBorder = new Rectangle(_scene.Width / 2 - 5, 0, 10, _scene.Height);
+            var timeBorder = new Rectangle(_scene.Width / 2 - 90, 0, 180, 40);
+
+            var splitBorderBig = splitBorder;
+            var timeBorderBig = timeBorder;
+            splitBorderBig.Inflate(3, 3);
+            timeBorderBig.Inflate(3, 3);
+
+            batch.FillRectangle(splitBorderBig, _textColor);
+            batch.Draw(_roundRectTexture, timeBorderBig, _textColor);
+
+            batch.FillRectangle(splitBorder, _borderColor);
+            batch.Draw(_roundRectTexture, timeBorder, _borderColor);
         }
 
         /// <summary>
         /// Writes the game over and win text to the screen.
         /// </summary>
         /// <param name="batch">The batch to use.</param>
-        /// <param name="gameTime">The current game time.</param>
-        private void DrawWinMessage(SpriteBatch batch, GameTime gameTime) {
-            string text = "It's a draw!";
+        private void DrawWinMessage(SpriteBatch batch) {
+            string text = "IT'S A DRAW!";
             if (_winner !=  0) {
-                text = "Player " + _winner + " wins this round!";
+                text = "PLAYER " + _winner + " WINS THIS ROUND!";
             }
-            Vector2 origin = _font.MeasureString(text) / 2;
-            batch.DrawString(_font, text, new Vector2(_drawArea.Width / 2, _scene.Height / 2), Color.Black, 0, origin, 0.8f, SpriteEffects.None, 0);
+            DrawDimScreen(batch);
+
+            var pos = new Vector2(_scene.Width / 2, _scene.Height / 2);
+            Vector2 origin = _fontGeneral.MeasureString(text) / 2;
+            batch.DrawString(_fontGeneral, text, pos - new Vector2(3, 3), Color.Black, 0, origin, 1.3f, SpriteEffects.None, 0);
+            batch.DrawString(_fontGeneral, text, pos, _textColor, 0, origin, 1.3f, SpriteEffects.None, 0);
         }
 
         /// <summary>
@@ -152,7 +173,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="batch"></param>
         private void DrawRemainingTime(SpriteBatch batch) {
-            int offsetTop = 35;
+            int offsetTop = 20;
             int secs;
             if (_scene.IsStarted) {
                 secs = TIME_LIMIT_S - (int) (_runtimeMs / 1000);
@@ -167,8 +188,7 @@ namespace TinyShopping.Game {
             if (secs < 0) {
                 time = "00:00";
             }
-            Vector2 origin = _font.MeasureString(time) / 2;
-            batch.DrawString(_font, time, new Vector2(_drawArea.Width / 2, offsetTop), Color.Black, 0, origin, 0.8f, SpriteEffects.None, 0);
+            DrawString(batch, time, new Vector2(_scene.Width / 2, offsetTop));
         }
 
         /// <summary>
@@ -181,8 +201,35 @@ namespace TinyShopping.Game {
             if (secs == 0) {
                 secStr = "Go!";
             }
-            Vector2 origin = _font.MeasureString(secStr) / 2;
-            batch.DrawString(_font, secStr, new Vector2(_drawArea.Width / 2, _scene.Height / 2), Color.Black, 0, origin, 3f, SpriteEffects.None, 0);
+            DrawDimScreen(batch);
+            DrawBoldString(batch, secStr, new Vector2(_scene.Width / 2, _scene.Height / 2), 1.5f, 0.06f);
+        }
+
+        private void DrawDimScreen(SpriteBatch batch) {
+            batch.FillRectangle(new Rectangle(0, 0, _scene.Width, _scene.Height), new Color(122, 119, 110, 120));
+        }
+        private void DrawString(SpriteBatch batch, String text, Vector2 position) {
+            Vector2 origin = _font.MeasureString(text) / 2;
+            batch.DrawString(_font, text, position, _textColor, 0, origin, 0.95f, SpriteEffects.None, 0);
+        }
+        private void DrawBoldString(SpriteBatch batch, String text, Vector2 position, float scale, float border = .005f) {
+            Vector2 origin = _fontBig.MeasureString(text) / 2;
+
+            batch.DrawString(_fontBig, text, position, Color.Black, 0, origin, scale + border, SpriteEffects.None, 0);
+            batch.DrawString(_fontBig, text, position, _textColor, 0, origin, scale, SpriteEffects.None, 0);
+        }
+
+        private void DrawOutlinedTexture(SpriteBatch batch, Texture2D texture, Rectangle rect, Color color, int border = 5, bool flipped = false) {
+            var rectBig = rect;
+            rectBig.Inflate(border, border);
+
+            if (!flipped) {
+                batch.Draw(texture, rectBig, _textColor);
+                batch.Draw(texture, rect, color);
+            } else {
+                batch.Draw(texture, rectBig, null, _textColor, 0, new Vector2(0, 0), SpriteEffects.FlipHorizontally, 0);
+                batch.Draw(texture, rect, null, color, 0, new Vector2(0, 0), SpriteEffects.FlipHorizontally, 0);
+            }
         }
 
         /// <summary>
@@ -190,42 +237,33 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="batch">The sprite batch to write to.</param>
         private void DrawStatistics(SpriteBatch batch) {
-            int offset = 15;
-            int textureSize = 40;
-            int offsetText = 35;
+            DrawOutlinedTexture(batch, _antsCharachterTexture, new Rectangle(30, 30, 160, 160), Color.White);
+            DrawOutlinedTexture(batch, _termiteCharachterTexture, new Rectangle(_scene.Width - 180, 30, 160, 160), Color.White);
 
-            int offsetL = 0 + offset;
-            int offsetR = _drawArea.Width - (offset + textureSize);
+            var appleRect1 = new Rectangle(145, 90, 80, 80);
+            var antsRect1 = new Rectangle(100, 130, 70, 70);
 
-            batch.Draw(_statsTexture, new Vector2(0, 0), Color.White);
+            var appleRect2 = new Rectangle(_scene.Width - 225, 90, 80, 80);
+            var antsRect2 = new Rectangle(_scene.Width - 170, 130, 70, 70);
 
-            batch.Draw(_antTexture, new Rectangle(offsetL, offset, textureSize, textureSize), Color.White);
-            batch.Draw(_antTexture, new Rectangle(offsetR, offset, textureSize, textureSize), Color.White);
+            DrawOutlinedTexture(batch, _appleTexture, appleRect1, Color.White, 3);
+            DrawOutlinedTexture(batch, _circleTexture, antsRect1, new Color(240, 137, 55), 2);
 
-            offsetL += textureSize + 5;
-            offsetR -= 5;
+            DrawOutlinedTexture(batch, _appleTexture, appleRect2, Color.White, 3, true);
+            DrawOutlinedTexture(batch, _circleTexture, antsRect2, new Color(240, 137, 55), 2);
+
             String AntsNum1 = "x" + _handler.GetNumberOfAnts(0);
-            Vector2 sizeAnts1 = _font.MeasureString(AntsNum1) / 2;
-            batch.DrawString(_font, AntsNum1, new Vector2(offsetL, offsetText), Color.Black, 0, sizeAnts1, 0.8f, SpriteEffects.None, 0);
+            DrawString(batch, AntsNum1, antsRect1.Center.ToVector2());
 
-            String AntsNum2 = _handler.GetNumberOfAnts(1) + "x";
-            Vector2 sizeAnts2 = _font.MeasureString(AntsNum2) / 2;
-            batch.DrawString(_font, AntsNum2, new Vector2(offsetR, offsetText), Color.Black, 0, sizeAnts2, 0.8f, SpriteEffects.None, 0);
-
-            offsetL += 20 + (int)sizeAnts1.X;
-            offsetR -= (20 + (int)sizeAnts2.X + textureSize);
-            batch.Draw(_appleTexture, new Rectangle(offsetL, offset, textureSize, textureSize), Color.White);
-            batch.Draw(_appleTexture, new Rectangle(offsetR, offset, textureSize, textureSize), Color.White);
-
-            offsetL += textureSize + 15;
-            offsetR -= 15;
             String FruitsNum1 = "x" + _handler.GetNumberOfFruits(0);
-            Vector2 sizeFruits1 = _font.MeasureString(FruitsNum1) / 2;
-            batch.DrawString(_font, FruitsNum1, new Vector2(offsetL, offsetText), Color.Black, 0, sizeFruits1, 0.8f, SpriteEffects.None, 0);
+            DrawString(batch, FruitsNum1, appleRect1.Center.ToVector2() - new Vector2(4, -6));
 
-            String FruitsNum2 = _handler.GetNumberOfFruits(1) + "x";
-            Vector2 sizeFruits2 = _font.MeasureString(FruitsNum2) / 2;
-            batch.DrawString(_font, FruitsNum2, new Vector2(offsetR, offsetText), Color.Black, 0, sizeFruits2, 0.8f, SpriteEffects.None, 0);
+            String AntsNum2 = "x" + _handler.GetNumberOfAnts(1);
+            DrawString(batch, AntsNum2, antsRect2.Center.ToVector2());
+
+            String FruitsNum2 = "x" + _handler.GetNumberOfFruits(1);
+            DrawString(batch, FruitsNum2, appleRect2.Center.ToVector2() - new Vector2(-4, -6));
+
         }
     }
 }
