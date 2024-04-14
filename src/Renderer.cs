@@ -19,8 +19,13 @@ namespace TinyShopping {
             _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
             _graphics.ApplyChanges();
             _graphics.ToggleFullScreen();
+#if DEBUG
+            if(_graphics.IsFullScreen) {
+                _graphics.ToggleFullScreen();
+            }
+#endif
 
-            _scene = new MainMenu.Scene(Content, GraphicsDevice, _graphics, this);
+            _scene = new StartupScreen.Scene(Content, GraphicsDevice, _graphics, this);
             _scene.Initialize();
 
             base.Initialize();
