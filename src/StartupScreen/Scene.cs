@@ -20,7 +20,7 @@ namespace TinyShopping.StartupScreen
 
         public override void LoadContent() {
             _background = Content.Load<Texture2D>("teaser");
-            _font = Content.Load<SpriteFont>("Arial");
+            _font = Content.Load<SpriteFont>("General");
             CalculateBackgroundPosition();
             base.LoadContent();
         }
@@ -38,10 +38,10 @@ namespace TinyShopping.StartupScreen
             SpriteBatch.Begin();
             SpriteBatch.Draw(_background, _backgroundPosition, Color.White);
             Vector2 pos = new Vector2(GraphicsDeviceManager.PreferredBackBufferWidth/2, GraphicsDeviceManager.PreferredBackBufferHeight*5/6);
-            String message = "Press any key to continue";
-            Vector2 textSize = _font.MeasureString(message);
-            SpriteBatch.DrawString(_font, message, pos, Color.Black, 0, textSize / 2, 2.01f, SpriteEffects.None, 0);
-            SpriteBatch.DrawString(_font, message, pos, Color.White, 0, textSize/2, 2, SpriteEffects.None, 0);
+            string message = "PRESS ANY KEY TO CONTINUE";
+            Vector2 textSize = _font.MeasureString(message) / 2;
+            SpriteBatch.DrawString(_font, message, pos - new Vector2(5,5), Color.Black, 0, textSize, 0.9f, SpriteEffects.None, 0);
+            SpriteBatch.DrawString(_font, message, pos, Color.White, 0, textSize, 0.9f, SpriteEffects.None, 0);
             SpriteBatch.End();
             base.Draw(gameTime);
         }

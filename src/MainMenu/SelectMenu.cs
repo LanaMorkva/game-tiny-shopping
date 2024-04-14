@@ -7,61 +7,53 @@ using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+//using System.Numerics;
 
-namespace TinyShopping.MainMenu {
+namespace TinyShopping.MainMenu
+{
 
-    internal class SelectMenu {
-
-        private SpriteFont _font;
-
-        private GraphicsDevice _device;
-
-        private Texture2D _backgroundTexture;
+    internal class SelectMenu
+    {
 
         private List<SoundEffect> _soundEffects;
 
-        private Scene _scene;
-
         private int _currentSelection;
 
-        private List<MenuItem> menuItems;
+        private List<MenuItem> _menuItems;
 
         private int _nextPressed;
 
         private int _previousPressed;
-        
+
         private int _submitPressed;
 
-        public SelectMenu(GraphicsDevice device, Scene scene) {
-            _device = device;
-            _scene = scene;
+        private Vector2 _itemBorder;
+        private float _itemPadding;
+
+        private Vector2 _basePosition;
+
+        public SelectMenu(Vector2 basePosition, Vector2 border, float padding)
+        {
             _soundEffects = new List<SoundEffect>();
             _currentSelection = 0;
-            
-            Vector2 basePosition = new(_scene.Width * 0.382f - 300, _scene.Height / 2.0f - 300);
-            Console.WriteLine(_scene.Width);
-            Console.WriteLine(basePosition);
-            Vector2 offset = new(0, 100);
-            menuItems = new List<MenuItem>
-            {
-                new MenuItem("New Game", _scene.StartGame, offset, basePosition, 0),
-                new MenuItem("How to play", _scene.NotImplementedScene, offset, basePosition, 1),
-                new MenuItem("Settings", _scene.NotImplementedScene, offset, basePosition, 2),
-                new MenuItem("Quit", _scene.ExitGame, offset, basePosition, 3),
-            };
+            _basePosition = basePosition;
+
+            _menuItems = new List<MenuItem>();
+            _itemBorder = border;
+            _itemPadding = padding;
         }
+
 
         /// <summary>
         /// Loads the necessary data.
         /// </summary>
         /// <param name="content">The content manager.</param>
-        public void LoadContent(ContentManager content) {
-            _backgroundTexture = content.Load<Texture2D>("teaser");
-            _font = content.Load<SpriteFont>("Arial");
+        public void LoadContent(ContentManager content)
+        {
             _soundEffects.Add(content.Load<SoundEffect>("sounds/glass_knock"));
-            foreach (var menuItem in menuItems)
+            foreach (var menuItem in _menuItems)
             {
-                menuItem.LoadContent(content); 
+                menuItem.LoadContent(content);
             }
         }
 
@@ -69,111 +61,154 @@ namespace TinyShopping.MainMenu {
         /// Updates the UI.
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
-        public void Update(GameTime gameTime) {
+        public void Update(GameTime gameTime)
+        {
+            // TODO: Remove unnessecary code duplication by adding better menu input controller
             GamePadState state = GamePad.GetState(PlayerIndex.One);
-            if (state.IsConnected) {
+            if (state.IsConnected)
+            {
                 // Use Gamepad inputs
-                if (state.IsButtonDown(Buttons.DPadDown)) {
+                if (state.IsButtonDown(Buttons.DPadDown))
+                {
                     _nextPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
-                } else if (_nextPressed > 0) {
+                }
+                else if (_nextPressed > 0)
+                {
                     nextItem();
                     _nextPressed = 0;
                 }
-                if (state.IsButtonDown(Buttons.DPadUp)) {
+                if (state.IsButtonDown(Buttons.DPadUp))
+                {
                     _previousPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
-                } else if (_previousPressed > 0) {
+                }
+                else if (_previousPressed > 0)
+                {
                     previousItem();
                     _previousPressed = 0;
                 }
-                if (state.IsButtonDown(Buttons.A)) {
+                if (state.IsButtonDown(Buttons.A))
+                {
                     _submitPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
-                } else if (_submitPressed > 0) {
+                }
+                else if (_submitPressed > 0)
+                {
                     _submitPressed = 0;
                     _soundEffects[0].Play();
-                    menuItems[_currentSelection].nextScene();
-                }
-            } else {
-                // Use keyboard inputs
-                KeyboardState kstate = Keyboard.GetState(PlayerIndex.One);
-                if (kstate.IsKeyDown(Keys.Down)) {
-                    _nextPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
-                } else if (_nextPressed > 0) {
-                    nextItem();
-                    _nextPressed = 0;
-                }
-                if (kstate.IsKeyDown(Keys.Up)) {
-                    _previousPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
-                } else if (_previousPressed > 0) {
-                    previousItem();
-                    _previousPressed = 0;
-                }
-                if (kstate.IsKeyDown(Keys.Enter)) {
-                    _submitPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
-                } else if (_submitPressed > 0) {
-                    _submitPressed = 0;
-                    _soundEffects[0].Play();
-                    menuItems[_currentSelection].nextScene();
+                    _menuItems[_currentSelection].GetNextScene()();
                 }
             }
-
-            // Check if selection button was pushed to go to respective scene
-
-            // Check if up or down was pushed to update selected item
-
+            else
+            {
+                // Use keyboard inputs
+                KeyboardState kstate = Keyboard.GetState();
+                if (kstate.IsKeyDown(Keys.Down))
+                {
+                    _nextPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
+                }
+                else if (_nextPressed > 0)
+                {
+                    nextItem();
+                    _nextPressed = 0;
+                }
+                if (kstate.IsKeyDown(Keys.Up))
+                {
+                    _previousPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
+                }
+                else if (_previousPressed > 0)
+                {
+                    previousItem();
+                    _previousPressed = 0;
+                }
+                if (kstate.IsKeyDown(Keys.Enter))
+                {
+                    _submitPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
+                }
+                else if (_submitPressed > 0)
+                {
+                    _submitPressed = 0;
+                    _soundEffects[0].Play();
+                    _menuItems[_currentSelection].GetNextScene()();
+                }
+            }
 
             setActiveItem();
         }
 
-        private void previousItem() {
+        private void previousItem()
+        {
             _currentSelection -= 1;
-            if (_currentSelection < 0) {
-                _currentSelection = menuItems.Count - 1;
+            if (_currentSelection < 0)
+            {
+                _currentSelection = _menuItems.Count - 1;
             }
             _soundEffects[0].Play();
         }
 
-        private void nextItem() {
+        private void nextItem()
+        {
             _currentSelection += 1;
-            _currentSelection %= menuItems.Count;
+            _currentSelection %= _menuItems.Count;
             _soundEffects[0].Play();
         }
 
-        private void setActiveItem() {
+        private void setActiveItem()
+        {
 
-            foreach (var it in menuItems.Select((x, i) => new { Value = x, Index = i }) )
+            foreach (var it in _menuItems.Select((x, i) => new { Value = x, Index = i }))
             {
-                if (it.Index == _currentSelection) {
+                if (it.Index == _currentSelection)
+                {
                     it.Value.isSelected = true;
-                } else {
+                }
+                else
+                {
                     it.Value.isSelected = false;
                 }
             }
         }
 
         /// <summary>
-        /// Draws the statistics and fps counter.
+        /// Add new item to menu
+        /// </summary>
+        /// <param name="text">Name of menu item</param>
+        /// <param name="nextScene">Function which implements the action that should take place when item is executed</param>
+        public void AddItem(string text, Action nextScene)
+        {
+            _menuItems.Add(new MenuItem(text, nextScene, _menuItems.Count, _itemBorder, new Vector2(0, _itemPadding)));
+        }
+
+        /// <summary>
+        /// Get total size of menu (all items plus paddings and borders)
+        /// </summary>
+        /// <returns>total size of menu</returns>
+        public Vector2 GetSize()
+        {
+            Vector2 totalSize = new(0, 0);
+            foreach (var item in _menuItems)
+            {
+                Vector2 itemSize = item.GetSize();
+                totalSize.X = Math.Max(itemSize.X, totalSize.X);
+                totalSize.Y += itemSize.Y;
+            }
+
+            totalSize.Y -= _itemPadding;
+
+            return totalSize;
+        }
+
+        /// <summary>
+        /// Draws the menu and fps counter.
         /// </summary>
         /// <param name="batch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SpriteBatch batch, GameTime gameTime) {
-            Vector2 backgroundCenter = new((int)(_scene.Width / 1.618), (int)(_scene.Height/2.0));
-
-            batch.FillRectangle(new RectangleF(0,0,5000,5000), new Color(211, 237, 150));
-            foreach (var menuItem in menuItems)
+        public void Draw(SpriteBatch batch, GameTime gameTime)
+        {
+            batch.FillRectangle(new RectangleF(0, 0, 5000, 5000), new Color(211, 237, 150));
+            Vector2 centralizedBasePosition = _basePosition - GetSize() * new Vector2(0.5f, 0.5f);
+            foreach (var menuItem in _menuItems)
             {
-                menuItem.Draw(batch, gameTime);
+                menuItem.Draw(batch, gameTime, centralizedBasePosition);
             }
-
-            Vector2 backgroundSize = new(500, 500);
-            Vector2 origin = backgroundCenter - backgroundSize;
-            batch.Draw(_backgroundTexture, new Rectangle((int)origin.X,(int) origin.Y,2*(int)backgroundSize.X,2*(int) backgroundSize.Y), Color.White);
-
-#if DEBUG
-            int fps = (int) Math.Round((1000 / gameTime.ElapsedGameTime.TotalMilliseconds));
-            batch.DrawString(_font, "FPS: " + fps.ToString(), new Vector2(0, 0), Color.White, 0, new Vector2(0, 0), 0.5f, SpriteEffects.None, 0);
-#endif
         }
-
-
     }
 }
