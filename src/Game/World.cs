@@ -13,7 +13,8 @@ namespace TinyShopping.Game {
     internal class World {
 
         enum LayerName {
-            Floor = 0,
+            BackgroundGroup = 0,
+            Floor,
             Objects,
             Walls,
             Objects2,
@@ -37,7 +38,7 @@ namespace TinyShopping.Game {
         public void LoadContent(ContentManager contentManager, GraphicsDevice device) {
             _tiledMap = contentManager.Load<TiledMap>("map_isometric/map-angled");
             _tiledMap.GetLayer("Walls").Offset = new Vector2(0, -96);
-            _tiledMap.GetLayer("Objects").Offset = new Vector2(0, -32);
+            _tiledMap.GetLayer("Objects").Offset = new Vector2(0, -64);
             _tiledMapRenderer = new TiledMapRenderer(device, _tiledMap);
             _obstacleLayer = new ObstacleLayer(_tiledMap);
             TileWidth = _tiledMap.TileWidth;
@@ -53,6 +54,7 @@ namespace TinyShopping.Game {
         /// <param name="destination">The destination to draw to.</param>
         /// <param name="source">The source rectangle on the texture to use.</param>
         public void DrawFloor(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
+            _tiledMapRenderer.Draw((int)LayerName.BackgroundGroup, viewMatrix);
             _tiledMapRenderer.Draw((int)LayerName.Floor, viewMatrix);
             _tiledMapRenderer.Draw((int)LayerName.Objects, viewMatrix);
         }
@@ -148,7 +150,7 @@ namespace TinyShopping.Game {
             // in Monogame world (0,0) corresponds to screen (0,0), in tiled screen (0,0) is top left corner of canvas,
             // so we need to offset our origin to match coordinates
             Vector2 leftTop = new Vector2(-_tiledMap.HeightInPixels, 0); //this offset works, dont ask why :)
-            Vector2 rightBottom = ConvertTileToScreenPosition(new Vector2(100, 30)) + new Vector2(_tiledMap.HeightInPixels, 0);
+            Vector2 rightBottom = ConvertTileToScreenPosition(new Vector2(89, 28)) + new Vector2(_tiledMap.HeightInPixels, 0);
             return new Rectangle(leftTop.ToPoint(), rightBottom.ToPoint());
         }
 
