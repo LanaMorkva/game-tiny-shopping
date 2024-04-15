@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 
 namespace TinyShopping.MainMenu
 {
@@ -13,7 +14,13 @@ namespace TinyShopping.MainMenu
 
         private SelectMenu _selectMenu;
 
-        private Texture2D _backgroundTexture;
+        private Texture2D _titleTexture;
+        private Texture2D _imageTexture;
+
+        private Rectangle _imageRegion;
+        private Rectangle _titleRegion;
+
+        private Color _backColor = new Color(211, 237, 150);
 
         public int Height { get; private set; }
         public int Width { get; private set; }
@@ -27,7 +34,17 @@ namespace TinyShopping.MainMenu
         {
             Height = GraphicsDeviceManager.PreferredBackBufferHeight;
             Width = GraphicsDeviceManager.PreferredBackBufferWidth;
-            _selectMenu = new SelectMenu(new Vector2(Width * 0.382f, Height / 2.0f), new Vector2(20, 20), 20);
+
+            int menuPosY = (int)(Height / 10);
+            int menuW = (int)(Width / 2.3);
+            var menuRegion = new Rectangle(menuW / 10, menuPosY, menuW, Height - menuPosY);
+            var menuItemSize = new Vector2((int)(Width / 2.8), Height / 10);
+
+            _titleRegion = new Rectangle(menuW / 8, (int)(menuPosY / 1.5), menuW, menuPosY);
+            _imageRegion = new Rectangle((int)(menuW / 1.5), menuPosY / 3, (int)(Width - menuW / 1.5),
+                Height - menuPosY / 3);
+
+            _selectMenu = new SelectMenu(menuRegion, menuItemSize);
             _selectMenu.AddItem("New Game", StartGame);
             _selectMenu.AddItem("How to play", NotImplementedScene);
             _selectMenu.AddItem("Settings", NotImplementedScene);
@@ -38,7 +55,8 @@ namespace TinyShopping.MainMenu
         public override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _backgroundTexture = Content.Load<Texture2D>("teaser");
+            _imageTexture = Content.Load<Texture2D>("main_menu/teaser");
+            _titleTexture = Content.Load<Texture2D>("main_menu/game_title");
             _selectMenu.LoadContent(Content);
             base.LoadContent();
         }
@@ -54,15 +72,12 @@ namespace TinyShopping.MainMenu
 
             _spriteBatch.Begin();
 
-            _selectMenu.Draw(_spriteBatch, gameTime);
-            Viewport original = GraphicsDevice.Viewport;
-            GraphicsDevice.Viewport = original;
-
+            var backRegion = new RectangleF(0, 0, Width, Height);
+            _spriteBatch.FillRectangle(backRegion, _backColor);
             // Draw menu texture
-            Vector2 backgroundCenter = new((int)(Width / 1.618), (int)(Height / 2.0));
-            Vector2 backgroundSize = new(500, 500);
-            Vector2 origin = backgroundCenter - backgroundSize;
-            _spriteBatch.Draw(_backgroundTexture, new Rectangle((int)origin.X, (int)origin.Y, 2 * (int)backgroundSize.X, 2 * (int)backgroundSize.Y), Color.White);
+            _spriteBatch.Draw(_imageTexture, _imageRegion, new Rectangle(40, 70, 535, 390), Color.White);
+            _spriteBatch.Draw(_titleTexture, _titleRegion, Color.White);
+            _selectMenu.Draw(_spriteBatch);
 
             _spriteBatch.End();
             base.Draw(gameTime);
