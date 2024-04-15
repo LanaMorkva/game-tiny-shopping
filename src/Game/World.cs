@@ -3,129 +3,85 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 
+using MonoGame.Extended.Tiled;
+using MonoGame.Extended.Tiled.Renderers;
+using MonoGame.Extended;
+using MonoGame.Extended.Graphics.Effects;
+using System.Collections.Generic;
+
 namespace TinyShopping.Game {
 
     internal class World {
 
-        public static int NUM_OF_SQUARES_WIDTH = 57;
+        enum LayerName {
+            BackgroundGroup = 0,
+            Floor,
+            Objects,
+            Walls,
+            Objects2,
+        };
 
-        public static int NUM_OF_SQUARES_HEIGHT = 40;
+        private ObstacleLayer _obstacleLayer;
 
-        private GraphicsDeviceManager _device;
+        public float TileWidth {get; private set;}
+        public float TileHeight {get; private set;}
+        private TiledMapRenderer _tiledMapRenderer;
+        private TiledMap _tiledMap;
+        private TiledMapEffect _tintEffect;
 
-        private Texture2D _floorTexture;
-        private Texture2D _objectsTexture;
+        public int Width { get; private set; }
 
-        private Rectangle _worldRegion;
-
-        private Vector2 _offset;
-
-        private Rectangle[] _obstacles;
-
-        public Rectangle WorldRegion => _worldRegion;
-
-#if DEBUG
-        private Texture2D _obstacleTexture;
-#endif
-
-        private float _tileSize;
-
-        public float TileSize {
-            get {
-                if (_tileSize == 0) {
-                    throw new Exception("Tile size is not yet known, call LoadContent first!");
-                }
-                return _tileSize;
-            }
-        }
+        public int Height { get; private set; }
 
         /// <summary>
         /// Loads necessary data from disk.
         /// </summary>
         /// <param name="contentManager">The content manager of the main game.</param>
-        public void LoadContent(ContentManager contentManager) {
-            _floorTexture = contentManager.Load<Texture2D>("static_map_floor");
-            _objectsTexture = contentManager.Load<Texture2D>("static_map_else");
-#if DEBUG
-            _obstacleTexture = contentManager.Load<Texture2D>("obstacle");
-#endif
-        }
-
-        public void createWorld(Rectangle boundaries) {
-            CalculateWorldPosition(boundaries);
-            CreateCollisionAreas();
+        public void LoadContent(ContentManager contentManager, GraphicsDevice device) {
+            _tintEffect = new TiledMapEffect(contentManager.Load<Effect>("shaders/TintMapEffect"));
+            _tiledMap = contentManager.Load<TiledMap>("map_isometric/map-angled");
+            _tiledMap.GetLayer("Walls").Offset = new Vector2(0, -96);
+            _tiledMap.GetLayer("Objects").Offset = new Vector2(0, -64);
+            _tiledMapRenderer = new TiledMapRenderer(device, _tiledMap);
+            _obstacleLayer = new ObstacleLayer(_tiledMap);
+            TileWidth = _tiledMap.TileWidth;
+            TileHeight = _tiledMap.TileHeight;
+            Width = _tiledMap.Width;
+            Height = _tiledMap.Height;
         }
 
         /// <summary>
-        /// Draws the world to the sprite batch.
+        /// Draws an area of the world to the sprite batch.
         /// </summary>
         /// <param name="batch">The batch to draw to.</param>
-        /// <param name="gameTime">The current time information.</param>
-        public void DrawFloor(SpriteBatch batch, GameTime gameTime) {
-            batch.Draw(_floorTexture, _worldRegion, Color.White);
+        /// <param name="destination">The destination to draw to.</param>
+        /// <param name="source">The source rectangle on the texture to use.</param>
+        public void DrawFloor(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
+            _tiledMapRenderer.Draw((int)LayerName.BackgroundGroup, viewMatrix, effect: _tintEffect);
+            _tiledMapRenderer.Draw((int)LayerName.Floor, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.Objects, viewMatrix);
         }
 
-        public void DrawObjects(SpriteBatch batch, GameTime gameTime) {
-             batch.Draw(_objectsTexture, _worldRegion, Color.White);
+        /// <summary>
+        /// Draws an area of the shelves to the sprite batch.
+        /// </summary>
+        /// <param name="batch">The sprite batch to draw to.</param>
+        /// <param name="gameTime">The current game time.</param>
+        public void DrawObjects(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
+            _tiledMapRenderer.Draw((int)LayerName.Walls, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.Objects2, viewMatrix);
+        }
+
 #if DEBUG
-            foreach (var o in _obstacles) {
-                float x = o.X * TileSize + _offset.X;
-                float y = o.Y * TileSize + _offset.Y;
-                float w = o.Width * TileSize;
-                float h = o.Height * TileSize;
-                batch.Draw(_obstacleTexture, new Rectangle((int)x, (int)y, (int)w, (int)h), Color.White);
-            }
+        /// <summary>
+        /// Draws red rectangles around obstacles.
+        /// </summary>
+        /// <param name="handler">The split screen handler to use.</param>
+        public void DrawDebugInfo(SpriteBatch batch) {
+            _obstacleLayer.Draw(batch);
+            batch.DrawRectangle(GetWorldBoundary(), Color.RoyalBlue, 5);
+        }
 #endif
-
-        }
-
-        /// <summary>
-        /// Calculates the position and size of the map such that it is fully on screen.
-        /// </summary>
-        private void CalculateWorldPosition(Rectangle boundaries) {
-            float ratio;
-            if ((float)_floorTexture.Height / boundaries.Height > (float)_floorTexture.Width / boundaries.Width) {
-                ratio = (float)boundaries.Height / _floorTexture.Height;
-            }
-            else {
-                ratio = (float)boundaries.Width / _floorTexture.Width;
-            }
-            int worldWidth = (int)(_floorTexture.Width * ratio);
-            int worldHeight = (int)(_floorTexture.Height * ratio);
-            int xOffset = (int)((boundaries.Width - worldWidth) / 2.0);
-            int yOffset = (int)((boundaries.Height - worldHeight) / 2.0) + boundaries.Y;
-            _offset = new Vector2(xOffset, yOffset);
-            _worldRegion = new Rectangle(xOffset, yOffset, worldWidth, worldHeight);
-            _tileSize = _worldRegion.Width / (float)NUM_OF_SQUARES_WIDTH;
-        }
-
-        /// <summary>
-        /// Creates obstacles that are considered not walkable.
-        /// </summary>
-        private void CreateCollisionAreas() {
-            _obstacles = new Rectangle[] { 
-                new Rectangle(0, 0, 1, NUM_OF_SQUARES_HEIGHT), // left wall
-                new Rectangle(0, 0, NUM_OF_SQUARES_WIDTH, 2), // top wall
-                new Rectangle(NUM_OF_SQUARES_WIDTH-1, 0, 1, NUM_OF_SQUARES_HEIGHT), // right wall
-                new Rectangle(0, NUM_OF_SQUARES_HEIGHT-1, NUM_OF_SQUARES_WIDTH, 1), // bottom wall
-                new Rectangle(4, 0, 2, 3), // top counter
-                new Rectangle(NUM_OF_SQUARES_WIDTH-3, NUM_OF_SQUARES_HEIGHT-6, 3, 2), // bottom counter
-                new Rectangle(18, 0, 2, 11),
-                new Rectangle(0, 15, 18, 3),
-                new Rectangle(11, 18, 2, 8),
-                new Rectangle(1, 28, 8, 3),
-                new Rectangle(7, 31, 2, 3),
-                new Rectangle(17, 24, 9, 3),
-                new Rectangle(24, 22, 2, 2),
-                new Rectangle(33, 25, 2, 14),
-                new Rectangle(24, 30, 9, 3),
-                new Rectangle(37, 18, 19, 3),
-                new Rectangle(45, 10, 2, 8),
-                new Rectangle(28, 11, 10, 3),
-                new Rectangle(28, 14, 2, 4),
-                new Rectangle(31, 2, 2, 4),
-            };
-        }
 
         /// <summary>
         /// Checks if the given position +- range is walkable.
@@ -135,16 +91,7 @@ namespace TinyShopping.Game {
         /// <param name="range">The range to include in the check.</param>
         /// <returns>True if walkable, false otherwise.</returns>
         public bool IsWalkable(int x, int y, int range) {
-            foreach (Rectangle obstacle  in _obstacles) {
-                float rightBorder = _offset.X + TileSize * obstacle.X + TileSize * obstacle.Width;
-                float leftBorder = _offset.X + TileSize * obstacle.X;
-                float topBorder = _offset.Y + TileSize * obstacle.Y;
-                float bottomBorder = _offset.Y + TileSize * obstacle.Y + TileSize * obstacle.Height;
-                if (x-range < rightBorder && x+range > leftBorder && y-range < bottomBorder && y+range > topBorder) {
-                    return false;
-                }
-            }
-            return true;
+            return !_obstacleLayer.HasCollision(x, y, range);
         }
 
         /// <summary>
@@ -152,11 +99,11 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="position">The position to align.</param>
         public Vector2 AlignPositionToGridCenter(Vector2 position) {
-            int xRaw = (int) MathF.Floor((position.X - _offset.X) / TileSize);
-            int yRaw = (int) MathF.Floor((position.Y - _offset.Y) / TileSize);
-            float x = xRaw * TileSize + TileSize / 2;
-            float y = yRaw * TileSize + TileSize / 2;
-            return new Vector2(x + _offset.X, y + _offset.Y);
+            int xRaw = (int) MathF.Floor((position.X) / TileWidth);
+            int yRaw = (int) MathF.Floor((position.Y) / TileHeight);
+            float x = xRaw * TileWidth + TileWidth / 2;
+            float y = yRaw * TileHeight + TileHeight / 2;
+            return new Vector2(x, y);
         }
 
         /// <summary>
@@ -166,8 +113,9 @@ namespace TinyShopping.Game {
         /// <param name="tileY">Y coordinate of the tile.</param>
         /// <returns>The center of the tile in screen pixel coordinates.</returns>
         public Vector2 GetCenterOfTile(int tileX, int tileY) {
-            return new Vector2(_offset.X + TileSize * tileX + TileSize / 2, _offset.Y + TileSize * tileY + TileSize / 2);
-        }
+            Vector2 tile = GetTopLeftOfTile(tileX, tileY);
+            return new Vector2(tile.X + TileWidth / 2, tile.Y + TileHeight / 2);
+        } 
 
         /// <summary>
         /// Calculates the top left of the given tile.
@@ -176,7 +124,48 @@ namespace TinyShopping.Game {
         /// <param name="tileY">Y coordinate of the tile.</param>
         /// <returns>The top left position of the given tile.</returns>
         public Vector2 GetTopLeftOfTile(int tileX, int tileY) {
-            return new Vector2(_offset.X + TileSize * tileX, _offset.Y + TileSize * tileY);
+            TiledMapTile tile = _tiledMap.GetLayer<TiledMapTileLayer>("Floor").GetTile((ushort)tileX, (ushort)tileY);
+            return ConvertTileToScreenPosition(new Vector2(tile.X, tile.Y));
+        }
+
+        public List<Vector2> GetSpawnPositions() {
+            TiledMapObject[] spawns = _tiledMap.GetLayer<TiledMapObjectLayer>("spawns").Objects;
+            List<Vector2> spawnPositions = new List<Vector2>();
+            foreach (TiledMapObject obj in spawns) {
+                spawnPositions.Add(ConvertPosToScreenPosition(obj.Position));
+            }
+            return spawnPositions;
+        }
+
+        public List<Vector2> GetDropOffPositions() {
+            TiledMapObject[] spawns = _tiledMap.GetLayer<TiledMapObjectLayer>("dropoffs").Objects;
+            List<Vector2> spawnPositions = new List<Vector2>();
+            foreach (TiledMapObject obj in spawns) {
+                spawnPositions.Add(ConvertPosToScreenPosition(obj.Position));
+            }
+            return spawnPositions;
+        }
+
+        /// <summary>
+        /// Return world boundary in screen coordinates
+        /// </summary>
+        public Rectangle GetWorldBoundary() {
+            // in Monogame world (0,0) corresponds to screen (0,0), in tiled screen (0,0) is top left corner of canvas,
+            // so we need to offset our origin to match coordinates
+            Vector2 leftTop = new Vector2(-_tiledMap.HeightInPixels, 0); //this offset works, dont ask why :)
+            Vector2 rightBottom = ConvertTileToScreenPosition(new Vector2(89, 28)) + new Vector2(_tiledMap.HeightInPixels, 0);
+            return new Rectangle(leftTop.ToPoint(), rightBottom.ToPoint());
+        }
+
+        /// <summary>
+        /// Converts the given world position to a screen position.
+        /// </summary>
+        public Vector2 ConvertPosToScreenPosition(Vector2 worldPosition) {
+            return Utilities.worldPosToScreen(worldPosition, _tiledMap.TileHeight, _tiledMap.TileWidth);
+        }
+
+        public Vector2 ConvertTileToScreenPosition(Vector2 tileIdx) {
+            return Utilities.worldTileToScreen(tileIdx, _tiledMap.TileHeight, _tiledMap.TileWidth);
         }
     }
 }

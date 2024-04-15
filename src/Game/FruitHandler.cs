@@ -3,15 +3,10 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TinyShopping.Game {
 
     internal class FruitHandler {
-
-        private static readonly int RANGE = 2;
 
         private World _world;
 
@@ -30,12 +25,20 @@ namespace TinyShopping.Game {
         /// <param name="contentManager">The content manager to use.</param>
         public void LoadContent(ContentManager content) {
             _appleTexture = content.Load<Texture2D>("apple");
-            for (int i = 0; i < 50; i++) {
-                int tileX = Random.Shared.Next(World.NUM_OF_SQUARES_WIDTH);
-                int tileY = Random.Shared.Next(World.NUM_OF_SQUARES_WIDTH);
+            GenerateFruits();
+        }
+
+        private void GenerateFruits() {
+            float halfFruitSize = _world.TileWidth * 0.15f;
+            for (int i = 0; i < Constants.FRUITS_NUM; ) {
+                int tileX = Random.Shared.Next(_world.Width);
+                int tileY = Random.Shared.Next(_world.Height);
                 Vector2 center = _world.GetCenterOfTile(tileX, tileY);
-                if (_world.IsWalkable((int)center.X, (int)center.Y, 0)) {
-                    _fruits.Add(new Fruit(center, _appleTexture, (int)(_world.TileSize*0.7)));
+                if (_world.IsWalkable((int)center.X, (int)center.Y, (int)halfFruitSize)) {
+                    Vector2 position = new Vector2(center.X - halfFruitSize, center.Y - halfFruitSize);
+                    int size = (int)(halfFruitSize * 2);
+                    _fruits.Add(new Fruit(position, _appleTexture, size, _world));
+                    i++;
                 }
             }
         }
@@ -43,7 +46,7 @@ namespace TinyShopping.Game {
         /// <summary>
         /// Draws the fruits.
         /// </summary>
-        /// <param name="batch">The batch to draw to.</param>
+        /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
             foreach (var fruit in _fruits) {
@@ -66,7 +69,7 @@ namespace TinyShopping.Game {
         /// <param name="fruit">Will be set to the closest fruit instance.</param>
         /// <returns>A vector representing the direction or null if no fruit is in range.</returns>
         public Vector2? GetDirectionToClosestFruit(Vector2 position, out Fruit fruit) {
-            int range = (int)(RANGE * _world.TileSize);
+            int range = (int)(Constants.PICKUP_RANGE * _world.TileWidth);
             float minDis = float.MaxValue;
             Fruit closest = null;
             foreach (var f in _fruits) {

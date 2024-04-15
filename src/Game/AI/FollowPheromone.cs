@@ -1,19 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace TinyShopping.Game.AI {
 
     internal class FollowPheromone : Task {
-
-        private static readonly int FIGHT_RANGE = 1;
-
-        private static readonly int DAMAGE = 2;
 
         private PheromoneHandler _handler;
 
@@ -66,9 +55,9 @@ namespace TinyShopping.Game.AI {
                 Insect enemy = _colony.GetClosestEnemy(Insect.Position);
                 if (enemy != null) {
                     direction = enemy.Position - Insect.Position;
-                    float fightRange = World.TileSize * FIGHT_RANGE;
+                    float fightRange = World.TileWidth * Constants.FIGHT_RANGE;
                     if (Vector2.DistanceSquared(enemy.Position, Insect.Position) < fightRange * fightRange) {
-                        enemy.TakeDamage(DAMAGE);
+                        enemy.TakeDamage(Insect.Damage);
                     }
                 }
             }

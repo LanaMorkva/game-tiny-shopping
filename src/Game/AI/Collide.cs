@@ -1,9 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TinyShopping.Game.AI {
 
@@ -29,7 +24,7 @@ namespace TinyShopping.Game.AI {
                 RecoverCollision(gameTime);
                 return true;
             }
-            if (!World.IsWalkable((int) Insect.Position.X, (int) Insect.Position.Y, Insect.TextureSize / 2)) {
+            if (!World.IsWalkable((int) Insect.Position.X, (int) Insect.Position.Y, Insect.TextureSize / 3)) {
                 _isRecovering = true;
                 Insect.TargetRotation += 180;
                 return true;
@@ -45,7 +40,7 @@ namespace TinyShopping.Game.AI {
             if (!Insect.IsTurning) {
                 _isRecovering = false;
             }
-            if (!World.IsWalkable((int)Insect.Position.X, (int)Insect.Position.Y, Insect.TextureSize / 2)) {
+            if (!World.IsWalkable((int)Insect.Position.X, (int)Insect.Position.Y, Insect.TextureSize / 3)) {
                 Insect.BackUp(gameTime);
             }
             else {

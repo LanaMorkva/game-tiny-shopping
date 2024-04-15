@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
 
 namespace TinyShopping {
 
@@ -11,17 +9,21 @@ namespace TinyShopping {
         private Scene _scene;
 
         public Renderer() {
-            _graphics = new GraphicsDeviceManager(this);
+            _graphics = new GraphicsDeviceManager(this); 
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
         }
 
         protected override void Initialize() {
-
-            _graphics.PreferredBackBufferWidth = 1400;
-            _graphics.PreferredBackBufferHeight = 1024;
-            //_graphics.ToggleFullScreen();
+            _graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            _graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
             _graphics.ApplyChanges();
+            _graphics.ToggleFullScreen();
+#if DEBUG
+            if(_graphics.IsFullScreen) {
+                _graphics.ToggleFullScreen();
+            }
+#endif
 
             _scene = new MainMenu.Scene(Content, GraphicsDevice, _graphics, this);
             _scene.Initialize();

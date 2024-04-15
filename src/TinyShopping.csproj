@@ -19,8 +19,26 @@
     <EmbeddedResource Include="Icon.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.1.303" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303" />
+    <!-- <PackageReference Include="MonoGame.Extended" Version="3.9.0" /> -->
+    <Reference Include="MonoGame.Extended" Version="3.9.0">
+      <HintPath>Libs\Monogame.Extended.dll</HintPath>
+    </Reference>
+    <!-- <PackageReference Include="MonoGame.Extended.Content.Pipeline" Version="3.9.0" /> -->
+    <Reference Include="MonoGame.Extended.Content.Pipeline" Version="3.9.0">
+      <HintPath>Libs\MonoGame.Extended.Content.Pipeline.dll</HintPath>
+    </Reference>
+    <!-- <PackageReference Include="MonoGame.Extended.Tiled" Version="3.9.0" /> -->
+    <Reference Include="MonoGame.Extended.Tiled" Version="3.9.0">
+      <HintPath>Libs\MonoGame.Extended.Tiled.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Extended.Graphics" Version="3.9.0">
+      <HintPath>Libs\MonoGame.Extended.Graphics.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\stats\" />
   </ItemGroup>
   <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
     <Message Text="Restoring dotnet tools" Importance="High" />

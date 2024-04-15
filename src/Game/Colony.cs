@@ -3,8 +3,14 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Audio;
 
 namespace TinyShopping.Game {
+
+    internal enum ColonyType {
+        ANT,
+        TERMITE
+    }
 
     internal class Colony {
 
@@ -12,15 +18,11 @@ namespace TinyShopping.Game {
 
         private int _spawnRotation;
 
-        private World _world;
-
-        private PheromoneHandler _handler;
-
-        private FruitHandler _fruits;
+        private Services _services;
 
         private Texture2D _antTexture;
 
-        private Texture2D _antFullTexture;
+        private Texture2D _termiteTexture;
 
         private List<Insect> _insects = new List<Insect>();
 
@@ -36,9 +38,13 @@ namespace TinyShopping.Game {
 
         private InsectHandler _insectHandler;
 
+        private ColonyType _type;
+
         public int FruitsNum => _collectedFruit;
 
         public int AntsNum => _insects.Count;
+
+        List<SoundEffect> _soundEffects;
 
 
         /// <summary>
@@ -52,16 +58,17 @@ namespace TinyShopping.Game {
         /// <param name="dropOff">The position the ants can drop off fruit.</param>
         /// <param name="owner">The id of the owning player, 0 or 1.</param>
         /// <param name="insectHandler">The insect handler.</param>
-        public Colony(Vector2 spawn, int spawnRotation, World world, PheromoneHandler handler, FruitHandler fruits, Vector2 dropOff, int owner, InsectHandler insectHandler) {
+        /// <param name="type">The insect type of this colony.</param>
+        public Colony(Vector2 spawn, int spawnRotation, World world, PheromoneHandler handler, FruitHandler fruits, Vector2 dropOff, int owner, InsectHandler insectHandler, ColonyType type) {
             _spawn = spawn;
-            _world = world;
-            _handler = handler;
-            _fruits = fruits;
             _spawnRotation = spawnRotation;
             _queue = 6;
             DropOff = dropOff;
             _owner = owner;
             _insectHandler = insectHandler;
+            _soundEffects = new List<SoundEffect>();
+            _services = new Services { colony = this, fruits = fruits, handler = handler, world = world };
+            _type = type;
         }
 
         /// <summary>
@@ -75,8 +82,10 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
-            _antTexture = content.Load<Texture2D>("ant_texture");
-            _antFullTexture = content.Load<Texture2D>("ant_full_texture");
+            _antTexture = content.Load<Texture2D>("ants/ant_texture");
+            _termiteTexture = content.Load<Texture2D>("termites/termite_texture");
+            _soundEffects.Add(content.Load<SoundEffect>("sounds/cash_register"));
+            _soundEffects.Add(content.Load<SoundEffect>("sounds/insect_dying"));
         }
 
         /// <summary>
@@ -88,7 +97,7 @@ namespace TinyShopping.Game {
             if (_spawnCooldown < 0 && _queue > 0) {
                 _spawnCooldown = 1000;
                 _queue -= 1;
-                Insect ant = new Insect(_world, _handler, _spawn, _spawnRotation, _fruits, _antTexture, _antFullTexture, this, _owner);
+                Insect ant = GetNewInsect();
                 _insects.Add(ant);
             }
             List<Insect> remaining = new List<Insect>(_insects.Count);
@@ -96,19 +105,34 @@ namespace TinyShopping.Game {
                 if (insect.Health > 0) {
                     insect.Update(gameTime);
                     remaining.Add(insect);
+                } else {
+                    _soundEffects[1].Play();
                 }
             }
             _insects = remaining;
         }
 
         /// <summary>
+        /// Creates a new insect of the correct type.
+        /// </summary>
+        /// <returns>An Ant or Termite.</returns>
+        private Insect GetNewInsect() {
+            if (_type == ColonyType.ANT) {
+                return new Insect(_services, _spawn, _spawnRotation, _antTexture, _owner, Constants.ANT_ATTRIBUTES);
+            }
+            else {
+                return new Insect(_services, _spawn, _spawnRotation, _termiteTexture, _owner, Constants.TERMITE_ATTRIBUTES);
+            }
+        }
+
+        /// <summary>
         /// Draws the insects.
         /// </summary>
-        /// <param name="spriteBatch">The sprite batch to draw to.</param>
+        /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SpriteBatch spriteBatch, GameTime gameTime) {
+        public void Draw(SpriteBatch batch, GameTime gameTime) {
             foreach (Insect insect in _insects) {
-                insect.Draw(spriteBatch, gameTime);
+                insect.Draw(batch, gameTime);
             }
         }
 
@@ -117,6 +141,7 @@ namespace TinyShopping.Game {
         /// </summary>
         public void IncreaseFruitCount() {
             _collectedFruit += 1;
+            _soundEffects[0].Play();
         }
 
         /// <summary>

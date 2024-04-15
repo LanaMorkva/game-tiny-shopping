@@ -1,11 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TinyShopping.Game {
 
@@ -15,11 +12,11 @@ namespace TinyShopping.Game {
 
         private Texture2D _texture;
 
-        private SpriteFont _font;
-
         private List<Pheromone>[] _pheromones;
 
         private List<Pheromone>[] _returnPheromones;
+
+        private List<SoundEffect> _soundEffects;
 
         /// <summary>
         /// Creates a new pheromone handler for two players.
@@ -29,6 +26,7 @@ namespace TinyShopping.Game {
             _world = world;
             _pheromones = new List<Pheromone>[] { new (), new () };
             _returnPheromones = new List<Pheromone>[] { new(), new() };
+            _soundEffects = new List<SoundEffect>();
         }
 
         /// <summary>
@@ -37,7 +35,7 @@ namespace TinyShopping.Game {
         /// <param name="contentManager">The content manager to use.</param>
         public void LoadContent(ContentManager contentManager) {
             _texture = contentManager.Load<Texture2D>("pheromone");
-            _font = contentManager.Load<SpriteFont>("arial");
+            _soundEffects.Add(contentManager.Load<SoundEffect>("sounds/glass_knock"));
         }
 
         /// <summary>
@@ -50,13 +48,14 @@ namespace TinyShopping.Game {
         /// <param name="priority">The priority of the pheromone, given in miliseconds.</param>
         public void AddPheromone(Vector2 rawPosition, GameTime gameTime, PheromoneType type, int player, int priority) {
             Vector2 position = _world.AlignPositionToGridCenter(rawPosition);
-            Pheromone p = new Pheromone(position, _texture, _world, priority, type);
+            Pheromone p = new Pheromone(position, _texture, _world, priority, type, player);
             if (type == PheromoneType.RETURN) {
                 _returnPheromones[player].Add(p);
             }
             else {
                 _pheromones[player].Add(p);
             }
+            _soundEffects[0].Play();
         }
 
         /// <summary>
@@ -90,17 +89,21 @@ namespace TinyShopping.Game {
         /// <summary>
         /// Draws the pheromones.
         /// </summary>
-        /// <param name="batch">The batch to draw to.</param>
+        /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SpriteBatch batch, GameTime gameTime) {
+        public void Draw(SpriteBatch batch,int ownerId, GameTime gameTime) {
             foreach (var ps in  _pheromones) {
                 foreach (var p in ps) {
-                    p.Draw(batch, gameTime);
+                    if (ownerId == p.Owner) {
+                        p.Draw(batch, gameTime);
+                    }
                 }
             }
             foreach (var ps in _returnPheromones) {
                 foreach (var p in ps) {
-                    p.Draw(batch, gameTime);
+                    if (ownerId == p.Owner) {
+                        p.Draw(batch, gameTime);
+                    }
                 }
             }
         }

@@ -1,12 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TinyShopping.Game {
 
@@ -14,8 +8,6 @@ namespace TinyShopping.Game {
     /// The InsectHandler takes care of the existing insect colonies.
     /// </summary>
     internal class InsectHandler {
-
-        private readonly static int ENEMY_VISIBILITY_RANGE = 2;
 
         private World _world;
 
@@ -42,10 +34,10 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager to use.</param>
         public void LoadContent(ContentManager content) {
-            Colony colony1 = new Colony(_world.GetTopLeftOfTile(5, 0), 180, _world, _pheromoneHandler, _fruitHandler, _world.GetTopLeftOfTile(5, 3), 0, this);
+            Colony colony1 = new Colony(_world.GetSpawnPositions()[0], 150, _world, _pheromoneHandler, _fruitHandler, _world.GetDropOffPositions()[0], 0, this, ColonyType.ANT);
             colony1.Initialize();
             colony1.LoadContent(content);
-            Colony colony2 = new Colony(_world.GetTopLeftOfTile(57, 35), 270, _world, _pheromoneHandler, _fruitHandler, _world.GetTopLeftOfTile(54, 35), 1, this);
+            Colony colony2 = new Colony(_world.GetSpawnPositions()[1], 230, _world, _pheromoneHandler, _fruitHandler, _world.GetDropOffPositions()[1], 1, this, ColonyType.TERMITE);
             colony2.Initialize();
             colony2.LoadContent(content);
             _colonies = new Colony[] { colony1, colony2 };
@@ -64,7 +56,7 @@ namespace TinyShopping.Game {
         /// <summary>
         /// Draws the colonies' insects.
         /// </summary>
-        /// <param name="batch">The sprite batch to draw to.</param>
+        /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
             foreach(var colony in _colonies) {
@@ -89,7 +81,7 @@ namespace TinyShopping.Game {
         public Insect GetClosestEnemy(int player, Vector2 position) {
             int enemyIndex = 1 - player;
             Colony c = _colonies[enemyIndex];
-            float range = _world.TileSize * ENEMY_VISIBILITY_RANGE;
+            float range = _world.TileWidth * Constants.ENEMY_VISIBILITY_RANGE;
             return c.GetClosestToInRange(position, range);            
         }
 
