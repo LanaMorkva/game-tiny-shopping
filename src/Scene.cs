@@ -1,7 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input; 
+using Microsoft.Xna.Framework.Input;
+using TinyShopping.MainMenu;
 
 namespace TinyShopping {
 
@@ -17,11 +18,14 @@ namespace TinyShopping {
 
         protected Renderer Game { get; private set; }
 
-        protected Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game) {
+        protected SettingsHandler SettingsHandler { get; private set; }
+
+        protected Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) {
             Content = content;
             GraphicsDevice = graphics;
             GraphicsDeviceManager = manager;
             Game = game;
+            SettingsHandler = settingsHandler;
         }
 
         public virtual void Initialize() {

@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 
-namespace TinyShopping.MainMenu
+namespace TinyShopping.SettingsMenu
 {
 
     public class Scene : TinyShopping.Scene
@@ -46,11 +46,10 @@ namespace TinyShopping.MainMenu
             _imageRegion = new Rectangle((int)(menuW / 1.5), menuPosY / 3, (int)(Width - menuW / 1.5),
                 Height - menuPosY / 3);
 
-            _selectMenu = new MainSelectMenu(menuRegion, menuItemSize);
-            _selectMenu.AddItem(new MainMenuItem("New Game", StartGame));
-            _selectMenu.AddItem(new MainMenuItem("How to play", NotImplementedScene));
-            _selectMenu.AddItem(new MainMenuItem("Settings", SettingsMenu));
-            _selectMenu.AddItem(new MainMenuItem("Quit", ExitGame));
+            _selectMenu = new SelectMenu(menuRegion, menuItemSize, LoadMainMenu);
+            _selectMenu.AddItem(new MenuItemBool("Music", NotImplementedScene, SettingsHandler.settings.music));
+            _selectMenu.AddItem(new MenuItemBool("Sound Effects", ChangeSoundEffectsSettings, SettingsHandler.settings.soundEffects));
+            _selectMenu.AddItem(new MenuItemBool("Fullscreen", ChangeFullScreenSettings, SettingsHandler.settings.fullScreen));
             base.Initialize();
         }
 
@@ -85,24 +84,21 @@ namespace TinyShopping.MainMenu
             base.Draw(gameTime);
         }
 
-        public void StartGame()
-        {
-            Game.ChangeScene(new Game.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
-        }
-
-        public void SettingsMenu()
-        {
-            Game.ChangeScene(new SettingsMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
-        }
-
         public void NotImplementedScene()
         {
             // empty
         }
 
-        public void ExitGame()
-        {
-            Game.Exit();
+        public void ChangeSoundEffectsSettings() {
+            SettingsHandler.ToggleSoundEffects();
+        }
+
+        public void ChangeFullScreenSettings() {
+            SettingsHandler.ToggleFullScreen(GraphicsDeviceManager);
+        }
+
+        public void LoadMainMenu() {
+            Game.ChangeScene(new MainMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
         }
     }
 }
