@@ -11,10 +11,6 @@ namespace TinyShopping.Game {
     /// </summary>
     internal class Player {
 
-        private static readonly int SIZE = 50;
-
-        private static readonly int SPEED = 600;
-
         private Vector2 _position;
 
         private Texture2D _texture;
@@ -68,7 +64,8 @@ namespace TinyShopping.Game {
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
-            Rectangle destination = new Rectangle((int)(_position.X - SIZE / 2f), (int)(_position.Y - SIZE / 2f), SIZE, SIZE);
+            int size = Constants.CURSOR_SIZE;
+            Rectangle destination = new Rectangle((int)(_position.X - size / 2f), (int)(_position.Y - size / 2f), size, size);
             batch.Draw(_texture, destination, Color.White);
         }
 
@@ -78,7 +75,7 @@ namespace TinyShopping.Game {
         /// <param name="gameTime"></param>
         /// <param name="handler">The split screen handler to use.</param>
         public void Update(GameTime gameTime, SplitScreenHandler handler) {
-            int speed = (int)(gameTime.ElapsedGameTime.TotalSeconds * SPEED);
+            int speed = (int)(gameTime.ElapsedGameTime.TotalSeconds * Constants.CURSOR_SPEED);
             PlacePheromones(gameTime);
             UpdatePosition(speed);
             handler.UpdateCameraPosition(_id, _position, speed);
@@ -89,19 +86,20 @@ namespace TinyShopping.Game {
         /// Clip the cursor position to the world.
         /// </summary>
         private void ClipCursorToWorld() {
-            Rectangle cursor = new Rectangle((int)(_position.X - SIZE / 2f), (int)(_position.Y - SIZE / 2f), SIZE, SIZE);
+            int size = Constants.CURSOR_SIZE;
+            Rectangle cursor = new Rectangle((int)(_position.X - size / 2f), (int)(_position.Y - size / 2f), size, size);
             Rectangle worldRect = _world.GetWorldBoundary();
             if (cursor.X < worldRect.Left) {
-                _position.X = worldRect.Left + SIZE / 2f;
+                _position.X = worldRect.Left + size / 2f;
             }
             if (cursor.Right > worldRect.Right) {
-                _position.X = worldRect.Right - SIZE / 2f;
+                _position.X = worldRect.Right - size / 2f;
             }
             if (cursor.Y < worldRect.Top) {
-                _position.Y = worldRect.Top + SIZE / 2f;
+                _position.Y = worldRect.Top + size / 2f;
             }
             if (cursor.Bottom > worldRect.Bottom) {
-                _position.Y = worldRect.Bottom - SIZE / 2f;
+                _position.Y = worldRect.Bottom - size / 2f;
             }
         }
 
@@ -124,21 +122,21 @@ namespace TinyShopping.Game {
                 _discoverPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
             }
             else if (_discoverPressed > 0) {
-                _handler.AddPheromone(_position, gameTime, PheromoneType.DISCOVER, _id, 5000 + _discoverPressed * 2);
+                _handler.AddPheromone(_position, gameTime, PheromoneType.DISCOVER, _id, Constants.PHEROMONE_DURATION + _discoverPressed * 2);
                 _discoverPressed = 0;
             }
             if (_input.IsReturnPressed()) {
                 _returnPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds); ;
             }
             else if (_returnPressed > 0) {
-                _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN, _id, 5000 + _returnPressed * 2);
+                _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN, _id, Constants.PHEROMONE_DURATION + _returnPressed * 2);
                 _returnPressed = 0;
             }
             if (_input.IsFightPressed()) {
                 _fightPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds); ;
             }
             else if (_fightPressed > 0) {
-                _handler.AddPheromone(_position, gameTime, PheromoneType.FIGHT, _id, 5000 + _fightPressed * 2);
+                _handler.AddPheromone(_position, gameTime, PheromoneType.FIGHT, _id, Constants.PHEROMONE_DURATION + _fightPressed * 2);
                 _fightPressed = 0;
             }
             if (_input.IsNewInsectPressed()) {

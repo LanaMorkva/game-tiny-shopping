@@ -9,8 +9,6 @@ namespace TinyShopping.Game {
     /// </summary>
     internal class InsectHandler {
 
-        private readonly static int ENEMY_VISIBILITY_RANGE = 2;
-
         private World _world;
 
         private PheromoneHandler _pheromoneHandler;
@@ -83,7 +81,7 @@ namespace TinyShopping.Game {
         public Insect GetClosestEnemy(int player, Vector2 position) {
             int enemyIndex = 1 - player;
             Colony c = _colonies[enemyIndex];
-            float range = _world.TileWidth * ENEMY_VISIBILITY_RANGE;
+            float range = _world.TileWidth * Constants.ENEMY_VISIBILITY_RANGE;
             return c.GetClosestToInRange(position, range);            
         }
 

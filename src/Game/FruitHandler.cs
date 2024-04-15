@@ -8,9 +8,6 @@ namespace TinyShopping.Game {
 
     internal class FruitHandler {
 
-        private static readonly int RANGE = 2;
-        private static readonly int FRUITS_NUM = 30;
-
         private World _world;
 
         private Texture2D _appleTexture;
@@ -33,7 +30,7 @@ namespace TinyShopping.Game {
 
         private void GenerateFruits() {
             float halfFruitSize = _world.TileWidth * 0.15f;
-            for (int i = 0; i < FRUITS_NUM; ) {
+            for (int i = 0; i < Constants.FRUITS_NUM; ) {
                 int tileX = Random.Shared.Next(_world.Width);
                 int tileY = Random.Shared.Next(_world.Height);
                 Vector2 center = _world.GetCenterOfTile(tileX, tileY);
@@ -72,7 +69,7 @@ namespace TinyShopping.Game {
         /// <param name="fruit">Will be set to the closest fruit instance.</param>
         /// <returns>A vector representing the direction or null if no fruit is in range.</returns>
         public Vector2? GetDirectionToClosestFruit(Vector2 position, out Fruit fruit) {
-            int range = (int)(RANGE * _world.TileWidth);
+            int range = (int)(Constants.PICKUP_RANGE * _world.TileWidth);
             float minDis = float.MaxValue;
             Fruit closest = null;
             foreach (var f in _fruits) {

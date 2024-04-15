@@ -10,7 +10,6 @@ namespace TinyShopping.Game {
 
     internal class UIController {
 
-        private static readonly int TIME_LIMIT_S = 5 * 60;
         private static readonly Color _borderColor = new Color(247, 140, 52);
         private static readonly Color _textColor = new Color(69, 49, 33);
 
@@ -84,7 +83,7 @@ namespace TinyShopping.Game {
                     _runtimeMs += gameTime.ElapsedGameTime.TotalMilliseconds;
                 }
 
-                if (_runtimeMs > TIME_LIMIT_S * 1000) {
+                if (_runtimeMs > Constants.TIME_LIMIT_S * 1000) {
                     _scene.IsOver = true;
                     if (_handler.GetNumberOfFruits(0) > _handler.GetNumberOfFruits(1)) {
                         _winner = 1;
@@ -176,9 +175,9 @@ namespace TinyShopping.Game {
             int offsetTop = 20;
             int secs;
             if (_scene.IsStarted) {
-                secs = TIME_LIMIT_S - (int) (_runtimeMs / 1000);
+                secs = Constants.TIME_LIMIT_S - (int) (_runtimeMs / 1000);
             } else {
-                secs = TIME_LIMIT_S;
+                secs = Constants.TIME_LIMIT_S;
             }
             int mins = secs / 60;
             secs %= 60;

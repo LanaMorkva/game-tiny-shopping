@@ -14,10 +14,6 @@ namespace TinyShopping.Game {
 
     internal class Colony {
 
-        private static Attributes _antAttributes = new Attributes {speed = 70, rotationSpeed = 100, maxHealth = 100, damage = 2 };
-
-        private static Attributes _termiteAttributes = new Attributes {speed = 50, rotationSpeed = 70, maxHealth = 120, damage = 4 };
-
         private Vector2 _spawn;
 
         private int _spawnRotation;
@@ -122,10 +118,10 @@ namespace TinyShopping.Game {
         /// <returns>An Ant or Termite.</returns>
         private Insect GetNewInsect() {
             if (_type == ColonyType.ANT) {
-                return new Insect(_services, _spawn, _spawnRotation, _antTexture, _owner, _antAttributes);
+                return new Insect(_services, _spawn, _spawnRotation, _antTexture, _owner, Constants.ANT_ATTRIBUTES);
             }
             else {
-                return new Insect(_services, _spawn, _spawnRotation, _termiteTexture, _owner, _termiteAttributes);
+                return new Insect(_services, _spawn, _spawnRotation, _termiteTexture, _owner, Constants.TERMITE_ATTRIBUTES);
             }
         }
 
