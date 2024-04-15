@@ -38,8 +38,8 @@ namespace TinyShopping {
             }
             string settingsString = File.ReadAllText(_settingsPath);
             Settings? loadedSettings = JsonSerializer.Deserialize<Settings>(settingsString);
-            if (settings != null) {
-                if (settings.version == settings.version) {
+            if (loadedSettings != null) {
+                if (loadedSettings.version == settings.version) {
                     settings = loadedSettings;
                 }
                 return  true;
