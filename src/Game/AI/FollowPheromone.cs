@@ -59,7 +59,7 @@ namespace TinyShopping.Game.AI {
                 Insect enemy = _colony.GetClosestEnemy(Insect.Position);
                 if (enemy != null) {
                     direction = enemy.Position - Insect.Position;
-                    float fightRange = World.TileSize * FIGHT_RANGE;
+                    float fightRange = World.TileWidth * FIGHT_RANGE;
                     if (Vector2.DistanceSquared(enemy.Position, Insect.Position) < fightRange * fightRange) {
                         enemy.TakeDamage(DAMAGE);
                     }

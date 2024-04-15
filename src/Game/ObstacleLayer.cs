@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using MonoGame.Extended.Tiled;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
+using System;
 
 namespace TinyShopping.Game {
     internal class Obstacle {
@@ -38,13 +39,20 @@ namespace TinyShopping.Game {
     internal class ObstacleLayer {
         private List<Obstacle> _obstacles; 
 
+
         public ObstacleLayer(TiledMap tiledMap) {
             _obstacles = new List<Obstacle>();
-            foreach (TiledMapObject obj in tiledMap.ObjectLayers[0].Objects) {
+            foreach (TiledMapObject obj in tiledMap.GetLayer<TiledMapObjectLayer>("obstacles").Objects) {
                 if (obj is TiledMapPolygonObject polygon) {
-                    _obstacles.Add(new Obstacle(polygon.Position, polygon.Points));
+                    for (int i = 0; i < polygon.Points.Length; i++) {
+                        polygon.Points[i] = Utilities.worldPosToScreen(polygon.Points[i], tiledMap.TileHeight, tiledMap.TileWidth);
+                    }
+                    var position = Utilities.worldPosToScreen(polygon.Position, tiledMap.TileHeight, tiledMap.TileWidth);
+                    _obstacles.Add(new Obstacle(position, polygon.Points));
                 } else {
-                    _obstacles.Add(new Obstacle(obj.Position, obj.Size));
+                    //TODO check if it works
+                    var position = Utilities.worldPosToScreen(obj.Position, tiledMap.TileHeight, tiledMap.TileWidth);
+                    _obstacles.Add(new Obstacle(position, obj.Size));
                 }
             }
         }

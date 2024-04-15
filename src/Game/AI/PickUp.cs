@@ -26,7 +26,7 @@ namespace TinyShopping.Game.AI {
                 return false;
             }
             Vector2? dir = _fruits.GetDirectionToClosestFruit(Insect.Position, out Fruit closestFruit);
-            if (dir != null && dir.Value.LengthSquared() <= (World.TileSize * World.TileSize) / 4) {
+            if (dir != null && dir.Value.LengthSquared() <= (World.TileWidth * World.TileWidth) / 4) {
                 Insect.IsCarrying = true;
                 _fruits.RemoveFruit(closestFruit);
                 return true;

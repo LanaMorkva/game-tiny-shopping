@@ -83,17 +83,18 @@ namespace TinyShopping.Game {
             _insectHandler.LoadContent(content);
             _fruitHandler.LoadContent(content);
             _pheromoneHandler.LoadContent(content);
+            
+            var spawnPositions = _world.GetSpawnPositions();
 
             PlayerInput input1 = CreatePlayerInput(PlayerIndex.One);
-            _player1 = new Player(_pheromoneHandler, input1, _insectHandler, _world, 0, _world.GetTopLeftOfTile(3, 5));
+            _player1 = new Player(_pheromoneHandler, input1, _insectHandler, _world, 0, spawnPositions[0]);
             _player1.LoadContent(content);
-
-            // _camera1.LookAt(_world.GetTopLeftOfTile(24, 14));
+            _camera1.LookAt(_world.GetTopLeftOfTile(19,38));
 
             PlayerInput input2 = CreatePlayerInput(PlayerIndex.Two);
-            _player2 = new Player(_pheromoneHandler, input2, _insectHandler, _world, 1, _world.GetTopLeftOfTile(54, 35));
+            _player2 = new Player(_pheromoneHandler, input2, _insectHandler, _world, 1, spawnPositions[1]);
             _player2.LoadContent(content);
-            _camera2.LookAt(_world.GetTopLeftOfTile(57, 27));
+            _camera2.LookAt(spawnPositions[1]);
 
             CreateBorderTexture(new Color(252, 239, 197), 3);
         }
@@ -144,6 +145,11 @@ namespace TinyShopping.Game {
             _pheromoneHandler.Draw(batch, playerId, gameTime);
             _insectHandler.Draw(batch, gameTime);
             _fruitHandler.Draw(batch, gameTime);
+
+            // need to flush sprites before rendering tiled map objects, to ensure that fruits, ants are drawn before map objects
+            // this is needed, because tiled draws directly to the graphics device, while SpriteBatch draw only at the End() call
+            batch.End();
+            _batch.Begin(transformMatrix: viewMatrix);
             _world.DrawObjects(batch, viewMatrix, Vector2.Zero);
             if (playerId == 0) {
                 _player1.Draw(batch, gameTime);
@@ -218,16 +224,17 @@ namespace TinyShopping.Game {
             }
 
             Vector2 cameraMoveDirection = Vector2.Zero;
-            if (cameraRect.Right - cursorPos.X < 50 && cameraRect.Right < _world.Width) {
-                cameraMoveDirection.X += speed;
+            Rectangle worldRect = _world.GetWorldBoundary();
+            if (cameraRect.Right - cursorPos.X < 50 && cameraRect.Right < worldRect.Right) {
+                cameraMoveDirection.X += speed; 
             }
-            if (cursorPos.X - cameraRect.Left < 50 && cameraRect.Left > 0) {
+            if (cursorPos.X - cameraRect.Left < 50 && cameraRect.Left > worldRect.Left) {
                 cameraMoveDirection.X -= speed; 
             }
-            if (cursorPos.Y - cameraRect.Top < 50 && cameraRect.Y > 0) {
+            if (cursorPos.Y - cameraRect.Top < 50 && cameraRect.Y > worldRect.Top) { 
                 cameraMoveDirection.Y -= speed;
             }
-            if (cameraRect.Bottom - cursorPos.Y < 50 && cameraRect.Bottom < _world.Height) {
+            if (cameraRect.Bottom - cursorPos.Y < 50 && cameraRect.Bottom < worldRect.Bottom) {
                 cameraMoveDirection.Y += speed;
             }
 

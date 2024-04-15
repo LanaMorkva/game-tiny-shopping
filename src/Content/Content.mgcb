@@ -83,6 +83,11 @@
 /processorParam:TextureFormat=Compressed
 /build:General.spritefont
 
+#begin map_isometric/map-angled.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:map_isometric/map-angled.tmx
+
 #begin map/Grocery_store_48x48.tsx
 /importer:TiledMapTilesetImporter
 /processor:TiledMapTilesetProcessor
