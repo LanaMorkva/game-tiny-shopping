@@ -30,10 +30,16 @@ namespace TinyShopping {
 
         protected Rectangle _menuRegion;
 
+        protected Vector2 _centerOffset;
+
         protected Action _backAction;
 
-        public SelectMenu(Rectangle menuRegion, Vector2 itemSize, Action backAction) {
+        public SelectMenu(Rectangle menuRegion, Vector2 itemSize, Action backAction): this(menuRegion, new Vector2(0, 0), itemSize, backAction) {
+        }
+
+        public SelectMenu(Rectangle menuRegion, Vector2 centerOffset, Vector2 itemSize, Action backAction) {
             _menuRegion = menuRegion;
+            _centerOffset = centerOffset;
             _itemSize = itemSize;
 
             _currentSelection = 0;
@@ -170,7 +176,8 @@ namespace TinyShopping {
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch) {
             Vector2 menuLocation = _menuRegion.Center.ToVector2() - GetSize() / 2;
-            menuLocation.Y -= _menuRegion.Y / 3;
+            //menuLocation.Y -= _menuRegion.Y / 3;
+            menuLocation += _centerOffset;
             foreach (var menuItem in _menuItems) {
                 var itemRect = new Rectangle(menuLocation.ToPoint(), _itemSize.ToPoint());
                 menuItem.Draw(batch, itemRect);

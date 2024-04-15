@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -46,7 +44,11 @@ namespace TinyShopping.MainMenu
             _imageRegion = new Rectangle((int)(menuW / 1.5), menuPosY / 3, (int)(Width - menuW / 1.5),
                 Height - menuPosY / 3);
 
-            _selectMenu = new MainSelectMenu(menuRegion, menuItemSize);
+
+            //menuLocation.Y -= _menuRegion.Y / 3;
+            Vector2 centerOffset = new Vector2(0, -(menuRegion.Y / 3));
+
+            _selectMenu = new MainSelectMenu(menuRegion, centerOffset, menuItemSize);
             _selectMenu.AddItem(new MainMenuItem("New Game", StartGame));
             _selectMenu.AddItem(new MainMenuItem("How to play", NotImplementedScene));
             _selectMenu.AddItem(new MainMenuItem("Settings", SettingsMenu));
