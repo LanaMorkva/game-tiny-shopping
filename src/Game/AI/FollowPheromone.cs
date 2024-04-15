@@ -6,8 +6,6 @@ namespace TinyShopping.Game.AI {
 
         private static readonly int FIGHT_RANGE = 1;
 
-        private static readonly int DAMAGE = 2;
-
         private PheromoneHandler _handler;
 
         private Colony _colony;
@@ -61,7 +59,7 @@ namespace TinyShopping.Game.AI {
                     direction = enemy.Position - Insect.Position;
                     float fightRange = World.TileWidth * FIGHT_RANGE;
                     if (Vector2.DistanceSquared(enemy.Position, Insect.Position) < fightRange * fightRange) {
-                        enemy.TakeDamage(DAMAGE);
+                        enemy.TakeDamage(Insect.Damage);
                     }
                 }
             }

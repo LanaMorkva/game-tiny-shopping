@@ -36,10 +36,10 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager to use.</param>
         public void LoadContent(ContentManager content) {
-            Colony colony1 = new Colony(_world.GetSpawnPositions()[0], 150, _world, _pheromoneHandler, _fruitHandler, _world.GetDropOffPositions()[0], 0, this);
+            Colony colony1 = new Colony(_world.GetSpawnPositions()[0], 150, _world, _pheromoneHandler, _fruitHandler, _world.GetDropOffPositions()[0], 0, this, ColonyType.ANT);
             colony1.Initialize();
             colony1.LoadContent(content);
-            Colony colony2 = new Colony(_world.GetSpawnPositions()[1], 230, _world, _pheromoneHandler, _fruitHandler, _world.GetDropOffPositions()[1], 1, this);
+            Colony colony2 = new Colony(_world.GetSpawnPositions()[1], 230, _world, _pheromoneHandler, _fruitHandler, _world.GetDropOffPositions()[1], 1, this, ColonyType.TERMITE);
             colony2.Initialize();
             colony2.LoadContent(content);
             _colonies = new Colony[] { colony1, colony2 };

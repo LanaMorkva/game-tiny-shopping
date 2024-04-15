@@ -5,6 +5,20 @@ using TinyShopping.Game.AI;
 
 namespace TinyShopping.Game {
 
+    internal struct Services {
+        public World world;
+        public PheromoneHandler handler;
+        public FruitHandler fruits;
+        public Colony colony;
+    }
+
+    internal struct Attributes {
+        public int speed;
+        public int rotationSpeed;
+        public int maxHealth;
+        public int damage;
+    }
+
     internal class Insect {
 
         private enum AnimationKey
@@ -15,15 +29,9 @@ namespace TinyShopping.Game {
             RightFull
         }
 
-        private static readonly int SPEED = 70;
-
-        private static readonly int ROTATION_SPEED = 100;
-
         private readonly World _world;
 
         private Texture2D _texture;
-
-        private Texture2D _textureFull; // legacy
 
         public int TextureSize { get; private set; }
 
@@ -64,24 +72,32 @@ namespace TinyShopping.Game {
             }
         }
 
+        private Attributes _attributes;
+
         public int Health { private set; get; }
+
+        public int Damage { 
+            get {
+                return _attributes.damage;
+            } 
+        }
 
         private Task[] _ais;
 
-        public Insect(World world, PheromoneHandler handler, Vector2 spawn, int spawnRotation, FruitHandler fruits, Texture2D texture, Texture2D textureFull, Colony colony, int owner) {
-            _world = world;
+        public Insect(Services services, Vector2 spawn, int spawnRotation, Texture2D texture, int owner, Attributes attributes) {
+            _world = services.world;
             _position = new InsectPos((int)spawn.X, (int)spawn.Y, spawnRotation);
             _texture = texture;
-            _textureFull = textureFull;
+            _attributes = attributes;
             TextureSize = (int)_world.TileWidth / 2;
             Owner = owner;
-            Health = 100;
+            Health = attributes.maxHealth;
             _ais = new Task[] {
                 new Spawn(this, _world),
                 new Collide(this, _world),
-                new PickUp(this, _world, fruits),
-                new DropOff(this, _world, colony),
-                new FollowPheromone(this, _world, handler, colony),
+                new PickUp(this, _world, services.fruits),
+                new DropOff(this, _world, services.colony),
+                new FollowPheromone(this, _world, services.handler, services.colony),
             };
 
             _animationManager.AddAnimation(AnimationKey.Left, new Animation(_texture, 2, 4, 0.2f, 1));
@@ -167,14 +183,14 @@ namespace TinyShopping.Game {
         /// <param name="gameTime">The current game time.</param>
         public void Walk(GameTime gameTime) {
             if (_position.IsTurning) {
-                _position.Rotate((float)gameTime.ElapsedGameTime.TotalSeconds * ROTATION_SPEED);
-                _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * SPEED / 3);
+                _position.Rotate((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.rotationSpeed);
+                _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed / 3);
             }
             else if (IsCarrying) {
-                _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * SPEED * 3/5);
+                _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed * 3/5);
             }
             else {
-                _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * SPEED);
+                _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed);
             }
         }
 
@@ -183,7 +199,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Rotate(GameTime gameTime) {
-            _position.Rotate((float)gameTime.ElapsedGameTime.TotalSeconds * ROTATION_SPEED);
+            _position.Rotate((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.rotationSpeed);
         }
 
         /// <summary>
@@ -191,7 +207,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void BackUp(GameTime gameTime) {
-            _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * -SPEED);
+            _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * -_attributes.speed);
         }
 
         /// <summary>
