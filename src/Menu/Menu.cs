@@ -117,6 +117,13 @@ namespace TinyShopping {
                     _soundEffects[0].Play();
                     _menuItems[_currentSelection].ApplyAction();
                 }
+                if (kstate.IsKeyDown(Keys.Back)) {
+                    _backPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
+                } else if (_backPressed > 0) {
+                    _backPressed = 0;
+                    _soundEffects[0].Play();
+                    _backAction();
+                }
             }
 
             setActiveItem();
