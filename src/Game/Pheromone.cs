@@ -6,8 +6,6 @@ namespace TinyShopping.Game {
 
     internal class Pheromone {
 
-        private static readonly int RANGE = 8;
-
         public Vector2 Position { private set; get; }
 
         private World _world;
@@ -43,7 +41,7 @@ namespace TinyShopping.Game {
             Priority = priority;
             Type = type;
             Owner = owner;
-            _pheromoneSize = RANGE * _tileSize;
+            _pheromoneSize = Constants.PHEROMONE_RANGE * _tileSize;
 
             switch (type) {
                 case PheromoneType.RETURN:

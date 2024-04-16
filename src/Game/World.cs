@@ -6,6 +6,7 @@ using System;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using MonoGame.Extended;
+using MonoGame.Extended.Graphics.Effects;
 using System.Collections.Generic;
 
 namespace TinyShopping.Game {
@@ -26,6 +27,7 @@ namespace TinyShopping.Game {
         public float TileHeight {get; private set;}
         private TiledMapRenderer _tiledMapRenderer;
         private TiledMap _tiledMap;
+        private TiledMapEffect _tintEffect;
 
         public int Width { get; private set; }
 
@@ -36,6 +38,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="contentManager">The content manager of the main game.</param>
         public void LoadContent(ContentManager contentManager, GraphicsDevice device) {
+            _tintEffect = new TiledMapEffect(contentManager.Load<Effect>("shaders/TintMapEffect"));
             _tiledMap = contentManager.Load<TiledMap>("map_isometric/map-angled");
             _tiledMap.GetLayer("Walls").Offset = new Vector2(0, -96);
             _tiledMap.GetLayer("Objects").Offset = new Vector2(0, -64);
@@ -54,7 +57,7 @@ namespace TinyShopping.Game {
         /// <param name="destination">The destination to draw to.</param>
         /// <param name="source">The source rectangle on the texture to use.</param>
         public void DrawFloor(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
-            _tiledMapRenderer.Draw((int)LayerName.BackgroundGroup, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.BackgroundGroup, viewMatrix, effect: _tintEffect);
             _tiledMapRenderer.Draw((int)LayerName.Floor, viewMatrix);
             _tiledMapRenderer.Draw((int)LayerName.Objects, viewMatrix);
         }

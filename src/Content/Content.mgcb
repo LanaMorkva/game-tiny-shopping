@@ -151,6 +151,18 @@
 /processorParam:TextureFormat=Color
 /build:pheromone.png
 
+#begin shaders/Macros.fxh
+/copy:shaders/Macros.fxh
+
+#begin shaders/Structures.fxh
+/copy:shaders/Structures.fxh
+
+#begin shaders/TintMapEffect.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:shaders/TintMapEffect.fx
+
 #begin sounds/cash_register.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
@@ -264,4 +276,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:teaser.png
+
+#begin termites/termite_texture.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:termites/termite_texture.png
 
