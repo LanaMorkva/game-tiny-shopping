@@ -22,8 +22,8 @@ namespace TinyShopping.Game {
         public int Height {  get; private set; }
         public int Width { get; private set; }
 
-        public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game) :
-            base(content, graphics, manager, game) {
+        public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
+            base(content, graphics, manager, game, settingsHandler) {
         }
 
         public override void Initialize() {

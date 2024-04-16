@@ -13,8 +13,8 @@ namespace TinyShopping.StartupScreen
 
         private Rectangle _backgroundPosition;
 
-        public Scene(ContentManager content, GraphicsDevice device, GraphicsDeviceManager manager, Renderer game): 
-            base(content, device, manager, game) {
+        public Scene(ContentManager content, GraphicsDevice device, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler): 
+            base(content, device, manager, game, settingsHandler) {
         }
 
         public override void LoadContent() {
@@ -28,7 +28,7 @@ namespace TinyShopping.StartupScreen
             KeyboardState state = Keyboard.GetState();
             GamePadState cState = GamePad.GetState(PlayerIndex.One);
             if (state.GetPressedKeys().Length > 0 || cState.IsButtonDown(Buttons.A)) {
-                Game.ChangeScene(new MainMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game));
+                Game.ChangeScene(new MainMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
             }
             base.Update(gameTime);
         }
