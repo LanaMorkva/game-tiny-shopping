@@ -122,21 +122,21 @@ namespace TinyShopping.Game {
                 _discoverPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
             }
             else if (_discoverPressed > 0) {
-                _handler.AddPheromone(_position, gameTime, PheromoneType.DISCOVER, _id, Constants.PHEROMONE_DURATION + _discoverPressed * 2);
+                _handler.AddPheromone(_position, gameTime, PheromoneType.DISCOVER, _id, Constants.PHEROMONE_DURATION + _discoverPressed * Constants.PHEROMONE_DURATION_COEFFICIENT);
                 _discoverPressed = 0;
             }
             if (_input.IsReturnPressed()) {
                 _returnPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds); ;
             }
             else if (_returnPressed > 0) {
-                _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN, _id, Constants.PHEROMONE_DURATION + _returnPressed * 2);
+                _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN, _id, Constants.PHEROMONE_DURATION + _returnPressed * Constants.PHEROMONE_DURATION_COEFFICIENT);
                 _returnPressed = 0;
             }
             if (_input.IsFightPressed()) {
                 _fightPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds); ;
             }
             else if (_fightPressed > 0) {
-                _handler.AddPheromone(_position, gameTime, PheromoneType.FIGHT, _id, Constants.PHEROMONE_DURATION + _fightPressed * 2);
+                _handler.AddPheromone(_position, gameTime, PheromoneType.FIGHT, _id, Constants.PHEROMONE_DURATION + _fightPressed * Constants.PHEROMONE_DURATION_COEFFICIENT);
                 _fightPressed = 0;
             }
             if (_input.IsNewInsectPressed()) {

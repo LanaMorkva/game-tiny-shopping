@@ -43,6 +43,12 @@
         public static readonly int PHEROMONE_DURATION = 5000;
 
         /// <summary>
+        /// How the length of a button press should influence the pheromone duration. The value is multiplied with the duration of the button press
+        /// and added to the pheromone duration when a pheromone is placed.
+        /// </summary>
+        public static readonly int PHEROMONE_DURATION_COEFFICIENT = 2;
+
+        /// <summary>
         /// The size of the players' cursors.
         /// </summary>
         public static readonly int CURSOR_SIZE = 50;
