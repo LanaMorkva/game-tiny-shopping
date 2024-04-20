@@ -42,6 +42,9 @@ namespace TinyShopping.Game {
         private RenderTarget2D _renderTarget1;
         private RenderTarget2D _renderTarget2;
 
+        private Vector2 _cam1TargetMovement;
+        private Vector2 _cam2TargetMovement;
+
         /// <summary>
         /// Creates a new instance to handle rendering to two split screens.
         /// </summary>
@@ -108,6 +111,9 @@ namespace TinyShopping.Game {
             _pheromoneHandler.Update(gameTime);
             _player1.Update(gameTime, this);
             _player2.Update(gameTime, this);
+
+            MoveCamera(_cam1TargetMovement, _camera1);
+            MoveCamera(_cam2TargetMovement, _camera2);
         }
 
         /// <summary>
@@ -205,6 +211,16 @@ namespace TinyShopping.Game {
             }
             return new KeyboardInput(playerIndex);
         }
+        
+
+        private void MoveCamera(Vector2 targetPosition, OrthographicCamera camera) {
+            float lerpSpeed = 0.75f;
+            if (Math.Abs(targetPosition.X) > 0 && Math.Abs(targetPosition.Y) > 0) {
+                lerpSpeed = 0.7f;
+            }
+
+            camera.Move(Vector2.Lerp(Vector2.Zero, targetPosition, lerpSpeed)); 
+        }
 
 
         /// <summary>
@@ -214,34 +230,35 @@ namespace TinyShopping.Game {
         /// <param name="cursorPos">The cursor world position.</param>
         /// <param name="speed">The speed of the scrolling.</param>
         public void UpdateCameraPosition(int player, Vector2 cursorPos, int speed) {
-            RectangleF cameraRect;
+            RectangleF cameraRect = RectangleF.Empty;
             if  (player == 0) {
-                cameraRect = _camera1.BoundingRectangle;
+                cameraRect.Position = _camera1.Position;
                 cameraRect.Size = _player1Area.Size.ToVector2();
             } else {
-                cameraRect = _camera2.BoundingRectangle;
+                cameraRect.Position = _camera2.Position;
                 cameraRect.Size = _player2Area.Size.ToVector2();
             }
 
             Vector2 cameraMoveDirection = Vector2.Zero;
             Rectangle worldRect = _world.GetWorldBoundary();
-            if (cameraRect.Right - cursorPos.X < 50 && cameraRect.Right < worldRect.Right) {
+            const int moveThreshold = 100;
+            if (cameraRect.Right - cursorPos.X < moveThreshold && cameraRect.Right < worldRect.Right) {
                 cameraMoveDirection.X += speed; 
             }
-            if (cursorPos.X - cameraRect.Left < 50 && cameraRect.Left > worldRect.Left) {
+            if (cursorPos.X - cameraRect.Left < moveThreshold && cameraRect.Left > worldRect.Left) {
                 cameraMoveDirection.X -= speed; 
             }
-            if (cursorPos.Y - cameraRect.Top < 50 && cameraRect.Y > worldRect.Top) { 
+            if (cursorPos.Y - cameraRect.Top < moveThreshold && cameraRect.Y > worldRect.Top) { 
                 cameraMoveDirection.Y -= speed;
             }
-            if (cameraRect.Bottom - cursorPos.Y < 50 && cameraRect.Bottom < worldRect.Bottom) {
+            if (cameraRect.Bottom - cursorPos.Y < moveThreshold && cameraRect.Bottom < worldRect.Bottom) {
                 cameraMoveDirection.Y += speed;
             }
 
             if (player == 0) {
-                _camera1.Move(cameraMoveDirection);
+                _cam1TargetMovement = cameraMoveDirection;
             } else {
-                _camera2.Move(cameraMoveDirection);
+                _cam2TargetMovement = cameraMoveDirection;
             }
         }
 

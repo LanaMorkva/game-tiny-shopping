@@ -12,6 +12,7 @@ namespace TinyShopping.Game {
     internal class Player {
 
         private Vector2 _position;
+        private Vector2 _targetPosition;
 
         private Texture2D _texture;
 
@@ -78,8 +79,8 @@ namespace TinyShopping.Game {
             int speed = (int)(gameTime.ElapsedGameTime.TotalSeconds * Constants.CURSOR_SPEED);
             PlacePheromones(gameTime);
             UpdatePosition(speed);
-            handler.UpdateCameraPosition(_id, _position, speed);
             ClipCursorToWorld();
+            handler.UpdateCameraPosition(_id, _position, speed);
         }
 
         /// <summary>
@@ -109,8 +110,12 @@ namespace TinyShopping.Game {
         /// <param name="speed">The speed to use.</param>
         private void UpdatePosition(int speed) {
             Vector2 motion = _input.GetMotion();
-            _position.X += motion.X * speed;
-            _position.Y += motion.Y * speed;
+            _targetPosition.X += motion.X * speed;
+            _targetPosition.Y += motion.Y * speed;
+
+            Vector2 lerped = Vector2.Lerp(Vector2.Zero, _targetPosition, 0.8f);
+            _position += lerped;
+            _targetPosition -= lerped;
         }
 
         /// <summary>
