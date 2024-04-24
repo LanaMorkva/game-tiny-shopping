@@ -1,7 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using TinyShopping.Game.AI;
+using TinyShopping.Game.Pathfinding;
+using PFPoint = TinyShopping.Game.Pathfinding.Point;
 
 namespace TinyShopping.Game {
 
@@ -21,8 +24,7 @@ namespace TinyShopping.Game {
 
     internal class Insect {
 
-        private enum AnimationKey
-        {
+        private enum AnimationKey {
             Left,
             Right,
             LeftFull,
@@ -84,8 +86,17 @@ namespace TinyShopping.Game {
 
         private Task[] _ais;
 
+        private Pathfinder _pathFinder;
+
+        private IList<PFPoint> _path = new List<PFPoint>();
+
+        private int _pathIndex;
+
+        private Vector2 _target;
+
         public Insect(Services services, Vector2 spawn, int spawnRotation, Texture2D texture, int owner, Attributes attributes) {
             _world = services.world;
+            _pathFinder = new Pathfinder(_world);
             _position = new InsectPos((int)spawn.X, (int)spawn.Y, spawnRotation);
             _texture = texture;
             _attributes = attributes;
@@ -191,6 +202,26 @@ namespace TinyShopping.Game {
             }
             else {
                 _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed);
+            }
+        }
+
+        /// <summary>
+        /// Walks towards the given target.
+        /// </summary>
+        /// <param name="target">The target to walk to.</param>
+        /// <param name="gameTime">The current game time.</param>
+        public void WalkTo(Vector2 target, GameTime gameTime) {
+            if (Vector2.DistanceSquared(target, _target) > 4) {
+                _target = target;
+                _path = _pathFinder.FindPath(Position, target);
+                _pathIndex = 0;
+            }
+            if (_pathIndex >= _path.Count) return;
+            Vector2 nextPoint = new Vector2(_path[_pathIndex].X, _path[_pathIndex].Y);
+            TargetDirection = nextPoint - Position;
+            Walk(gameTime);
+            if (Vector2.DistanceSquared(nextPoint, Position) < 256) {
+                _pathIndex++;
             }
         }
 

@@ -39,8 +39,7 @@ namespace TinyShopping.Game.AI {
             if (p == null) {
                 return false;
             }
-            Insect.TargetDirection = p.Position - Insect.Position;
-            Insect.Walk(gameTime);
+            Insect.WalkTo(p.Position, gameTime);
             return true;
 
         }
@@ -50,19 +49,18 @@ namespace TinyShopping.Game.AI {
             if (p == null) {
                 return false;
             }
-            Vector2 direction = p.Position - Insect.Position;
+            Vector2 target = p.Position;
             if (p.Type == PheromoneType.FIGHT) {
                 Insect enemy = _colony.GetClosestEnemy(Insect.Position);
                 if (enemy != null) {
-                    direction = enemy.Position - Insect.Position;
+                    target = enemy.Position;
                     float fightRange = World.TileWidth * Constants.FIGHT_RANGE;
                     if (Vector2.DistanceSquared(enemy.Position, Insect.Position) < fightRange * fightRange) {
                         enemy.TakeDamage(Insect.Damage);
                     }
                 }
             }
-            Insect.TargetDirection = direction;
-            Insect.Walk(gameTime);
+            Insect.WalkTo(target, gameTime);
             return true;
         }
     }
