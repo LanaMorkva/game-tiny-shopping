@@ -49,11 +49,24 @@ namespace TinyShopping.Game {
             }
         }
 
+        private int _targetRotation;
+
         /// <summary>
-        /// The desired rotation of the insect.
+        /// The desired rotation of the insect in degrees.
         /// </summary>
         public int TargetRotation {
-            get; set;
+            get {
+                return _targetRotation;
+            } 
+            set {
+                _targetRotation = value;
+                if (_targetRotation < 0) {
+                    _targetRotation += 360;
+                }
+                if (_targetRotation > 360) {
+                    _targetRotation -= 360;
+                }
+            }
         }
 
         public Vector2 TargetDirection {
@@ -68,7 +81,7 @@ namespace TinyShopping.Game {
         /// </summary>
         public bool IsTurning {
             get {
-                return Math.Abs(TargetRotation - _rotation) > 1;
+                return Math.Abs(TargetRotation - _rotation) > 5;
             }
         }
 
@@ -100,8 +113,11 @@ namespace TinyShopping.Game {
                     _rotation -= 360;
                 }
             }
-            if (diff != 0) {
-                _rotation += (float)((diff / Math.Abs(diff)) * degrees);
+            if (diff < degrees || diff == 0) {
+                _rotation = TargetRotation;
+            }
+            else {
+                _rotation += diff / Math.Abs(diff) * degrees;
             }
             _rotationRad = MathHelper.ToRadians(_rotation);
             _direction = new Vector2(MathF.Sin(_rotationRad), -MathF.Cos(_rotationRad));

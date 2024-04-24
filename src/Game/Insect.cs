@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
 using TinyShopping.Game.AI;
@@ -124,11 +125,17 @@ namespace TinyShopping.Game {
         /// <param name="gameTime">The current time information.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
             //Texture2D texture = IsCarrying ? _textureFull : _texture;
-            Rectangle destination = new Rectangle(_position.X, _position.Y, TextureSize, TextureSize);
-            Vector2 origin = new Vector2(_texture.Width / 4f, _texture.Height / 8f);
+            Rectangle destination = new Rectangle(_position.X - TextureSize / 2, _position.Y - TextureSize / 2, TextureSize, TextureSize);
+            Vector2 origin = new Vector2(0, 0);
             //batch.Draw(texture, destination, null, Color.White, _position.Rotation, origin, SpriteEffects.None, 0);
 
             _animationManager.Draw(batch, gameTime, destination, origin);
+
+#if DEBUG
+            batch.DrawRectangle(destination, Color.Red);
+            batch.DrawLine(Position, 30, _position.Rotation - (float) Math.PI/2, Color.Blue);
+            batch.DrawLine(Position, 30, MathHelper.ToRadians(_position.TargetRotation - 90), Color.Red);
+#endif
         }
 
         /// <summary>
@@ -150,11 +157,10 @@ namespace TinyShopping.Game {
         /// Updates the animation manager.
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
-        private void UpdateAnimationManager(GameTime gameTime)
-        {
+        private void UpdateAnimationManager(GameTime gameTime) {
             // TODO: fix idle state, fix rotation, add more rotation states
             
-            bool movesLeft = _position.TargetRotation <= 180;
+            bool movesLeft = _position.Rotation <= Math.PI;
             if (movesLeft && !IsCarrying)
             {
                 _animationManager.Update(AnimationKey.Left, gameTime);
@@ -216,7 +222,10 @@ namespace TinyShopping.Game {
                 _path = _pathFinder.FindPath(Position, target);
                 _pathIndex = 0;
             }
-            if (_pathIndex >= _path.Count) return;
+            if (_pathIndex >= _path.Count) {
+                Wander(gameTime);
+                return;
+            }
             Vector2 nextPoint = new Vector2(_path[_pathIndex].X, _path[_pathIndex].Y);
             TargetDirection = nextPoint - Position;
             Walk(gameTime);
