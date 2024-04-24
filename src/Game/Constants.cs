@@ -10,12 +10,12 @@
         /// <summary>
         /// Attributes of ants.
         /// </summary>
-        public static Attributes ANT_ATTRIBUTES = new Attributes { speed = 70, rotationSpeed = 100, maxHealth = 100, damage = 2 };
+        public static Attributes ANT_ATTRIBUTES = new Attributes { speed = 70, rotationSpeed = 200, maxHealth = 100, damage = 2 };
 
         /// <summary>
         /// Attributes of termites.
         /// </summary>
-        public static Attributes TERMITE_ATTRIBUTES = new Attributes { speed = 50, rotationSpeed = 70, maxHealth = 120, damage = 4 };
+        public static Attributes TERMITE_ATTRIBUTES = new Attributes { speed = 50, rotationSpeed = 200, maxHealth = 120, damage = 4 };
 
         /// <summary>
         /// How close a fruit must be for the insect to see it. Given in tiles.

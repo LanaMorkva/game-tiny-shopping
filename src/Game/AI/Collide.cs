@@ -24,7 +24,7 @@ namespace TinyShopping.Game.AI {
                 RecoverCollision(gameTime);
                 return true;
             }
-            if (!World.IsWalkable((int) Insect.Position.X, (int) Insect.Position.Y, Insect.TextureSize / 3)) {
+            if (!World.IsWalkable((int) Insect.Position.X, (int) Insect.Position.Y, Insect.TextureSize / 5)) {
                 _isRecovering = true;
                 Insect.TargetRotation += 180;
                 return true;
@@ -40,7 +40,7 @@ namespace TinyShopping.Game.AI {
             if (!Insect.IsTurning) {
                 _isRecovering = false;
             }
-            if (!World.IsWalkable((int)Insect.Position.X, (int)Insect.Position.Y, Insect.TextureSize / 3)) {
+            if (!World.IsWalkable((int)Insect.Position.X, (int)Insect.Position.Y, Insect.TextureSize / 5)) {
                 Insect.BackUp(gameTime);
             }
             else {

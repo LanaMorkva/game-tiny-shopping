@@ -32,8 +32,7 @@ namespace TinyShopping.Game.AI {
                 return true;
             }
             if (dir != null) {
-                Insect.TargetDirection = dir.Value;
-                Insect.Walk(gameTime);
+                Insect.WalkTo(closestFruit.Position, gameTime);
                 return true;
             }
             return false;
