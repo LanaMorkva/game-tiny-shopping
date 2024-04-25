@@ -11,13 +11,15 @@ namespace TinyShopping.Game {
         private World _world;
 
         private int _tileSize;
-        private int _pheromoneSize;
 
         private Texture2D _texture;
         private Color _color;
 
         public int Priority { private set; get; }
-        public int PheromoneRange => _pheromoneSize / 2;
+
+        public int Range { private set; get; }
+
+        public int Duration { private set; get; }
 
         public PheromoneType Type { private set; get; }
 
@@ -28,12 +30,13 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="position">The position to use.</param>
         /// <param name="texture">The texture to draw.</param>
-        /// <param name="font">The font to use.</param>
         /// <param name="world">The world to exist in.</param>
         /// <param name="priority">The starting priority. This will decrease for each passing milisecond.</param>
+        /// <param name="duration">The duration of the pheromone.</param>
+        /// <param name="range">The pheromone effect range.</param>
         /// <param name="type">The pheromone type.</param>
         /// <param name="owner">The player placing the pheromone.</param>
-        public Pheromone(Vector2 position, Texture2D texture, World world, int priority, PheromoneType type, int owner) {
+        public Pheromone(Vector2 position, Texture2D texture, World world, int priority, int duration, int range, PheromoneType type, int owner) {
             Position = position;
             _world = world;
             _tileSize = (int)_world.TileWidth;
@@ -41,8 +44,8 @@ namespace TinyShopping.Game {
             Priority = priority;
             Type = type;
             Owner = owner;
-            _pheromoneSize = (int) (priority / 1000f * _tileSize);
-
+            Range = range;
+            Duration = duration;
             switch (type) {
                 case PheromoneType.RETURN:
                     _color = Color.Blue;
@@ -62,7 +65,7 @@ namespace TinyShopping.Game {
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
-            Rectangle destination = new Rectangle((int)Position.X - PheromoneRange, (int)Position.Y - PheromoneRange, _pheromoneSize, _pheromoneSize);
+            Rectangle destination = new Rectangle((int)Position.X - Range, (int)Position.Y - Range, Range * 2, Range * 2);
             float priority = (Priority + 500) / 1000;
             int alpha = (int)(priority * 15) + 50;
             Color updateColor = new Color(_color, alpha);
@@ -74,7 +77,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
-            Priority -= (int) Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
+            Duration -= (int) Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
         }
     }
 }

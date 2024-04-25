@@ -46,9 +46,11 @@ namespace TinyShopping.Game {
         /// <param name="type">The pheromone type to place.</param>
         /// <param name="player">The current player id, 0 or 1.</param>
         /// <param name="priority">The priority of the pheromone, given in miliseconds.</param>
-        public void AddPheromone(Vector2 rawPosition, GameTime gameTime, PheromoneType type, int player, int priority) {
+        /// <param name="duration">The effect duration.</param>
+        /// <param name="range">The effect range.</param>
+        public void AddPheromone(Vector2 rawPosition, GameTime gameTime, PheromoneType type, int player, int priority, int duration, int range) {
             Vector2 position = _world.AlignPositionToGridCenter(rawPosition);
-            Pheromone p = new Pheromone(position, _texture, _world, priority, type, player);
+            Pheromone p = new Pheromone(position, _texture, _world, priority, duration, range, type, player);
             if (type == PheromoneType.RETURN) {
                 _returnPheromones[player].Add(p);
             }
@@ -78,7 +80,7 @@ namespace TinyShopping.Game {
                 List<Pheromone> relevant = new List<Pheromone>(pheromones[id].Count);
                 foreach (var p in pheromones[id]) {
                     p.Update(gameTime);
-                    if (p.Priority > 0) {
+                    if (p.Duration > 0) {
                         relevant.Add(p);
                     }
                 }
@@ -142,7 +144,7 @@ namespace TinyShopping.Game {
                     continue;
                 }
                 float sqDis = Vector2.DistanceSquared(position, p.Position);
-                int range = p.PheromoneRange;
+                int range = p.Range;
                 if (sqDis < range * range) {
                     closest = p;
                     maxPrio = p.Priority;

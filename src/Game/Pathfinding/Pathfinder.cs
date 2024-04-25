@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using MonoGame.Extended.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -40,16 +41,24 @@ namespace TinyShopping.Game.Pathfinding {
             _nodes.Add(startPoint, startNode);
             _queue.Add(startNode);
             _previous = new Dictionary<Point, Point>(64);
+            int delta = (int)(_world.TileWidth * RANGE);
+            long minDelta = long.MaxValue;
+            Node bestApprox = null;
             while (_queue.Count > 0) {
                 Node current = GetNextNode();
-                if (current == null || IsCloseEnough(current.Position, _end)) {
+                long currentDistance = current.Position.SquaredDistance(_end);
+                if (currentDistance <= delta * delta) {
                     IList<Point> path = ConstructPath(current.Position);
                     return path;
                 }
+                else if (currentDistance < minDelta) {
+                    minDelta = currentDistance;
+                    bestApprox = current;
+                }
                 EnqueueNeighbors(current);
             }
-            Debug.Print("Pathfinding finished without result");
-            return new List<Point>();
+            Debug.Print("Pathfinding finished without result. Best approx distance {0} larger than {1}", minDelta, delta);
+            return ConstructPath(bestApprox.Position);
         }
 
         /// <summary>

@@ -73,9 +73,8 @@ namespace TinyShopping.Game {
             int pressDuration = _discoverPressed + _fightPressed + _returnPressed;
             if (pressDuration > 0) {
                 Vector2 position = _world.AlignPositionToGridCenter(_position);
-                // Constants.PHEROMONE_DURATION + _fightPressed * Constants.PHEROMONE_DURATION_COEFFICIENT
-                float previewSize = (Constants.PHEROMONE_DURATION + pressDuration * Constants.PHEROMONE_DURATION_COEFFICIENT) / 1000f * _world.TileWidth; //Constants.PHEROMONE_RANGE * _world.TileWidth;
-                Rectangle previewDest = new Rectangle((int)(position.X - previewSize / 2), (int)(position.Y - previewSize / 2), (int)previewSize, (int)previewSize);
+                int previewSize = (int) ((Constants.PHEROMONE_RANGE + Constants.PHEROMONE_RANGE_COEFFICIENT * pressDuration / 1000f) * _world.TileWidth);
+                Rectangle previewDest = new Rectangle((int)(position.X - previewSize), (int)(position.Y - previewSize), previewSize*2, previewSize*2);
                 batch.Draw(_pheromonePreview, previewDest, Color.White);
             }
         }
@@ -137,21 +136,24 @@ namespace TinyShopping.Game {
                 _discoverPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
             }
             else if (_discoverPressed > 0) {
-                _handler.AddPheromone(_position, gameTime, PheromoneType.DISCOVER, _id, Constants.PHEROMONE_DURATION + _discoverPressed * Constants.PHEROMONE_DURATION_COEFFICIENT);
+                float range = (Constants.PHEROMONE_RANGE + Constants.PHEROMONE_RANGE_COEFFICIENT * _discoverPressed / 1000f) * _world.TileWidth;
+                _handler.AddPheromone(_position, gameTime, PheromoneType.DISCOVER, _id, int.MaxValue, Constants.PHEROMONE_DURATION, (int) range);
                 _discoverPressed = 0;
             }
             if (_input.IsReturnPressed()) {
                 _returnPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds); ;
             }
             else if (_returnPressed > 0) {
-                _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN, _id, Constants.PHEROMONE_DURATION + _returnPressed * Constants.PHEROMONE_DURATION_COEFFICIENT);
+                float range = (Constants.PHEROMONE_RANGE + Constants.PHEROMONE_RANGE_COEFFICIENT * _returnPressed / 1000f) * _world.TileWidth;
+                _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN, _id, int.MaxValue, Constants.PHEROMONE_DURATION, (int) range);
                 _returnPressed = 0;
             }
             if (_input.IsFightPressed()) {
                 _fightPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds); ;
             }
             else if (_fightPressed > 0) {
-                _handler.AddPheromone(_position, gameTime, PheromoneType.FIGHT, _id, Constants.PHEROMONE_DURATION + _fightPressed * Constants.PHEROMONE_DURATION_COEFFICIENT);
+                float range = (Constants.PHEROMONE_RANGE + Constants.PHEROMONE_RANGE_COEFFICIENT * _fightPressed / 1000f) * _world.TileWidth;
+                _handler.AddPheromone(_position, gameTime, PheromoneType.FIGHT, _id, int.MaxValue, Constants.PHEROMONE_DURATION, (int) range);
                 _fightPressed = 0;
             }
             if (_input.IsNewInsectPressed()) {

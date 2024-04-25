@@ -35,18 +35,18 @@
         /// <summary>
         /// The effect radius of pheromones. Given in tiles.
         /// </summary>
-        public static readonly int PHEROMONE_RANGE = 8;
+        public static readonly int PHEROMONE_RANGE = 2;
 
         /// <summary>
         /// How long a pheromone spot should exist, in miliseconds.
         /// </summary>
-        public static readonly int PHEROMONE_DURATION = 2000;
+        public static readonly int PHEROMONE_DURATION = 10000;
 
         /// <summary>
         /// How the length of a button press should influence the pheromone duration. The value is multiplied with the duration of the button press
         /// and added to the pheromone duration when a pheromone is placed.
         /// </summary>
-        public static readonly int PHEROMONE_DURATION_COEFFICIENT = 4;
+        public static readonly int PHEROMONE_RANGE_COEFFICIENT = 4;
 
         /// <summary>
         /// The size of the players' cursors.

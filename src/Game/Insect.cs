@@ -135,6 +135,12 @@ namespace TinyShopping.Game {
             batch.DrawRectangle(destination, Color.Red);
             batch.DrawLine(Position, 30, _position.Rotation - (float) Math.PI/2, Color.Blue);
             batch.DrawLine(Position, 30, MathHelper.ToRadians(_position.TargetRotation - 90), Color.Red);
+            Vector2 current = Position;
+            for (int i = _pathIndex; i < _path.Count; i++) {
+                Vector2 p = new Vector2(_path[i].X, _path[i].Y);
+                batch.DrawLine(current, p, Color.Black, 2);
+                current = p;
+            }
 #endif
         }
 
@@ -217,7 +223,7 @@ namespace TinyShopping.Game {
         /// <param name="target">The target to walk to.</param>
         /// <param name="gameTime">The current game time.</param>
         public void WalkTo(Vector2 target, GameTime gameTime) {
-            if (Vector2.DistanceSquared(target, _target) > 4) {
+            if (Vector2.DistanceSquared(target, _target) > 32) {
                 _target = target;
                 _path = _pathFinder.FindPath(Position, target);
                 _pathIndex = 0;
