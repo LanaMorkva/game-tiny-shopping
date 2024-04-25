@@ -33,17 +33,14 @@ namespace TinyShopping.Game {
 
         private SpriteBatch _batch;
 
-        private OrthographicCamera _camera1;
-        private OrthographicCamera _camera2;
+        private Camera2D _camera1;
+        private Camera2D _camera2;
 
         private Viewport _viewport1;
         private Viewport _viewport2;
 
         private RenderTarget2D _renderTarget1;
         private RenderTarget2D _renderTarget2;
-
-        private Vector2 _cam1TargetMovement;
-        private Vector2 _cam2TargetMovement;
 
         /// <summary>
         /// Creates a new instance to handle rendering to two split screens.
@@ -67,8 +64,8 @@ namespace TinyShopping.Game {
             _fruitHandler = new FruitHandler(_world);
             _insectHandler = new InsectHandler(_world, _pheromoneHandler, _fruitHandler);
             
-            _camera1 = new OrthographicCamera(_device);
-            _camera2 = new OrthographicCamera(_device);
+            _camera1 = new Camera2D(_player1Area.Width, _player1Area.Height);
+            _camera2 = new Camera2D(_player2Area.Width, _player2Area.Height);
 
             _viewport1 = new Viewport(_player1Area);
             _viewport2 = new Viewport(_player2Area);
@@ -92,12 +89,14 @@ namespace TinyShopping.Game {
             PlayerInput input1 = CreatePlayerInput(PlayerIndex.One);
             _player1 = new Player(_pheromoneHandler, input1, _insectHandler, _world, 0, spawnPositions[0]);
             _player1.LoadContent(content);
-            _camera1.LookAt(_world.GetTopLeftOfTile(19,38));
+            _camera1.LookAt(spawnPositions[0]);
+            _camera1.ZoomIn(0.5f);
 
             PlayerInput input2 = CreatePlayerInput(PlayerIndex.Two);
             _player2 = new Player(_pheromoneHandler, input2, _insectHandler, _world, 1, spawnPositions[1]);
             _player2.LoadContent(content);
             _camera2.LookAt(spawnPositions[1]);
+            _camera2.ZoomOut(0.5f);
 
             CreateBorderTexture(new Color(252, 239, 197), 3);
         }
@@ -112,8 +111,8 @@ namespace TinyShopping.Game {
             _player1.Update(gameTime, this);
             _player2.Update(gameTime, this);
 
-            MoveCamera(_cam1TargetMovement, _camera1);
-            MoveCamera(_cam2TargetMovement, _camera2);
+            _camera1.Update();
+            _camera2.Update();
         }
 
         /// <summary>
@@ -153,7 +152,7 @@ namespace TinyShopping.Game {
             _fruitHandler.Draw(batch, gameTime);
 
             // need to flush sprites before rendering tiled map objects, to ensure that fruits, ants are drawn before map objects
-            // this is needed, because tiled draws directly to the graphics device, while SpriteBatch draw only at the End() call
+            // this is needed, because tiled draws directly to the graphics device, while SpriteBatch draws only at the End() call
             batch.End();
             _batch.Begin(transformMatrix: viewMatrix);
             _world.DrawObjects(batch, viewMatrix, Vector2.Zero);
@@ -211,17 +210,6 @@ namespace TinyShopping.Game {
             }
             return new KeyboardInput(playerIndex);
         }
-        
-
-        private void MoveCamera(Vector2 targetPosition, OrthographicCamera camera) {
-            float lerpSpeed = 0.75f;
-            if (Math.Abs(targetPosition.X) > 0 && Math.Abs(targetPosition.Y) > 0) {
-                lerpSpeed = 0.7f;
-            }
-
-            camera.Move(Vector2.Lerp(Vector2.Zero, targetPosition, lerpSpeed)); 
-        }
-
 
         /// <summary>
         /// Updates the given player's camera position.
@@ -229,19 +217,18 @@ namespace TinyShopping.Game {
         /// <param name="player">The current player.</param>
         /// <param name="cursorPos">The cursor world position.</param>
         /// <param name="speed">The speed of the scrolling.</param>
-        public void UpdateCameraPosition(int player, Vector2 cursorPos, int speed) {
-            RectangleF cameraRect = RectangleF.Empty;
+        public void UpdateCameraState(int player, Vector2 cursorPos, int speed, float zoom) {
+            Camera2D currentCamera;
             if  (player == 0) {
-                cameraRect.Position = _camera1.Position;
-                cameraRect.Size = _player1Area.Size.ToVector2();
+                currentCamera = _camera1;
             } else {
-                cameraRect.Position = _camera2.Position;
-                cameraRect.Size = _player2Area.Size.ToVector2();
+                currentCamera = _camera2;
             }
-
+            
+            RectangleF cameraRect = currentCamera.BoundingRectangle();
             Vector2 cameraMoveDirection = Vector2.Zero;
             Rectangle worldRect = _world.GetWorldBoundary();
-            const int moveThreshold = 100;
+            float moveThreshold = 100f / currentCamera.Zoom;
             if (cameraRect.Right - cursorPos.X < moveThreshold && cameraRect.Right < worldRect.Right) {
                 cameraMoveDirection.X += speed; 
             }
@@ -255,11 +242,12 @@ namespace TinyShopping.Game {
                 cameraMoveDirection.Y += speed;
             }
 
-            if (player == 0) {
-                _cam1TargetMovement = cameraMoveDirection;
-            } else {
-                _cam2TargetMovement = cameraMoveDirection;
-            }
+            currentCamera.TargetMovement = cameraMoveDirection;
+            currentCamera.ZoomIn(zoom);
+        }
+
+        public float GetZoomValue(int playerId) {
+            return playerId == 0 ? _camera1.Zoom : _camera2.Zoom;
         }
 
         /// <summary>

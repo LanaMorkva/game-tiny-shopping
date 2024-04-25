@@ -15,6 +15,8 @@ namespace TinyShopping.Game {
         /// <exception cref="Exception">Thrown if no input was received.</exception>
         public abstract Vector2 GetMotion();
 
+        public abstract float GetZoom();
+
         /// <summary>
         /// Checks if the discover pheromone button is pressed.
         /// </summary>
@@ -50,6 +52,10 @@ namespace TinyShopping.Game {
 
         private Buttons _newInsectButton = Buttons.Y;
 
+        private Buttons _zoomIn = Buttons.LeftTrigger;
+
+        private Buttons _zoomOut = Buttons.RightShoulder;
+
         public GamePadInput(PlayerIndex playerIndex) {
             _playerIndex = playerIndex;
         }
@@ -63,6 +69,19 @@ namespace TinyShopping.Game {
             motion.Y *= -1;
             return motion;
         }
+
+        public override float GetZoom() {
+            GamePadState state = GamePad.GetState(_playerIndex);
+            float zoom = 0f;
+            if (state.IsButtonDown(_zoomIn)) {
+                zoom += Constants.ZOOM_SPEED;
+            }
+            if (state.IsButtonDown(_zoomOut)) {
+                zoom -= Constants.ZOOM_SPEED;
+            }
+            return zoom;
+        }
+
 
         public override bool IsDiscoverPressed() {
             GamePadState cState = GamePad.GetState(_playerIndex);
@@ -103,6 +122,9 @@ namespace TinyShopping.Game {
 
         private Keys _newInsectKey = Keys.D4;
 
+        private Keys _zoomIn = Keys.Q;
+        private Keys _zoomOut = Keys.E;
+
         public KeyboardInput(PlayerIndex playerIndex) {
             if (playerIndex < 0 || playerIndex > PlayerIndex.Two) {
                 throw new Exception("Invalid player index, maximum 2 players are allowed");
@@ -112,6 +134,9 @@ namespace TinyShopping.Game {
                 _down = Keys.K;
                 _left = Keys.J;
                 _right = Keys.L;
+                _zoomIn = Keys.U;
+                _zoomOut = Keys.O;
+
                 _discoverKey = Keys.D7;
                 _returnKey = Keys.D8;
                 _fightKey = Keys.D9;
@@ -140,6 +165,18 @@ namespace TinyShopping.Game {
                 motion.Normalize();
             }
             return motion;
+        }
+
+        public override float GetZoom() {
+            KeyboardState state = Keyboard.GetState();
+            float zoom = 0f;
+            if (state.IsKeyDown(_zoomIn)) {
+                zoom += Constants.ZOOM_SPEED;
+            }
+            if (state.IsKeyDown(_zoomOut)) {
+                zoom -= Constants.ZOOM_SPEED;
+            }
+            return zoom;
         }
 
         public override bool IsDiscoverPressed() {
