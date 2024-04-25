@@ -190,6 +190,16 @@ namespace TinyShopping.Game {
             DrawString(batch, time, new Vector2(_scene.Width / 2, offsetTop));
         }
 
+        public float GetRemainingTime() {
+            if (!_scene.IsStarted) {
+                return Constants.TIME_LIMIT_S;
+            } else if (_scene.IsOver) {
+                return 0f;
+            } else {
+                return (float) (Constants.TIME_LIMIT_S - (_runtimeMs / 1000f));
+            }
+        }
+
         /// <summary>
         /// Draw Countdown at the start of the game
         /// </summary>

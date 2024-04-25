@@ -54,7 +54,9 @@ namespace TinyShopping {
         /// </summary>
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
-            _soundEffects.Add(content.Load<SoundEffect>("sounds/glass_knock"));
+            _soundEffects.Add(content.Load<SoundEffect>("sounds/beep-deep"));
+            _soundEffects.Add(content.Load<SoundEffect>("sounds/cash_register"));
+            _soundEffects.Add(content.Load<SoundEffect>("sounds/beep-extra-deep"));
             foreach (var menuItem in _menuItems) {
                 menuItem.LoadContent(content);
             }
@@ -85,14 +87,14 @@ namespace TinyShopping {
                     _submitPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
                 } else if (_submitPressed > 0) {
                     _submitPressed = 0;
-                    _soundEffects[0].Play();
+                    _soundEffects[2].Play();
                     _menuItems[_currentSelection].ApplyAction();
                 }
                 if (state.IsButtonDown(Buttons.B)) {
                     _backPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
                 } else if (_backPressed > 0) {
                     _backPressed = 0;
-                    _soundEffects[0].Play();
+                    _soundEffects[2].Play();
                     _backAction();
                 }
             } else {
@@ -114,14 +116,14 @@ namespace TinyShopping {
                     _submitPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
                 } else if (_submitPressed > 0) {
                     _submitPressed = 0;
-                    _soundEffects[0].Play();
+                    _soundEffects[1].Play();
                     _menuItems[_currentSelection].ApplyAction();
                 }
                 if (kstate.IsKeyDown(Keys.Back)) {
                     _backPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
                 } else if (_backPressed > 0) {
                     _backPressed = 0;
-                    _soundEffects[0].Play();
+                    _soundEffects[1].Play();
                     _backAction();
                 }
             }

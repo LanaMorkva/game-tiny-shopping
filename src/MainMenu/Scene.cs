@@ -1,6 +1,9 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended;
 
 namespace TinyShopping.MainMenu
@@ -19,6 +22,9 @@ namespace TinyShopping.MainMenu
 
         private Rectangle _imageRegion;
         private Rectangle _titleRegion;
+
+        private Song _backgroundSong;
+        private SoundEffectInstance _supermarketNoiseInstance;
 
         private Color _backColor = new Color(211, 237, 150);
 
@@ -54,6 +60,7 @@ namespace TinyShopping.MainMenu
             _selectMenu.AddItem(new MainMenuItem("Settings", SettingsMenu));
             _selectMenu.AddItem(new MainMenuItem("Quit", ExitGame));
             base.Initialize();
+
         }
 
         public override void LoadContent()
@@ -62,7 +69,17 @@ namespace TinyShopping.MainMenu
             _imageTexture = Content.Load<Texture2D>("main_menu/teaser");
             _titleTexture = Content.Load<Texture2D>("main_menu/game_title");
             _selectMenu.LoadContent(Content);
+            _backgroundSong = Content.Load<Song>("songs/basic_supermarket");
+            SoundEffect supermarketNoise = Content.Load<SoundEffect>("sounds/supermarket_atmosphere");
             base.LoadContent();
+            if (SettingsHandler.settings.music) {
+                MediaPlayer.Volume = 0.2f;
+            }
+            MediaPlayer.Play(_backgroundSong);
+            MediaPlayer.IsRepeating = true;
+            _supermarketNoiseInstance = supermarketNoise.CreateInstance();
+            _supermarketNoiseInstance.IsLooped = true;
+            _supermarketNoiseInstance.Play();
         }
 
         public override void Update(GameTime gameTime)
@@ -85,6 +102,14 @@ namespace TinyShopping.MainMenu
 
             _spriteBatch.End();
             base.Draw(gameTime);
+        }
+
+        public override void Terminate()
+        {
+            base.Terminate();
+            // If loop is not falsified for some reason this has a side effect for the MediaPlayer
+            _supermarketNoiseInstance.IsLooped = false;
+            _supermarketNoiseInstance.Stop(true);
         }
 
         public void StartGame()
