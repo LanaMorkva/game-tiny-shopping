@@ -8,11 +8,8 @@ namespace TinyShopping.Game {
 
         public Vector2 Position { private set; get; }
 
-        private World _world;
-
-        private int _tileSize;
-
         private Texture2D _texture;
+
         private Color _color;
 
         public int Priority { private set; get; }
@@ -38,8 +35,6 @@ namespace TinyShopping.Game {
         /// <param name="owner">The player placing the pheromone.</param>
         public Pheromone(Vector2 position, Texture2D texture, World world, int priority, int duration, int range, PheromoneType type, int owner) {
             Position = position;
-            _world = world;
-            _tileSize = (int)_world.TileWidth;
             _texture = texture;
             Priority = priority;
             Type = type;

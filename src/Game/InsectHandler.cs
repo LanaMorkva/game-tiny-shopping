@@ -81,7 +81,7 @@ namespace TinyShopping.Game {
         public Insect GetClosestEnemy(int player, Vector2 position) {
             int enemyIndex = 1 - player;
             Colony c = _colonies[enemyIndex];
-            float range = _world.TileWidth * Constants.ENEMY_VISIBILITY_RANGE;
+            float range = Constants.ENEMY_VISIBILITY_RANGE;
             return c.GetClosestToInRange(position, range);            
         }
 

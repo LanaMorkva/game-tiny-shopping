@@ -36,7 +36,7 @@ namespace TinyShopping.Game {
 
         private Texture2D _texture;
 
-        public int TextureSize { get; private set; }
+        public int TextureSize { get; private set; } // equal to Constants.ANT_TEXTURE_SIZE, can be removed
 
         private double _nextUpdateTime;
 
@@ -101,7 +101,7 @@ namespace TinyShopping.Game {
             _position = new InsectPos((int)spawn.X, (int)spawn.Y, spawnRotation);
             _texture = texture;
             _attributes = attributes;
-            TextureSize = (int)_world.TileWidth / 2;
+            TextureSize = Constants.ANT_TEXTURE_SIZE;
             Owner = owner;
             Health = attributes.maxHealth;
             _ais = new Task[] {

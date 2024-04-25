@@ -10,7 +10,7 @@ namespace TinyShopping.Game.Pathfinding {
     /// </summary>
     internal class Pathfinder {
 
-        private static readonly float RANGE = .4f;
+        private static readonly int RANGE = 25;
 
         private World _world;
 
@@ -41,7 +41,7 @@ namespace TinyShopping.Game.Pathfinding {
             _nodes.Add(startPoint, startNode);
             _queue.Add(startNode);
             _previous = new Dictionary<Point, Point>(64);
-            int delta = (int)(_world.TileWidth * RANGE);
+            int delta = RANGE;
             long minDelta = long.MaxValue;
             Node bestApprox = null;
             while (_queue.Count > 0) {
@@ -103,7 +103,7 @@ namespace TinyShopping.Game.Pathfinding {
         /// <param name="p2">The second point.</param>
         /// <returns>If p1 and p2 are close enough.</returns>
         private bool IsCloseEnough(Point p1, Point p2) {
-            int delta = (int)(_world.TileWidth * RANGE);
+            int delta = RANGE;
             return p1.SquaredDistance(p2) <= delta * delta;
         }
 
@@ -112,7 +112,7 @@ namespace TinyShopping.Game.Pathfinding {
         /// </summary>
         /// <param name="current">The current node.</param>
         private void EnqueueNeighbors(Node current) {
-            int delta = (int)(_world.TileWidth * RANGE);
+            int delta = RANGE;
             for (int dX = -1; dX <= 1; dX++) {
                 for (int dY = -1; dY <= 1; dY++) {
                     if (dX == 0 && dY == 0) {
@@ -130,10 +130,10 @@ namespace TinyShopping.Game.Pathfinding {
         /// <param name="position">The position to add.</param>
         /// <param name="current">The currently processing position.</param>
         private void TryEnqueuePosition(Point position, Node current) {
-            if (!_world.IsWalkable(position.X, position.Y, (int)(_world.TileWidth * RANGE / 2))) {
+            if (!_world.IsWalkable(position.X, position.Y, RANGE / 2)) {
                 return;
             }
-            int delta = (int)(_world.TileWidth * RANGE);
+            int delta = RANGE;
             Node node;
             bool hasNode = _nodes.TryGetValue(position, out node);
             long tentativeCost = current.Cost + delta;
