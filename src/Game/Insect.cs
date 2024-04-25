@@ -193,6 +193,9 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         private void Wander(GameTime gameTime) {
+            if (_path.Count > 0) {
+                _path = new List<PFPoint>();
+            }
             if (gameTime.TotalGameTime.TotalMilliseconds > _nextUpdateTime) {
                 _nextUpdateTime = gameTime.TotalGameTime.TotalMilliseconds + Random.Shared.Next(5000) + 500;
                 _position.TargetRotation = Random.Shared.Next(360);
