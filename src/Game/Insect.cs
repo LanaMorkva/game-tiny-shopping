@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using TinyShopping.Game.AI;
 using TinyShopping.Game.Pathfinding;
 using PFPoint = TinyShopping.Game.Pathfinding.Point;
@@ -95,8 +96,17 @@ namespace TinyShopping.Game {
 
         private Vector2 _target;
 
+        private Vector2 _lastPlacementSpot;
+
+        private PheromoneHandler _pheromoneHandler;
+
+        private bool _wasCarrying;
+
+        private int _pheromonePriority = 100;
+
         public Insect(Services services, Vector2 spawn, int spawnRotation, Texture2D texture, int owner, Attributes attributes) {
             _world = services.world;
+            _pheromoneHandler = services.handler;
             _pathFinder = new Pathfinder(_world);
             _position = new InsectPos((int)spawn.X, (int)spawn.Y, spawnRotation);
             _texture = texture;
@@ -149,10 +159,26 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
+            if (Vector2.DistanceSquared(_lastPlacementSpot, Position) > 16 * 16) {
+                if (!IsCarrying) {
+                    if (_wasCarrying) {
+                        _pheromonePriority = 100;
+                    }
+                    _pheromoneHandler.AddPheromone(Position, gameTime, PheromoneType.RETURN, Owner, _pheromonePriority--, 20000, 32);
+                    if (Owner == 0) Debug.Print("Return pheromone priority {0}", _pheromonePriority);
+                }
+                else {
+                    if (!_wasCarrying) {
+                        _pheromonePriority = 0;
+                    }
+                    _pheromoneHandler.AddPheromone(Position, gameTime, PheromoneType.DISCOVER, Owner, _pheromonePriority++, 20000, 20);
+                }
+                _lastPlacementSpot = Position;
+                _wasCarrying = IsCarrying;
+            }
             UpdateAnimationManager(gameTime);
             foreach (var ai in _ais) {
                 if (ai.Run(gameTime)) {
-                    
                     return;
                 }
             }
