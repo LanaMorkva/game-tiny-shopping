@@ -52,10 +52,6 @@ namespace TinyShopping.Game {
 
         private Buttons _newInsectButton = Buttons.Y;
 
-        private Buttons _zoomIn = Buttons.LeftTrigger;
-
-        private Buttons _zoomOut = Buttons.RightShoulder;
-
         public GamePadInput(PlayerIndex playerIndex) {
             _playerIndex = playerIndex;
         }
@@ -72,14 +68,8 @@ namespace TinyShopping.Game {
 
         public override float GetZoom() {
             GamePadState state = GamePad.GetState(_playerIndex);
-            float zoom = 0f;
-            if (state.IsButtonDown(_zoomIn)) {
-                zoom += Constants.ZOOM_SPEED;
-            }
-            if (state.IsButtonDown(_zoomOut)) {
-                zoom -= Constants.ZOOM_SPEED;
-            }
-            return zoom;
+            Vector2 motion = state.ThumbSticks.Right;
+            return motion.Y * -1 * Constants.ZOOM_SPEED;
         }
 
 
