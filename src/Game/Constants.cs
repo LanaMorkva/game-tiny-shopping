@@ -3,9 +3,19 @@
     internal class Constants {
 
         /// <summary>
-        /// How close an enemy insect must be to deal damage. Given in tiles.
+        /// The size of the ants.
         /// </summary>
-        public static readonly int FIGHT_RANGE = 1;
+        public static readonly int ANT_TEXTURE_SIZE = 32;
+
+        /// <summary>
+        /// The size of the fruits.
+        /// </summary>
+        public static readonly int FRUIT_TEXTURE_SIZE = 18;
+
+        /// <summary>
+        /// How close an enemy insect must be to deal damage.
+        /// </summary>
+        public static readonly int FIGHT_RANGE = 64;
 
         /// <summary>
         /// Attributes of ants.
@@ -18,9 +28,19 @@
         public static Attributes TERMITE_ATTRIBUTES = new Attributes { speed = 50, rotationSpeed = 200, maxHealth = 120, damage = 4 };
 
         /// <summary>
-        /// How close a fruit must be for the insect to see it. Given in tiles.
+        /// How close a fruit must be for the insect to see it.
         /// </summary>
-        public static readonly int PICKUP_RANGE = 2;
+        public static readonly int FRUIT_VISIBILITY_RANGE = 128;
+
+        /// <summary>
+        /// How close a fruit must be for the insect to pick it up.
+        /// </summary>
+        public static readonly int PICKUP_RANGE = 32;
+
+        /// <summary>
+        /// How close a drop off location has to be for the ant to drop off the carried food.
+        /// </summary>
+        public static readonly int DROP_OFF_RANGE = 64;
 
         /// <summary>
         /// The amount of fruit distributed on the map.
@@ -30,12 +50,12 @@
         /// <summary>
         /// How close an enemy insect must be for it to be visible.
         /// </summary>
-        public readonly static int ENEMY_VISIBILITY_RANGE = 2;
+        public readonly static int ENEMY_VISIBILITY_RANGE = 128;
 
         /// <summary>
-        /// The effect radius of pheromones. Given in tiles.
+        /// The effect radius of pheromones.
         /// </summary>
-        public static readonly int PHEROMONE_RANGE = 2;
+        public static readonly int PHEROMONE_RANGE = 128;
 
         /// <summary>
         /// How long a pheromone spot should exist, in miliseconds.
@@ -46,7 +66,7 @@
         /// How the length of a button press should influence the pheromone duration. The value is multiplied with the duration of the button press
         /// and added to the pheromone duration when a pheromone is placed.
         /// </summary>
-        public static readonly int PHEROMONE_RANGE_COEFFICIENT = 4;
+        public static readonly int PHEROMONE_RANGE_COEFFICIENT = 256;
 
         /// <summary>
         /// The size of the players' cursors.

@@ -41,15 +41,14 @@ namespace TinyShopping.Game {
         /// <summary>
         /// Adds a new pheromone.
         /// </summary>
-        /// <param name="rawPosition">The position of the player's cursor.</param>
+        /// <param name="position">The position of the player's cursor.</param>
         /// <param name="gameTime">The current game time.</param>
         /// <param name="type">The pheromone type to place.</param>
         /// <param name="player">The current player id, 0 or 1.</param>
         /// <param name="priority">The priority of the pheromone, given in miliseconds.</param>
         /// <param name="duration">The effect duration.</param>
         /// <param name="range">The effect range.</param>
-        public void AddPheromone(Vector2 rawPosition, GameTime gameTime, PheromoneType type, int player, int priority, int duration, int range) {
-            Vector2 position = _world.AlignPositionToGridCenter(rawPosition);
+        public void AddPheromone(Vector2 position, GameTime gameTime, PheromoneType type, int player, int priority, int duration, int range) {
             Pheromone p = new Pheromone(position, _texture, _world, priority, duration, range, type, player);
             if (type == PheromoneType.RETURN) {
                 _returnPheromones[player].Add(p);

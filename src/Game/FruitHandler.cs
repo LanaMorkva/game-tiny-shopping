@@ -29,7 +29,7 @@ namespace TinyShopping.Game {
         }
 
         private void GenerateFruits() {
-            float halfFruitSize = _world.TileWidth * 0.15f;
+            float halfFruitSize = Constants.FRUIT_TEXTURE_SIZE / 2;
             for (int i = 0; i < Constants.FRUITS_NUM; ) {
                 int tileX = Random.Shared.Next(_world.Width);
                 int tileY = Random.Shared.Next(_world.Height);
@@ -69,7 +69,7 @@ namespace TinyShopping.Game {
         /// <param name="fruit">Will be set to the closest fruit instance.</param>
         /// <returns>A vector representing the direction or null if no fruit is in range.</returns>
         public Vector2? GetDirectionToClosestFruit(Vector2 position, out Fruit fruit) {
-            int range = (int)(Constants.PICKUP_RANGE * _world.TileWidth);
+            int range = Constants.FRUIT_VISIBILITY_RANGE;
             float minDis = float.MaxValue;
             Fruit closest = null;
             foreach (var f in _fruits) {

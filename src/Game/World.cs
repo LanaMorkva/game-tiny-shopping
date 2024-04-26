@@ -1,12 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using MonoGame.Extended;
-using MonoGame.Extended.Graphics.Effects;
 using System.Collections.Generic;
 
 namespace TinyShopping.Game {
@@ -22,9 +20,6 @@ namespace TinyShopping.Game {
         };
 
         private ObstacleLayer _obstacleLayer;
-
-        public float TileWidth {get; private set;}
-        public float TileHeight {get; private set;}
         private TiledMapRenderer _tiledMapRenderer;
         private TiledMap _tiledMap;
         private TiledMapEffect _tintEffect;
@@ -44,8 +39,6 @@ namespace TinyShopping.Game {
             _tiledMap.GetLayer("Objects").Offset = new Vector2(0, -64);
             _tiledMapRenderer = new TiledMapRenderer(device, _tiledMap);
             _obstacleLayer = new ObstacleLayer(_tiledMap);
-            TileWidth = _tiledMap.TileWidth;
-            TileHeight = _tiledMap.TileHeight;
             Width = _tiledMap.Width;
             Height = _tiledMap.Height;
         }
@@ -95,18 +88,6 @@ namespace TinyShopping.Game {
         }
 
         /// <summary>
-        /// Aligns the given position to the center of the current grid tile.
-        /// </summary>
-        /// <param name="position">The position to align.</param>
-        public Vector2 AlignPositionToGridCenter(Vector2 position) {
-            int xRaw = (int) MathF.Floor((position.X) / TileWidth);
-            int yRaw = (int) MathF.Floor((position.Y) / TileHeight);
-            float x = xRaw * TileWidth + TileWidth / 2;
-            float y = yRaw * TileHeight + TileHeight / 2;
-            return new Vector2(x, y);
-        }
-
-        /// <summary>
         /// Calculates the center of the tile at given position.
         /// </summary>
         /// <param name="tileX">X coordinate of the tile.</param>
@@ -114,7 +95,7 @@ namespace TinyShopping.Game {
         /// <returns>The center of the tile in screen pixel coordinates.</returns>
         public Vector2 GetCenterOfTile(int tileX, int tileY) {
             Vector2 tile = GetTopLeftOfTile(tileX, tileY);
-            return new Vector2(tile.X + TileWidth / 2, tile.Y + TileHeight / 2);
+            return new Vector2(tile.X + _tiledMap.TileWidth / 2, tile.Y + _tiledMap.TileHeight / 2);
         } 
 
         /// <summary>
