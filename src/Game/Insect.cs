@@ -96,7 +96,7 @@ namespace TinyShopping.Game {
 
         private Vector2 _target;
 
-        private Vector2 _lastPlacementSpot;
+        private float _pheromoneCooldown;
 
         private PheromoneHandler _pheromoneHandler;
 
@@ -159,21 +159,23 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
-            if (Vector2.DistanceSquared(_lastPlacementSpot, Position) > 16 * 16) {
+            _pheromoneCooldown -= (float) gameTime.ElapsedGameTime.TotalMilliseconds;
+            if (_pheromoneCooldown <= 0) {
                 if (!IsCarrying) {
                     if (_wasCarrying) {
-                        _pheromonePriority = 100;
+                        _pheromonePriority = 300;
                     }
-                    _pheromoneHandler.AddPheromone(Position, gameTime, PheromoneType.RETURN, Owner, _pheromonePriority--, 20000, 32);
-                    if (Owner == 0) Debug.Print("Return pheromone priority {0}", _pheromonePriority);
+                    _pheromoneHandler.AddPheromone(Position, gameTime, PheromoneType.RETURN, Owner, _pheromonePriority--, 30000, 32);
+                    //if (Owner == 0) Debug.Print("Return pheromone priority {0}", _pheromonePriority);
                 }
                 else {
                     if (!_wasCarrying) {
-                        _pheromonePriority = 0;
+                        _pheromonePriority = 300;
                     }
-                    _pheromoneHandler.AddPheromone(Position, gameTime, PheromoneType.DISCOVER, Owner, _pheromonePriority++, 20000, 20);
+                    _pheromoneHandler.AddPheromone(Position, gameTime, PheromoneType.DISCOVER, Owner, _pheromonePriority--, 30000, 32);
+                    //if (Owner == 0) Debug.Print("Forward pheromone priority {0}", _pheromonePriority);
                 }
-                _lastPlacementSpot = Position;
+                _pheromoneCooldown = 250;
                 _wasCarrying = IsCarrying;
             }
             UpdateAnimationManager(gameTime);

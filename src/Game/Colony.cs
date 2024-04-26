@@ -62,7 +62,7 @@ namespace TinyShopping.Game {
         public Colony(Vector2 spawn, int spawnRotation, World world, PheromoneHandler handler, FruitHandler fruits, Vector2 dropOff, int owner, InsectHandler insectHandler, ColonyType type) {
             _spawn = spawn;
             _spawnRotation = spawnRotation;
-            _queue = 1;
+            _queue = 6;
             DropOff = dropOff;
             _owner = owner;
             _insectHandler = insectHandler;

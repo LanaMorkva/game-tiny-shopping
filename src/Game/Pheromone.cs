@@ -61,9 +61,9 @@ namespace TinyShopping.Game {
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
             Rectangle destination = new Rectangle((int)Position.X - Range, (int)Position.Y - Range, Range * 2, Range * 2);
-            float priority = (Duration + 500) / 2000;
-            int alpha = (int)(priority * 15) + 50;
-            Color updateColor = new Color(_color, alpha);
+            int alphaDuration = (int)(Duration*255 / 20000); // 0 - 255
+            int alphaPriority = (int)(Priority / 500); // 0 - 1
+            Color updateColor = new Color(_color, alphaDuration * alphaPriority);
             batch.Draw(_texture, destination, updateColor);
         }
 
