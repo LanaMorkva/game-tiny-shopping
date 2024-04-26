@@ -12,6 +12,7 @@ namespace TinyShopping.Game {
 
         private Vector2 _position;
         private Vector2 _targetPosition;
+        private int _cursorSize;
 
         private Texture2D _texture;
 
@@ -67,7 +68,7 @@ namespace TinyShopping.Game {
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
-            int size = Constants.CURSOR_SIZE;
+            int size = _cursorSize;
             Rectangle destination = new Rectangle((int)(_position.X - size / 2f), (int)(_position.Y - size / 2f), size, size);
             batch.Draw(_texture, destination, Color.White);
             int pressDuration = _discoverPressed + _fightPressed + _returnPressed;
@@ -84,18 +85,20 @@ namespace TinyShopping.Game {
         /// <param name="gameTime"></param>
         /// <param name="handler">The split screen handler to use.</param>
         public void Update(GameTime gameTime, SplitScreenHandler handler) {
-            int speed = (int)(gameTime.ElapsedGameTime.TotalSeconds * Constants.CURSOR_SPEED);
+            int speed = (int)(gameTime.ElapsedGameTime.TotalSeconds * Constants.CURSOR_SPEED / handler.GetZoomValue(_id));
             PlacePheromones(gameTime);
             UpdatePosition(speed);
             ClipCursorToWorld();
-            handler.UpdateCameraPosition(_id, _position, speed);
+            handler.UpdateCameraState(_id, _position, speed, _input.GetZoom());
+
+            _cursorSize = (int)(Constants.CURSOR_SIZE / handler.GetZoomValue(_id));
         }
 
         /// <summary>
         /// Clip the cursor position to the world.
         /// </summary>
         private void ClipCursorToWorld() {
-            int size = Constants.CURSOR_SIZE;
+            int size = _cursorSize;
             Rectangle cursor = new Rectangle((int)(_position.X - size / 2f), (int)(_position.Y - size / 2f), size, size);
             Rectangle worldRect = _world.GetWorldBoundary();
             if (cursor.X < worldRect.Left) {

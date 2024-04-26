@@ -78,6 +78,9 @@
         /// </summary>
         public static readonly int CURSOR_SPEED = 600;
 
+        public static readonly float ZOOM_MIN = 1.1f;
+        public static readonly float ZOOM_MAX = 2.5f;
+        public static readonly float ZOOM_SPEED = 0.05f;
         /// <summary>
         /// The number of seconds each game lasts.
         /// </summary>

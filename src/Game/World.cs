@@ -50,7 +50,6 @@ namespace TinyShopping.Game {
         /// <param name="destination">The destination to draw to.</param>
         /// <param name="source">The source rectangle on the texture to use.</param>
         public void DrawFloor(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
-            _tiledMapRenderer.Draw((int)LayerName.BackgroundGroup, viewMatrix, effect: _tintEffect);
             _tiledMapRenderer.Draw((int)LayerName.Floor, viewMatrix);
             _tiledMapRenderer.Draw((int)LayerName.Objects, viewMatrix);
         }
@@ -61,6 +60,7 @@ namespace TinyShopping.Game {
         /// <param name="batch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
         public void DrawObjects(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
+            _tiledMapRenderer.Draw((int)LayerName.BackgroundGroup, viewMatrix, effect: _tintEffect);
             _tiledMapRenderer.Draw((int)LayerName.Walls, viewMatrix);
             _tiledMapRenderer.Draw((int)LayerName.Objects2, viewMatrix);
         }
