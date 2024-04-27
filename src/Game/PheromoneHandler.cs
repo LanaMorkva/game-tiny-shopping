@@ -34,7 +34,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="contentManager">The content manager to use.</param>
         public void LoadContent(ContentManager contentManager) {
-            _texture = contentManager.Load<Texture2D>("pheromone");
+            _texture = contentManager.Load<Texture2D>("pheromone_particle");
             _soundEffects.Add(contentManager.Load<SoundEffect>("sounds/glass_knock"));
         }
 
@@ -81,6 +81,8 @@ namespace TinyShopping.Game {
                     p.Update(gameTime);
                     if (p.Duration > 0) {
                         relevant.Add(p);
+                    } else {
+                        p.Dispose();
                     }
                 }
                 pheromones[id] = relevant;

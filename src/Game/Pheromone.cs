@@ -1,6 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
+
+
+using MonoGame.Extended;
+using MonoGame.Extended.Particles;
+using MonoGame.Extended.Particles.Modifiers;
+using MonoGame.Extended.Particles.Modifiers.Containers;
+using MonoGame.Extended.Particles.Modifiers.Interpolators;
+using MonoGame.Extended.Particles.Profiles;
+using MonoGame.Extended.TextureAtlases;
+
 
 namespace TinyShopping.Game {
 
@@ -9,7 +20,7 @@ namespace TinyShopping.Game {
         public Vector2 Position { private set; get; }
 
         private Texture2D _texture;
-
+        private ParticleEffect _particleEffect;
         private Color _color;
 
         public int Priority { private set; get; }
@@ -52,6 +63,44 @@ namespace TinyShopping.Game {
                     _color = Color.Green;
                     break;
             }
+
+            
+            TextureRegion2D textureRegion = new TextureRegion2D(_texture);
+            _particleEffect = new ParticleEffect() {
+                Position = position,
+                Emitters = new List<ParticleEmitter> {
+                    new ParticleEmitter(textureRegion, 100, System.TimeSpan.FromMilliseconds(duration),
+                        Profile.Circle(range / 4, Profile.CircleRadiation.None)) {
+                        Parameters = new ParticleReleaseParameters {
+                            Speed = new Range<float>(0f, 70f),
+                            Quantity = 3,
+                            Scale = new Range<float>(0.1f, 0.5f),
+                            Opacity = new Range<float>(0.5f, 0.5f),
+                        },
+                        Modifiers = { new AgeModifier { Interpolators = {
+                            new ColorInterpolator {StartValue = _color.ToHsl(), EndValue = _color.ToHsl()} } },
+                            new RotationModifier {RotationRate = -2.1f},
+                            new CircleContainerModifier {Radius = range, Inside = true},
+                        }
+                    }, 
+                    new ParticleEmitter(textureRegion, 500, System.TimeSpan.FromMilliseconds(500),
+                        Profile.Ring(range, Profile.CircleRadiation.None)) {
+                        Parameters = new ParticleReleaseParameters {
+                            Speed = new Range<float>(0f, 5f),
+                            Quantity = 30,
+                            Scale = new Range<float>(0.1f, 0.5f)
+                        },
+                        Modifiers = {new AgeModifier { Interpolators = {
+                            new ColorInterpolator {StartValue = Color.DarkGray.ToHsl(), EndValue = Color.DarkGray.ToHsl()} } },
+                            new RotationModifier {RotationRate = -2.1f}}
+                    }
+                }
+            };
+        }
+
+
+        public void Dispose() {
+            _particleEffect.Dispose();
         }
 
         /// <summary>
@@ -60,11 +109,7 @@ namespace TinyShopping.Game {
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
-            Rectangle destination = new Rectangle((int)Position.X - Range, (int)Position.Y - Range, Range * 2, Range * 2);
-            float priority = (Duration + 500) / 2000;
-            int alpha = (int)(priority * 15) + 50;
-            Color updateColor = new Color(_color, alpha);
-            batch.Draw(_texture, destination, updateColor);
+            batch.Draw(_particleEffect);
         }
 
         /// <summary>
@@ -72,6 +117,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
+            _particleEffect.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             Duration -= (int) Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
         }
     }

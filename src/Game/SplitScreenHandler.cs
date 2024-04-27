@@ -121,14 +121,14 @@ namespace TinyShopping.Game {
             Matrix viewMatrix = _camera1.GetViewMatrix();
             _device.Viewport = _viewport1;
             _device.SetRenderTarget(_renderTarget1);
-            _batch.Begin(transformMatrix: viewMatrix);
+            _batch.Begin(transformMatrix: viewMatrix, blendState: BlendState.AlphaBlend);
             DrawAllGameObjects(_batch, 0, viewMatrix, gameTime);
             _batch.End();
             
             viewMatrix = _camera2.GetViewMatrix();
             _device.Viewport = _viewport2;
             _device.SetRenderTarget(_renderTarget2);
-            _batch.Begin(transformMatrix: viewMatrix);
+            _batch.Begin(transformMatrix: viewMatrix, blendState: BlendState.AlphaBlend);
             DrawAllGameObjects(_batch, 1, viewMatrix, gameTime);
             _batch.End();
 
