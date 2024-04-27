@@ -19,7 +19,8 @@ namespace TinyShopping.Game {
             Objects2,
         };
 
-        private ObstacleLayer _obstacleLayer;
+        private ObstacleLayer _obstacleLayer;      
+        public FruitHandler FruitHandler {get; private set;}
         private TiledMapRenderer _tiledMapRenderer;
         private TiledMap _tiledMap;
         private TiledMapEffect _tintEffect;
@@ -28,19 +29,26 @@ namespace TinyShopping.Game {
 
         public int Height { get; private set; }
 
+        public World() {
+            FruitHandler = new FruitHandler(this);
+        }
+
         /// <summary>
         /// Loads necessary data from disk.
         /// </summary>
         /// <param name="contentManager">The content manager of the main game.</param>
         public void LoadContent(ContentManager contentManager, GraphicsDevice device) {
-            _tintEffect = new TiledMapEffect(contentManager.Load<Effect>("shaders/TintMapEffect"));
+            //_tintEffect = new TiledMapEffect(contentManager.Load<Effect>("shaders/TintMapEffect"));
             _tiledMap = contentManager.Load<TiledMap>("map_isometric/map-angled");
             _tiledMap.GetLayer("Walls").Offset = new Vector2(0, -96);
             _tiledMap.GetLayer("Objects").Offset = new Vector2(0, -64);
             _tiledMapRenderer = new TiledMapRenderer(device, _tiledMap);
             _obstacleLayer = new ObstacleLayer(_tiledMap);
+
             Width = _tiledMap.Width;
             Height = _tiledMap.Height;
+            
+            FruitHandler.LoadContent(contentManager);
         }
 
         /// <summary>
@@ -60,9 +68,11 @@ namespace TinyShopping.Game {
         /// <param name="batch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
         public void DrawObjects(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
-            _tiledMapRenderer.Draw((int)LayerName.BackgroundGroup, viewMatrix, effect: _tintEffect);
+            _tiledMapRenderer.Draw((int)LayerName.BackgroundGroup, viewMatrix);
             _tiledMapRenderer.Draw((int)LayerName.Walls, viewMatrix);
             _tiledMapRenderer.Draw((int)LayerName.Objects2, viewMatrix);
+
+            FruitHandler.Draw(batch);
         }
 
 #if DEBUG
@@ -84,7 +94,8 @@ namespace TinyShopping.Game {
         /// <param name="range">The range to include in the check.</param>
         /// <returns>True if walkable, false otherwise.</returns>
         public bool IsWalkable(int x, int y, int range) {
-            return !_obstacleLayer.HasCollision(x, y, range);
+            var objBox = new Rectangle(x - range, y - range, 2*range, 2*range);
+            return !_obstacleLayer.HasCollision(objBox) & !FruitHandler.HasCollision(objBox);
         }
 
         /// <summary>
@@ -125,6 +136,15 @@ namespace TinyShopping.Game {
                 spawnPositions.Add(ConvertPosToScreenPosition(obj.Position));
             }
             return spawnPositions;
+        }
+
+        public List<Vector2> GetBoxPositions() {
+            TiledMapObject[] boxes = _tiledMap.GetLayer<TiledMapObjectLayer>("boxes").Objects;
+            List<Vector2> boxPositions = new List<Vector2>();
+            foreach (var obj in boxes) {
+                boxPositions.Add(ConvertPosToScreenPosition(obj.Position));
+            }
+            return boxPositions;
         }
 
         /// <summary>

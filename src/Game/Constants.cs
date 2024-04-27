@@ -48,6 +48,11 @@
         public static readonly int FRUITS_NUM = 30;
 
         /// <summary>
+        /// The half height of the box's bottom 
+        /// </summary>
+        public static readonly int BOX_BOTTOM_H = 22;
+
+        /// <summary>
         /// How close an enemy insect must be for it to be visible.
         /// </summary>
         public readonly static int ENEMY_VISIBILITY_RANGE = 128;

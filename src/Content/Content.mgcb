@@ -119,6 +119,18 @@
 /processorParam:TextureFormat=Color
 /build:main_menu/teaser.png
 
+#begin map_isometric/asset-box.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:map_isometric/asset-box.png
+
 #begin map_isometric/map-angled.tmx
 /importer:TiledMapImporter
 /processor:TiledMapProcessor
@@ -150,18 +162,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:pheromone.png
-
-#begin shaders/Macros.fxh
-/copy:shaders/Macros.fxh
-
-#begin shaders/Structures.fxh
-/copy:shaders/Structures.fxh
-
-#begin shaders/TintMapEffect.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:shaders/TintMapEffect.fx
 
 #begin sounds/cash_register.mp3
 /importer:Mp3Importer

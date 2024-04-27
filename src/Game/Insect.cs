@@ -167,23 +167,13 @@ namespace TinyShopping.Game {
             // TODO: fix idle state, fix rotation, add more rotation states
             
             bool movesLeft = _position.Rotation <= Math.PI;
-            if (movesLeft && !IsCarrying)
-            {
+            if (movesLeft && !IsCarrying) {
                 _animationManager.Update(AnimationKey.Left, gameTime);
-            }
-            else
-            if (!movesLeft && !IsCarrying)
-            {
+            } else  if (!movesLeft && !IsCarrying) {
                 _animationManager.Update(AnimationKey.Right, gameTime);
-            }
-            else
-            if (movesLeft && IsCarrying)
-            {
+            } else if (movesLeft && IsCarrying) {
                 _animationManager.Update(AnimationKey.LeftFull, gameTime);
-            }
-            else
-            if (!movesLeft && IsCarrying)
-            {
+            } else if (!movesLeft && IsCarrying) {
                 _animationManager.Update(AnimationKey.RightFull, gameTime);
             }
         }
