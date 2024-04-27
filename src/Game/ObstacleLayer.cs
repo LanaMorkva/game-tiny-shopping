@@ -36,9 +36,10 @@ namespace TinyShopping.Game {
             Polygon = new Polygon(vertices);
         }
 
-        public bool Contains(List<Vector2> corners) {
-            corners = corners.Select(v => v - Position).ToList();
-            return corners.Any(v => Polygon.Contains(v));
+        public bool Contains(Rectangle objRect) {
+            objRect.Offset(-Position);
+            List<Vector2> corners = objRect.GetCorners().Select(point => new Vector2(point.X, point.Y)).ToList();
+            return corners.Any(v => Polygon.Contains(v)) || Polygon.Vertices.Any(v => objRect.Contains(v));
         }
 
         public void Draw(SpriteBatch batch) {
@@ -85,8 +86,7 @@ namespace TinyShopping.Game {
         /// <param name="y">Center (Y) of the object that is checked</param>
         /// <param name="range">Range where collision is happening</param>
         public bool HasCollision(Rectangle objRect) {
-            List<Vector2> corners = objRect.GetCorners().Select(point => new Vector2(point.X, point.Y)).ToList();
-            return _obstacles.Any(o => o.Contains(corners));
+            return _obstacles.Any(o => o.Contains(objRect));
         }
     }
 }

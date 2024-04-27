@@ -24,7 +24,7 @@ namespace TinyShopping.Game {
 
         public abstract void Draw(SpriteBatch _);
 
-        public abstract bool Contains(List<Vector2> corners);
+        public abstract bool Contains(Rectangle objRect);
 
         public void EatFruit() {
             _health -= 1;
@@ -46,8 +46,8 @@ namespace TinyShopping.Game {
             batch.Draw(_texture, BoundingBox.ToRectangle(), Color.White);
         }
 
-        public override bool Contains(List<Vector2> corners) {
-            return corners.Any(c => BoundingBox.Contains(c));
+        public override bool Contains(Rectangle objRect) {
+            return BoundingBox.Intersects(objRect);
         }
     }
 
@@ -105,8 +105,8 @@ namespace TinyShopping.Game {
             }
         }
 
-        public override bool Contains(List<Vector2> corners) {
-            return _obstacle.Contains(corners);
+        public override bool Contains(Rectangle objRect) {
+            return _obstacle.Contains(objRect);
         }
     }
 }
