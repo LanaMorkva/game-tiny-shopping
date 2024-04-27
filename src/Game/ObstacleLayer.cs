@@ -13,11 +13,16 @@ namespace TinyShopping.Game {
         public Polygon Polygon { get; }
 
         public Obstacle(Vector2 position, Point2[] points) {
-            Position = position;
             List<Vector2> vertices = new List<Vector2>();
             foreach (Point2 point in points) {
                 vertices.Add(new Vector2(point.X, point.Y));
             }
+            Position = position;
+            Polygon = new Polygon(vertices);
+        }
+
+        public Obstacle(Vector2 position, List<Vector2> vertices) {
+            Position = position;
             Polygon = new Polygon(vertices);
         }
 
@@ -31,14 +36,20 @@ namespace TinyShopping.Game {
             Polygon = new Polygon(vertices);
         }
 
-        public bool Contains(Vector2 point) {
-            Vector2 shiftedPoint = point - Position;
-            return Polygon.Contains(shiftedPoint);
+        public bool Contains(List<Vector2> corners) {
+            corners = corners.Select(v => v - Position).ToList();
+            return corners.Any(v => Polygon.Contains(v));
+        }
+
+        public void Draw(SpriteBatch batch) {
+            if (Polygon.Vertices.Length > 0) {
+                batch.DrawPolygon(Position, Polygon, Color.Red, 2f);
+            }
         }
     }
+
     internal class ObstacleLayer {
         private List<Obstacle> _obstacles; 
-
 
         public ObstacleLayer(TiledMap tiledMap) {
             _obstacles = new List<Obstacle>();
@@ -63,11 +74,7 @@ namespace TinyShopping.Game {
         /// <param name="batch">SpriteBatch for drawing.</param>
         public void Draw(SpriteBatch batch) {
             foreach (var obstacle in _obstacles) {
-                Vector2 position = obstacle.Position;
-                Polygon polygon = obstacle.Polygon;
-                if (polygon.Vertices.Length > 0) {
-                    batch.DrawPolygon(position, polygon, Color.Red, 2f);
-                }
+                obstacle.Draw(batch);
             }
         }
 
@@ -77,17 +84,9 @@ namespace TinyShopping.Game {
         /// <param name="x">Center (X) of the object that is checked</param>
         /// <param name="y">Center (Y) of the object that is checked</param>
         /// <param name="range">Range where collision is happening</param>
-        public bool HasCollision(int x, int y, int range) {
-            Rectangle objRect = new Rectangle(x - range, y - range, 2*range, 2*range);
+        public bool HasCollision(Rectangle objRect) {
             List<Vector2> corners = objRect.GetCorners().Select(point => new Vector2(point.X, point.Y)).ToList();
-            foreach (var obstacle in _obstacles) {
-                foreach (var corner in corners) {
-                    if (obstacle.Contains(corner)) {
-                        return true;
-                    }
-                }
-            }
-            return false;
+            return _obstacles.Any(o => o.Contains(corners));
         }
     }
 }
