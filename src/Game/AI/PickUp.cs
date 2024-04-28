@@ -28,11 +28,14 @@ namespace TinyShopping.Game.AI {
             Vector2? dir = _fruits.GetDirectionToClosestFruit(Insect.Position, out Fruit closestFruit);
             if (dir != null && dir.Value.LengthSquared() <= Constants.PICKUP_RANGE * Constants.PICKUP_RANGE) {
                 Insect.IsCarrying = true;
-                _fruits.RemoveFruit(closestFruit);
+                closestFruit.EatFruit();
+                if (closestFruit.ShouldRemove) {
+                    _fruits.RemoveFruit(closestFruit);
+                }
                 return true;
             }
             if (dir != null) {
-                Insect.WalkTo(closestFruit.Position, gameTime);
+                Insect.WalkTo(closestFruit.BoundingBox.Center, gameTime);
                 return true;
             }
             return false;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using System;
 
 namespace TinyShopping.Game {
@@ -15,8 +16,6 @@ namespace TinyShopping.Game {
         private int _cursorSize;
 
         private Texture2D _texture;
-
-        private Texture2D _pheromonePreview;
 
         private int _discoverPressed;
 
@@ -59,7 +58,6 @@ namespace TinyShopping.Game {
         /// <param name="content">The content manager to use.</param>
         public void LoadContent(ContentManager content) {
             _texture = content.Load<Texture2D>("crosshair");
-            _pheromonePreview = content.Load<Texture2D>("pheromone");
         }
 
         /// <summary>
@@ -73,9 +71,8 @@ namespace TinyShopping.Game {
             batch.Draw(_texture, destination, Color.White);
             int pressDuration = _discoverPressed + _fightPressed + _returnPressed;
             if (pressDuration > 0) {
-                int previewSize = (int) (Constants.PHEROMONE_RANGE + Constants.PHEROMONE_RANGE_COEFFICIENT * pressDuration / 1000f);
-                Rectangle previewDest = new Rectangle((int)(_position.X - previewSize), (int)(_position.Y - previewSize), previewSize*2, previewSize*2);
-                batch.Draw(_pheromonePreview, previewDest, Color.White);
+                CircleF circle = new CircleF(_position, Constants.PHEROMONE_RANGE + Constants.PHEROMONE_RANGE_COEFFICIENT * pressDuration / 1000f);
+                batch.DrawCircle(circle, 100, Color.DarkGray, 3f);
             }
         }
 

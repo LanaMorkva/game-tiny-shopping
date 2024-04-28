@@ -25,8 +25,6 @@ namespace TinyShopping.Game {
 
         private PheromoneHandler _pheromoneHandler;
 
-        private FruitHandler _fruitHandler;
-
         private Player _player1;
 
         private Player _player2;
@@ -61,8 +59,7 @@ namespace TinyShopping.Game {
         public void Initialize() {
             _world = new World();
             _pheromoneHandler = new PheromoneHandler(_world);
-            _fruitHandler = new FruitHandler(_world);
-            _insectHandler = new InsectHandler(_world, _pheromoneHandler, _fruitHandler);
+            _insectHandler = new InsectHandler(_world, _pheromoneHandler, _world.FruitHandler);
             
             _camera1 = new Camera2D(_player1Area.Width, _player1Area.Height);
             _camera2 = new Camera2D(_player2Area.Width, _player2Area.Height);
@@ -81,7 +78,6 @@ namespace TinyShopping.Game {
         public void LoadContent(ContentManager content) {
             _world.LoadContent(content, _device);
             _insectHandler.LoadContent(content);
-            _fruitHandler.LoadContent(content);
             _pheromoneHandler.LoadContent(content);
             
             var spawnPositions = _world.GetSpawnPositions();
@@ -125,14 +121,14 @@ namespace TinyShopping.Game {
             Matrix viewMatrix = _camera1.GetViewMatrix();
             _device.Viewport = _viewport1;
             _device.SetRenderTarget(_renderTarget1);
-            _batch.Begin(transformMatrix: viewMatrix);
+            _batch.Begin(transformMatrix: viewMatrix, blendState: BlendState.AlphaBlend);
             DrawAllGameObjects(_batch, 0, viewMatrix, gameTime);
             _batch.End();
             
             viewMatrix = _camera2.GetViewMatrix();
             _device.Viewport = _viewport2;
             _device.SetRenderTarget(_renderTarget2);
-            _batch.Begin(transformMatrix: viewMatrix);
+            _batch.Begin(transformMatrix: viewMatrix, blendState: BlendState.AlphaBlend);
             DrawAllGameObjects(_batch, 1, viewMatrix, gameTime);
             _batch.End();
 
@@ -149,7 +145,6 @@ namespace TinyShopping.Game {
             _world.DrawFloor(batch, viewMatrix, Vector2.Zero);
             _pheromoneHandler.Draw(batch, playerId, gameTime);
             _insectHandler.Draw(batch, gameTime);
-            _fruitHandler.Draw(batch, gameTime);
 
             // need to flush sprites before rendering tiled map objects, to ensure that fruits, ants are drawn before map objects
             // this is needed, because tiled draws directly to the graphics device, while SpriteBatch draws only at the End() call
