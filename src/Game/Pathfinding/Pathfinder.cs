@@ -36,7 +36,7 @@ namespace TinyShopping.Game.Pathfinding {
             _nodes = new Dictionary<Point, Node>(64);
             _queue = new HashSet<Node>(); // TODO: Replace with min heap
             Point startPoint = new Point(start);
-            _end = new Point(end);
+            _end = FindViableEndPosition(end);
             Node startNode = new Node(startPoint, 0, startPoint.SquaredDistance(_end));
             _nodes.Add(startPoint, startNode);
             _queue.Add(startNode);
@@ -57,8 +57,33 @@ namespace TinyShopping.Game.Pathfinding {
                 }
                 EnqueueNeighbors(current);
             }
-            Debug.Print("Pathfinding finished without result. Best approx distance {0} larger than {1}", minDelta, delta);
+            bool targetWalkable = _world.IsWalkable(_end.X, _end.Y, RANGE / 2);
+            Debug.Print("Pathfinding finished without result. Best approx distance {0} larger than {1}. Target walkable: {2}", minDelta, delta, targetWalkable);
             return ConstructPath(bestApprox.Position);
+        }
+
+        /// <summary>
+        /// Finds a viable end position that is walkable.
+        /// </summary>
+        /// <param name="end">The initial end position, might be unwalkable.</param>
+        /// <returns>A position close to the initial position that is walkable.</returns>
+        private Point FindViableEndPosition(Vector2 end) {
+            int distance = RANGE;
+            while (true) {
+                for (int dX = -1; dX <= 1; dX++) {
+                    for (int dY = -1; dY <= 1; dY++) {
+                        if (dX == 0 && dY == 0) {
+                            continue;
+                        }
+                        int x = (int)end.X + dX * distance;
+                        int y = (int)end.Y + dY * distance;
+                        if (_world.IsWalkable(x, y, RANGE / 2)) {
+                            return new Point(x, y);
+                        }
+                    }
+                }
+                distance += RANGE;
+            }
         }
 
         /// <summary>
