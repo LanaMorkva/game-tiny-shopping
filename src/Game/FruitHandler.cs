@@ -62,7 +62,7 @@ namespace TinyShopping.Game {
         /// <param name="y">Center (Y) of the object that is checked</param>
         /// <param name="range">Range where collision is happening</param>
         public bool HasCollision(Rectangle objRect) {
-            return _fruits.Any(o => o.Contains(objRect));;
+            return _fruits.Any(o => o.Collides(objRect));;
         }
 
         /// <summary>
