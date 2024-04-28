@@ -9,43 +9,78 @@ using System;
 
 namespace TinyShopping.Game {
     internal class Obstacle {
-        public Vector2 Position { get; }
-        public Polygon Polygon { get; }
+
+        private List<Vector2> _normals;
+        private Polygon _polygon;
 
         public Obstacle(Vector2 position, Point2[] points) {
             List<Vector2> vertices = new List<Vector2>();
             foreach (Point2 point in points) {
                 vertices.Add(new Vector2(point.X, point.Y));
             }
-            Position = position;
-            Polygon = new Polygon(vertices);
+            SetParameters(position, vertices);
         }
 
         public Obstacle(Vector2 position, List<Vector2> vertices) {
-            Position = position;
-            Polygon = new Polygon(vertices);
+            SetParameters(position, vertices);
         }
 
         public Obstacle(Vector2 position, Size2 size) {
-            Position = position;
-            List<Vector2> vertices = new List<Vector2>();
-            vertices.Add(new Vector2(0, 0));
-            vertices.Add(new Vector2(size.Width, 0));
-            vertices.Add(new Vector2(size.Width, size.Height));
-            vertices.Add(new Vector2(0, size.Height));
-            Polygon = new Polygon(vertices);
+            Vector2[] vertices = {new(0, 0), new(size.Width, 0), new(size.Width, size.Height), new(0, size.Height)};
+            SetParameters(position, vertices.ToList());
         }
 
-        public bool Contains(Rectangle objRect) {
-            objRect.Offset(-Position);
-            List<Vector2> corners = objRect.GetCorners().Select(point => new Vector2(point.X, point.Y)).ToList();
-            return corners.Any(v => Polygon.Contains(v)) || Polygon.Vertices.Any(v => objRect.Contains(v));
+        private void SetParameters(Vector2 position, List<Vector2> vertices) {
+            vertices = vertices.Select(v => v + position).ToList();
+            _polygon = new Polygon(vertices);
+            _normals = GetNormals(_polygon);
+        }
+
+        public bool IsColliding(Polygon otherPoly) {
+            List<Vector2> axes = new List<Vector2>();
+            axes.AddRange(_normals);
+            axes.AddRange(GetNormals(otherPoly));
+
+            foreach (Vector2 axis in axes)  {
+                (float minA, float maxA) = Project(_polygon, axis);
+                (float minB, float maxB) = Project(otherPoly, axis);
+
+                if (maxA < minB || maxB < minA) {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public void Draw(SpriteBatch batch) {
-            if (Polygon.Vertices.Length > 0) {
-                batch.DrawPolygon(Position, Polygon, Color.Red, 2f);
+            batch.DrawPolygon(Vector2.Zero, _polygon, Color.Red, 2f);
+        }
+
+
+        // Helper function to find normals to every edge
+        private List<Vector2> GetNormals(Polygon polygon) {
+            List<Vector2> normals = new List<Vector2>();
+            for (int i = 0; i < polygon.Vertices.Count(); i++) {
+                Vector2 edge = polygon.Vertices[(i + 1) % polygon.Vertices.Count()] - polygon.Vertices[i];
+                Vector2 normal = new(-edge.Y, edge.X);
+                normals.Add(normal.NormalizedCopy()); 
             }
+            return normals;
+        }
+
+        // Helper function to project the polygon onto a axis
+        private (float min, float max) Project(Polygon polygon, Vector2 axis) {
+            float min = Vector2.Dot(axis, polygon.Vertices[0]);
+            float max = min;
+            for (int i = 1; i < polygon.Vertices.Count(); i++) {
+                float p = Vector2.Dot(axis, polygon.Vertices[i]);
+                if (p < min)
+                    min = p;
+                else if (p > max)
+                    max = p;
+            }
+            return (min, max);
         }
     }
 
@@ -82,11 +117,8 @@ namespace TinyShopping.Game {
         /// <summary>
         /// Checks for collisions with static obstacles
         /// </summary>
-        /// <param name="x">Center (X) of the object that is checked</param>
-        /// <param name="y">Center (Y) of the object that is checked</param>
-        /// <param name="range">Range where collision is happening</param>
-        public bool HasCollision(Rectangle objRect) {
-            return _obstacles.Any(o => o.Contains(objRect));
+        public bool HasCollision(Polygon objPolygon) {
+            return _obstacles.Any(o => o.IsColliding(objPolygon));
         }
     }
 }

@@ -146,7 +146,9 @@ namespace TinyShopping.Game.Pathfinding {
         /// <param name="position">The position to add.</param>
         /// <param name="current">The currently processing position.</param>
         private void TryEnqueuePosition(Point position, Node current) {
-            if (!_world.IsWalkable(position.X, position.Y, RANGE / 2)) {
+            Vector2 start = new(current.Position.X, current.Position.Y);
+            Vector2 end = new(position.X, position.Y);
+            if (!_world.IsWalkable(start, end, Constants.ANT_TEXTURE_SIZE)) {
                 return;
             }
             int delta = RANGE;

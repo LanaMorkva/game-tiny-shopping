@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using MonoGame.Extended;
+using MonoGame.Extended.Shapes;
 using System.Linq;
 
 namespace TinyShopping.Game {
@@ -58,10 +59,8 @@ namespace TinyShopping.Game {
         /// <summary>
         /// Checks for collisions with static obstacles
         /// </summary>
-        /// <param name="x">Center (X) of the object that is checked</param>
-        /// <param name="y">Center (Y) of the object that is checked</param>
-        /// <param name="range">Range where collision is happening</param>
-        public bool HasCollision(Rectangle objRect) {
+        /// <param name="objRect">Polygon that determines objects boundaries</param>
+        public bool HasCollision(Polygon objRect) {
             return _fruits.Any(o => o.Collides(objRect));;
         }
 
