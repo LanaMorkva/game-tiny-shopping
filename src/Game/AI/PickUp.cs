@@ -25,8 +25,14 @@ namespace TinyShopping.Game.AI {
             if (Insect.IsCarrying) {
                 return false;
             }
+            Rectangle insectBounds = new Rectangle(
+                (int) Insect.Position.X, 
+                (int) Insect.Position.Y, 
+                Insect.TextureSize + Constants.PICKUP_RANGE, 
+                Insect.TextureSize + Constants.PICKUP_RANGE
+            );
             Vector2? dir = _fruits.GetDirectionToClosestFruit(Insect.Position, out Fruit closestFruit);
-            if (dir != null && dir.Value.LengthSquared() <= Constants.PICKUP_RANGE * Constants.PICKUP_RANGE) {
+            if (dir != null && closestFruit.Contains(insectBounds)) {
                 Insect.IsCarrying = true;
                 closestFruit.EatFruit();
                 if (closestFruit.ShouldRemove) {

@@ -48,7 +48,7 @@ namespace TinyShopping.Game.Pathfinding {
                 Node current = GetNextNode();
                 long currentDistance = current.Position.SquaredDistance(_end);
                 if (currentDistance <= delta * delta) {
-                    IList<Point> path = ConstructPath(current.Position);
+                    IList<Point> path = ConstructPath(current.Position, new Point(end));
                     return path;
                 }
                 else if (currentDistance < minDelta) {
@@ -59,7 +59,7 @@ namespace TinyShopping.Game.Pathfinding {
             }
             bool targetWalkable = _world.IsWalkable(_end.X, _end.Y, RANGE / 2);
             Debug.Print("Pathfinding finished without result. Best approx distance {0} larger than {1}. Target walkable: {2}", minDelta, delta, targetWalkable);
-            return ConstructPath(bestApprox.Position);
+            return ConstructPath(bestApprox.Position, new Point(end));
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace TinyShopping.Game.Pathfinding {
         /// <param name="end">The initial end position, might be unwalkable.</param>
         /// <returns>A position close to the initial position that is walkable.</returns>
         private Point FindViableEndPosition(Vector2 end) {
-            int distance = RANGE;
+            int distance = 0;
             while (true) {
                 for (int dX = -1; dX <= 1; dX++) {
                     for (int dY = -1; dY <= 1; dY++) {
@@ -90,9 +90,11 @@ namespace TinyShopping.Game.Pathfinding {
         /// Constructs the final path from the processing results.
         /// </summary>
         /// <param name="current">The final point close to the end.</param>
+        /// <param name="actualEnd">The initially provided end position that might not be walkable.</param>
         /// <returns>The complete path.</returns>
-        private IList<Point> ConstructPath(Point current) {
+        private IList<Point> ConstructPath(Point current, Point actualEnd) {
             List<Point> path = new List<Point> {
+                actualEnd,
                 _end
             };
             while (_previous.ContainsKey(current)) {
@@ -119,17 +121,6 @@ namespace TinyShopping.Game.Pathfinding {
             }
             _queue.Remove(next);
             return next;
-        }
-
-        /// <summary>
-        /// Checks if two points are close enough.
-        /// </summary>
-        /// <param name="p1">The first point.</param>
-        /// <param name="p2">The second point.</param>
-        /// <returns>If p1 and p2 are close enough.</returns>
-        private bool IsCloseEnough(Point p1, Point p2) {
-            int delta = RANGE;
-            return p1.SquaredDistance(p2) <= delta * delta;
         }
 
         /// <summary>

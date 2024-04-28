@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace TinyShopping.Game {
 
@@ -25,6 +24,8 @@ namespace TinyShopping.Game {
         public abstract void Draw(SpriteBatch _);
 
         public abstract bool Contains(Rectangle objRect);
+
+        public abstract bool Collides(Rectangle objRect);
 
         public void EatFruit() {
             _health -= 1;
@@ -48,6 +49,10 @@ namespace TinyShopping.Game {
 
         public override bool Contains(Rectangle objRect) {
             return BoundingBox.Intersects(objRect);
+        }
+
+        public override bool Collides(Rectangle objRect) {
+            return false;
         }
     }
 
@@ -107,6 +112,10 @@ namespace TinyShopping.Game {
 
         public override bool Contains(Rectangle objRect) {
             return _obstacle.Contains(objRect);
+        }
+
+        public override bool Collides(Rectangle objRect) {
+            return Contains(objRect);
         }
     }
 }
