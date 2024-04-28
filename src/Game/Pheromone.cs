@@ -64,11 +64,11 @@ namespace TinyShopping.Game {
                     break;
             }
 
-            
-            TextureRegion2D textureRegion = new TextureRegion2D(_texture);
-            _particleEffect = new ParticleEffect() {
-                Position = position,
-                Emitters = new List<ParticleEmitter> {
+            if (Priority == 500) {
+                TextureRegion2D textureRegion = new TextureRegion2D(_texture);
+                _particleEffect = new ParticleEffect() {
+                    Position = position,
+                    Emitters = new List<ParticleEmitter> {
                     new ParticleEmitter(textureRegion, 100, System.TimeSpan.FromMilliseconds(duration),
                         Profile.Circle(range / 4, Profile.CircleRadiation.None)) {
                         Parameters = new ParticleReleaseParameters {
@@ -82,7 +82,7 @@ namespace TinyShopping.Game {
                             new RotationModifier {RotationRate = -2.1f},
                             new CircleContainerModifier {Radius = range, Inside = true},
                         }
-                    }, 
+                    },
                     new ParticleEmitter(textureRegion, 500, System.TimeSpan.FromMilliseconds(500),
                         Profile.Ring(range, Profile.CircleRadiation.None)) {
                         Parameters = new ParticleReleaseParameters {
@@ -93,14 +93,17 @@ namespace TinyShopping.Game {
                         Modifiers = {new AgeModifier { Interpolators = {
                             new ColorInterpolator {StartValue = Color.DarkGray.ToHsl(), EndValue = Color.DarkGray.ToHsl()} } },
                             new RotationModifier {RotationRate = -2.1f}}
+                        }
                     }
-                }
-            };
+                };
+            }            
         }
 
 
         public void Dispose() {
-            _particleEffect.Dispose();
+            if (_particleEffect != null) { 
+                _particleEffect.Dispose();
+            }
         }
 
         /// <summary>
@@ -109,7 +112,9 @@ namespace TinyShopping.Game {
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
-            batch.Draw(_particleEffect);
+            if (Priority == 500) {
+                batch.Draw(_particleEffect);
+            }
         }
 
         /// <summary>
@@ -117,7 +122,9 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
-            _particleEffect.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            if (_particleEffect != null) {
+                _particleEffect.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            }
             Duration -= (int) Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
         }
     }
