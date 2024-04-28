@@ -19,7 +19,7 @@ namespace TinyShopping.StartupScreen
 
         public override void LoadContent() {
             _background = Content.Load<Texture2D>("teaser");
-            _font = Content.Load<SpriteFont>("General");
+            _font = Content.Load<SpriteFont>("fonts/General");
             CalculateBackgroundPosition();
             base.LoadContent();
         }

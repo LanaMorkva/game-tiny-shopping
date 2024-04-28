@@ -18,7 +18,9 @@ namespace TinyShopping.MainMenu
         private Texture2D _imageTexture;
 
         private Rectangle _imageRegion;
-        private Rectangle _titleRegion;
+        private Vector2 _titleLocation;
+
+        private SpriteFont _font;
 
         private Color _backColor = new Color(211, 237, 150);
 
@@ -40,12 +42,11 @@ namespace TinyShopping.MainMenu
             var menuRegion = new Rectangle(menuW / 10, menuPosY, menuW, Height - menuPosY);
             var menuItemSize = new Vector2((int)(Width / 2.8), Height / 10);
 
-            _titleRegion = new Rectangle(menuW / 8, (int)(menuPosY / 1.5), menuW, menuPosY);
             _imageRegion = new Rectangle((int)(menuW / 1.5), menuPosY / 3, (int)(Width - menuW / 1.5),
                 Height - menuPosY / 3);
+            _titleLocation = new Vector2(menuW / 8, (int)(menuPosY / 3));
 
 
-            //menuLocation.Y -= _menuRegion.Y / 3;
             Vector2 centerOffset = new Vector2(0, -(menuRegion.Y / 3));
 
             _selectMenu = new MainSelectMenu(menuRegion, centerOffset, menuItemSize);
@@ -61,6 +62,7 @@ namespace TinyShopping.MainMenu
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _imageTexture = Content.Load<Texture2D>("main_menu/teaser");
             _titleTexture = Content.Load<Texture2D>("main_menu/game_title");
+            _font = Content.Load<SpriteFont>("fonts/General");
             _selectMenu.LoadContent(Content);
             base.LoadContent();
         }
@@ -80,7 +82,8 @@ namespace TinyShopping.MainMenu
             _spriteBatch.FillRectangle(backRegion, _backColor);
             // Draw menu texture
             _spriteBatch.Draw(_imageTexture, _imageRegion, new Rectangle(40, 70, 535, 390), Color.White);
-            _spriteBatch.Draw(_titleTexture, _titleRegion, Color.White);
+            // Draw title
+            _spriteBatch.DrawString(_font, "Tiny Shopping", _titleLocation, Color.Coral, 0, Vector2.Zero, 1.5f, SpriteEffects.None, 0);
             _selectMenu.Draw(_spriteBatch);
 
             _spriteBatch.End();

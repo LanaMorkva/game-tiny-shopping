@@ -24,7 +24,7 @@ namespace TinyShopping {
             _selectAction = selectAction;
         }
         public virtual void LoadContent(ContentManager content) {
-            _font = content.Load<SpriteFont>("General");
+            _font = content.Load<SpriteFont>("fonts/General");
         }
 
         public virtual void Draw(SpriteBatch batch, Rectangle itemRect) {
