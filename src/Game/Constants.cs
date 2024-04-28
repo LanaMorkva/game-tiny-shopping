@@ -50,7 +50,7 @@
         /// <summary>
         /// The half height of the box's bottom 
         /// </summary>
-        public static readonly int BOX_BOTTOM_H = 22;
+        public static readonly int BOX_BOTTOM_H = 33;
 
         /// <summary>
         /// How close an enemy insect must be for it to be visible.
