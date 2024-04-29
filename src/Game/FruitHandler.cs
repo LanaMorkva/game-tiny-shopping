@@ -83,24 +83,24 @@ namespace TinyShopping.Game {
         /// <param name="fruit">Will be set to the closest fruit instance.</param>
         /// <returns>A vector representing the direction or null if no fruit is in range.</returns>
         public Vector2? GetDirectionToClosestFruit(Vector2 position, out Fruit fruit) {
-            int range = Constants.FRUIT_VISIBILITY_RANGE;
             float minDis = float.MaxValue;
             Fruit closest = null;
             foreach (var f in _fruits) {
                 if (f.Eaten) {
                     continue;
                 }
-                float sqDis = f.BoundingBox.SquaredDistanceTo(position);
-                if (sqDis < minDis) {
+                Vector2 boxCenterDist = f.Center - position;
+                float dis = boxCenterDist.Length();
+                if (dis < minDis) {
                     closest = f;
-                    minDis = sqDis;
+                    minDis = dis;
                 }
             }
-            if (closest == null || minDis > range * range) {
+            if (closest == null || minDis > closest.VisibleRange) {
                 fruit = null;
                 return null;
             }
-            Vector2 direction = closest.BoundingBox.Center - position;
+            Vector2 direction = closest.Center - position;
             fruit = closest;
             return direction;
         }

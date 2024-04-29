@@ -12,6 +12,11 @@
         /// </summary>
         public static readonly int FRUIT_TEXTURE_SIZE = 18;
 
+         /// <summary>
+        /// The size of the fruits.
+        /// </summary>
+        public static readonly int FRUIT_BOX_TEXTURE_SIZE = 128;
+
         /// <summary>
         /// How close an enemy insect must be to deal damage.
         /// </summary>
@@ -45,7 +50,7 @@
         /// <summary>
         /// How close a fruit must be for the insect to pick it up.
         /// </summary>
-        public static readonly int PICKUP_RANGE = 24;
+        public static readonly int PICKUP_RANGE = 16;
 
         /// <summary>
         /// How close a drop off location has to be for the ant to drop off the carried food.

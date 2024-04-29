@@ -25,20 +25,21 @@ namespace TinyShopping.Game.AI {
             if (Insect.IsCarrying || (Insect.Pheromone != null && Insect.Pheromone.Type == PheromoneType.FIGHT)) {
                 return false; 
             }
+            int size = Insect.TextureSize + Constants.PICKUP_RANGE;
             Rectangle insectBounds = new Rectangle(
-                (int) Insect.Position.X, 
-                (int) Insect.Position.Y, 
-                Insect.TextureSize + Constants.PICKUP_RANGE, 
-                Insect.TextureSize + Constants.PICKUP_RANGE
+                (int) Insect.Position.X - size/2, 
+                (int) Insect.Position.Y - size/2, 
+                size, 
+                size
             );
             Vector2? dir = _fruits.GetDirectionToClosestFruit(Insect.Position, out Fruit closestFruit);
-            if (dir != null && closestFruit.Contains(insectBounds)) {
+            if (dir != null && closestFruit.ShouldPickUp(insectBounds)) {
                 Insect.IsCarrying = true;
                 closestFruit.EatFruit();
                 return true;
             }
             if (dir != null) {
-                Insect.WalkTo(closestFruit.BoundingBox.Center, Insect.Pheromone, gameTime);
+                Insect.WalkTo(closestFruit.Center, Insect.Pheromone, gameTime);
                 return true;
             }
             return false;
