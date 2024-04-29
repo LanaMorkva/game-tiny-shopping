@@ -68,5 +68,9 @@ namespace TinyShopping.Game {
             _spriteBatch.End();
             base.Draw(gameTime);
         }
+
+        public void LoadMainMenu() {
+            Game.ChangeScene(new MainMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
+        }
     }
 }
