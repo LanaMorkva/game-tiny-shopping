@@ -41,7 +41,7 @@ namespace TinyShopping.Game.AI {
                 return true;
             }
             if (dir != null) {
-                Insect.WalkTo(closestFruit.BoundingBox.Center, null, gameTime);
+                Insect.WalkTo(closestFruit.BoundingBox.Center, Insect.Pheromone, gameTime);
                 return true;
             }
             return false;

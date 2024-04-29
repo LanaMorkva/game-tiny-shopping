@@ -40,7 +40,7 @@
         /// <summary>
         /// How close a fruit must be for the insect to see it.
         /// </summary>
-        public static readonly int FRUIT_VISIBILITY_RANGE = 96;
+        public static readonly int FRUIT_VISIBILITY_RANGE = 64;
 
         /// <summary>
         /// How close a fruit must be for the insect to pick it up.
