@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
+using MonoGame.Extended.Shapes;
 using System;
 using System.Collections.Generic;
 
@@ -25,7 +26,7 @@ namespace TinyShopping.Game {
 
         public abstract bool Contains(Rectangle objRect);
 
-        public abstract bool Collides(Rectangle objRect);
+        public abstract bool Collides(Polygon objRect);
 
         public void EatFruit() {
             _health -= 1;
@@ -51,9 +52,9 @@ namespace TinyShopping.Game {
             return BoundingBox.Intersects(objRect);
         }
 
-        public override bool Collides(Rectangle objRect) {
+        public override bool Collides(Polygon objRect) {
             return false;
-        }
+        }  
     }
 
     internal class FruitBox : Fruit {
@@ -111,11 +112,11 @@ namespace TinyShopping.Game {
         }
 
         public override bool Contains(Rectangle objRect) {
-            return _obstacle.Contains(objRect);
+            return _obstacle.IsColliding(new Polygon(objRect.ToRectangleF().GetCorners()));
         }
 
-        public override bool Collides(Rectangle objRect) {
-            return Contains(objRect);
+        public override bool Collides(Polygon objRect) {
+            return _obstacle.IsColliding(objRect);
         }
     }
 }

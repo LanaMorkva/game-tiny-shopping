@@ -62,26 +62,26 @@
 /processorParam:TextureFormat=Color
 /build:crosshair.png
 
-#begin Fun.spritefont
+#begin fonts/Fun.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:Fun.spritefont
+/build:fonts/Fun.spritefont
 
-#begin FunBig.spritefont
+#begin fonts/FunBig.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:FunBig.spritefont
+/build:fonts/FunBig.spritefont
 
-#begin General.spritefont
+#begin fonts/General.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:General.spritefont
+/build:fonts/General.spritefont
 
 #begin main_menu/game_title.png
 /importer:TextureImporter

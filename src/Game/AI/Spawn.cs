@@ -26,7 +26,7 @@ namespace TinyShopping.Game.AI {
             if (World.IsWalkable((int) Insect.Position.X, (int) Insect.Position.Y, Insect.TextureSize / 2)) {
                 _didSpawn = true;
             }
-            Insect.Walk(gameTime);
+            Insect.Walk(gameTime, Insect.InsectState.Run);
             return true;
         }
     }

@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using MonoGame.Extended;
+using MonoGame.Extended.Shapes;
 using System.Collections.Generic;
 
 namespace TinyShopping.Game {
@@ -94,8 +95,26 @@ namespace TinyShopping.Game {
         /// <param name="range">The range to include in the check.</param>
         /// <returns>True if walkable, false otherwise.</returns>
         public bool IsWalkable(int x, int y, int range) {
-            var objBox = new Rectangle(x - range, y - range, 2*range, 2*range);
-            return !_obstacleLayer.HasCollision(objBox) & !FruitHandler.HasCollision(objBox);
+            Polygon objPoly = new Polygon(new RectangleF(x-range, y-range, range*2, range*2).GetCorners());
+            return !_obstacleLayer.HasCollision(objPoly) & !FruitHandler.HasCollision(objPoly);
+        }
+
+        /// <summary>
+        /// Checks if the path from position start to end of the width is walkable.
+        /// </summary>
+        /// <param name="start">The start coordinate of the path.</param>
+        /// <param name="end">The end coordinate of the path.</param>
+        /// <param name="width">The width of the path.</param>
+        /// <returns>True if walkable, false otherwise.</returns>
+        public bool IsWalkable(Point2 start, Point2 end, int width) {
+            Vector2 direction = end - start;
+            Vector2 perpendicular = new Vector2(-direction.Y, direction.X);
+            perpendicular.Normalize();
+            Vector2 offset = perpendicular * (width / 2);
+
+            Vector2[] corners = {start + offset, end + offset, end - offset, start - offset};
+            Polygon objPoly = new Polygon(corners);
+            return !_obstacleLayer.HasCollision(objPoly) & !FruitHandler.HasCollision(objPoly);
         }
 
         /// <summary>
