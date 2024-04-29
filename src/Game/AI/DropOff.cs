@@ -27,7 +27,7 @@ namespace TinyShopping.Game.AI {
                 _colony.IncreaseFruitCount();
                 return true;
             }
-            if (Insect.IsCarrying && Vector2.DistanceSquared(Insect.Position, _colony.DropOff) < Constants.PHEROMONE_RANGE * Constants.PHEROMONE_RANGE) {
+            if (Insect.IsCarrying && Vector2.DistanceSquared(Insect.Position, _colony.DropOff) < Constants.PHEROMONE_DROPOFF_RANGE * Constants.PHEROMONE_DROPOFF_RANGE) {
                 Insect.WalkTo(_colony.DropOff, null, gameTime);
                 return true;
             }

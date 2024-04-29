@@ -197,7 +197,7 @@ namespace TinyShopping.Game {
             if (_path.Count > 0) {
                 _path = new List<PFPoint>();
                 // Don't turn right after finding pheromone
-                _nextUpdateTime = gameTime.TotalGameTime.TotalMilliseconds + Random.Shared.Next(1000) + 500;
+                _nextUpdateTime += 750;
             }
             if (gameTime.TotalGameTime.TotalMilliseconds > _nextUpdateTime) {
                 _nextUpdateTime = gameTime.TotalGameTime.TotalMilliseconds + Random.Shared.Next(5000) + 500;

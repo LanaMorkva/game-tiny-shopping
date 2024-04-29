@@ -70,6 +70,11 @@
         /// <summary>
         /// The effect radius of pheromones.
         /// </summary>
+        public static readonly int PHEROMONE_DROPOFF_RANGE = 128;
+
+        /// <summary>
+        /// The effect radius of pheromones.
+        /// </summary>
         public static readonly int PHEROMONE_RANGE = 96;
 
         /// <summary>
