@@ -175,6 +175,54 @@
 /processorParam:TextureFormat=Color
 /build:pheromone.png
 
+#begin songs/basic_fast.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:songs/basic_fast.wav
+
+#begin songs/basic_supermarket.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:songs/basic_supermarket.wav
+
+#begin songs/basic_without_intro.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:songs/basic_without_intro.wav
+
+#begin songs/drama_fast.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:songs/drama_fast.wav
+
+#begin songs/drama.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:songs/drama.wav
+
+#begin sounds/beep-deep.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/beep-deep.wav
+
+#begin sounds/beep-extra-deep.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/beep-extra-deep.wav
+
+#begin sounds/beep.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/beep.wav
+
 #begin sounds/cash_register.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
@@ -204,6 +252,12 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:sounds/insect_dying.mp3
+
+#begin sounds/supermarket_atmosphere.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/supermarket_atmosphere.wav
 
 #begin stats/Ant_Icon.png
 /importer:TextureImporter

@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -47,7 +45,7 @@ namespace TinyShopping.SettingsMenu
                 Height - menuPosY / 3);
 
             _selectMenu = new SelectMenu(menuRegion, menuItemSize, LoadMainMenu);
-            _selectMenu.AddItem(new MenuItemBool("Music", NotImplementedScene, SettingsHandler.settings.music));
+            _selectMenu.AddItem(new MenuItemBool("Music", ChangeMusicSettings, SettingsHandler.settings.music));
             _selectMenu.AddItem(new MenuItemBool("Sound Effects", ChangeSoundEffectsSettings, SettingsHandler.settings.soundEffects));
             _selectMenu.AddItem(new MenuItemBool("Fullscreen", ChangeFullScreenSettings, SettingsHandler.settings.fullScreen));
             base.Initialize();
@@ -87,6 +85,10 @@ namespace TinyShopping.SettingsMenu
         public void NotImplementedScene()
         {
             // empty
+        }
+
+        public void ChangeMusicSettings() {
+            SettingsHandler.ToggleMusic();
         }
 
         public void ChangeSoundEffectsSettings() {

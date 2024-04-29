@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Text.Json;
 using Microsoft.Xna.Framework;
@@ -88,7 +87,6 @@ namespace TinyShopping {
         }
 
         public void ApplySettings(GraphicsDeviceManager graphics) {
-            // TODO: Add music and sound effects
             ApplyMusic();
             ApplySoundEffects();
             ApplyFullScreen(graphics);
