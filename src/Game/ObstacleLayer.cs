@@ -36,6 +36,7 @@ namespace TinyShopping.Game {
             _normals = GetNormals(_polygon);
         }
 
+        // Polygons should be convex
         public bool IsColliding(Polygon otherPoly) {
             List<Vector2> axes = new List<Vector2>();
             axes.AddRange(_normals);

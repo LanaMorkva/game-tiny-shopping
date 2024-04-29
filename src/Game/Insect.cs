@@ -46,6 +46,14 @@ namespace TinyShopping.Game {
 
         public bool IsCarrying { get; set; }
 
+        public enum InsectState {
+            Wander = 0, 
+            Run = 1,
+            CarryWander = 2,
+            CarryRun = 3,
+            Fight = 4
+        }
+
         public int Owner { get; private set; }
 
         public Vector2 Position {
@@ -190,23 +198,25 @@ namespace TinyShopping.Game {
                 _nextUpdateTime = gameTime.TotalGameTime.TotalMilliseconds + Random.Shared.Next(5000) + 500;
                 _position.TargetRotation = Random.Shared.Next(360);
             }
-            Walk(gameTime);
+            var state = IsCarrying ? InsectState.CarryWander : InsectState.Wander;
+            Walk(gameTime, state);
         }
 
         /// <summary>
         /// Turns towards the target and walks towards it.
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
-        public void Walk(GameTime gameTime) {
+        public void Walk(GameTime gameTime, InsectState state) {
             if (_position.IsTurning) {
                 _position.Rotate((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.rotationSpeed);
                 _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed / 3);
+                return;
             }
-            else if (IsCarrying) {
-                _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed * 3/5);
-            }
-            else {
-                _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed);
+            switch (state) {
+                case InsectState.CarryWander:
+                case InsectState.Wander: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * Constants.WANDER_SPEED); break;}
+                case InsectState.CarryRun: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed * 3/5); break;}
+                case InsectState.Run: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed); break;}
             }
         }
 
@@ -227,7 +237,8 @@ namespace TinyShopping.Game {
             }
             Vector2 nextPoint = new Vector2(_path[_pathIndex].X, _path[_pathIndex].Y);
             TargetDirection = nextPoint - Position;
-            Walk(gameTime);
+            var state = IsCarrying ? InsectState.CarryRun : InsectState.Run;
+            Walk(gameTime, state);
             if (Vector2.DistanceSquared(nextPoint, Position) < 256) {
                 _pathIndex++;
             }

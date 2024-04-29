@@ -28,14 +28,24 @@
         public static Attributes TERMITE_ATTRIBUTES = new Attributes { speed = 50, rotationSpeed = 200, maxHealth = 120, damage = 4 };
 
         /// <summary>
+        /// Speed of wandering
+        /// </summary>
+        public static readonly int WANDER_SPEED = 25;
+
+         /// <summary>
+        /// Insect price in fruits
+        /// </summary>
+        public static readonly int INSECT_PRICE = 3;
+
+        /// <summary>
         /// How close a fruit must be for the insect to see it.
         /// </summary>
-        public static readonly int FRUIT_VISIBILITY_RANGE = 128;
+        public static readonly int FRUIT_VISIBILITY_RANGE = 64;
 
         /// <summary>
         /// How close a fruit must be for the insect to pick it up.
         /// </summary>
-        public static readonly int PICKUP_RANGE = 32;
+        public static readonly int PICKUP_RANGE = 16;
 
         /// <summary>
         /// How close a drop off location has to be for the ant to drop off the carried food.
@@ -45,7 +55,7 @@
         /// <summary>
         /// The amount of fruit distributed on the map.
         /// </summary>
-        public static readonly int FRUITS_NUM = 30;
+        public static readonly int FRUITS_NUM = 15;
 
         /// <summary>
         /// The half height of the box's bottom 
@@ -55,7 +65,7 @@
         /// <summary>
         /// How close an enemy insect must be for it to be visible.
         /// </summary>
-        public readonly static int ENEMY_VISIBILITY_RANGE = 128;
+        public readonly static int ENEMY_VISIBILITY_RANGE = 64;
 
         /// <summary>
         /// The effect radius of pheromones.
