@@ -22,18 +22,24 @@ namespace TinyShopping.Game.AI {
         /// <param name="gameTime">The current game time.</param>
         /// <returns>True if any action was taken, false otherwise.</returns>
         public override bool Run(GameTime gameTime) {
-            if (Insect.IsCarrying) {
-                return false;
+            if (Insect.IsCarrying || (Insect.Pheromone != null && Insect.Pheromone.Type == PheromoneType.FIGHT)) {
+                return false; 
             }
+            int size = Insect.TextureSize + Constants.PICKUP_RANGE;
+            Rectangle insectBounds = new Rectangle(
+                (int) Insect.Position.X - size/2, 
+                (int) Insect.Position.Y - size/2, 
+                size, 
+                size
+            );
             Vector2? dir = _fruits.GetDirectionToClosestFruit(Insect.Position, out Fruit closestFruit);
-            if (dir != null && dir.Value.LengthSquared() <= (World.TileWidth * World.TileWidth) / 4) {
+            if (dir != null && closestFruit.ShouldPickUp(insectBounds)) {
                 Insect.IsCarrying = true;
-                _fruits.RemoveFruit(closestFruit);
+                closestFruit.EatFruit();
                 return true;
             }
             if (dir != null) {
-                Insect.TargetDirection = dir.Value;
-                Insect.Walk(gameTime);
+                Insect.WalkTo(closestFruit.Center, Insect.Pheromone, gameTime);
                 return true;
             }
             return false;

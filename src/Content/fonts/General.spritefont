@@ -11,13 +11,13 @@ with.
     <!--
     Modify this string to change the font that will be imported.
     -->
-    <FontName>Riffic.ttf</FontName>
+    <FontName>Disposabledroid.otf</FontName>
 
     <!--
     Size is a float value, measured in points. Modify this value to change
     the size of the font.
     -->
-    <Size>64</Size>
+    <Size>84</Size>
 
     <!--
     Spacing is a float value, measured in pixels. Modify this value to change

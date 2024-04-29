@@ -10,6 +10,8 @@ namespace TinyShopping.Game {
 
         private UIController _ui;
 
+        private SoundController _sound;
+
         private SplitScreenHandler _splitScreenHandler;
 
         private Rectangle _player1Area;
@@ -22,8 +24,8 @@ namespace TinyShopping.Game {
         public int Height {  get; private set; }
         public int Width { get; private set; }
 
-        public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game) :
-            base(content, graphics, manager, game) {
+        public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
+            base(content, graphics, manager, game, settingsHandler) {
         }
 
         public override void Initialize() {
@@ -34,6 +36,7 @@ namespace TinyShopping.Game {
             _splitScreenHandler = new SplitScreenHandler(_player1Area, _player2Area, GraphicsDevice);
             _splitScreenHandler.Initialize();
             _ui = new UIController(GraphicsDevice, _splitScreenHandler, this);
+            _sound = new SoundController(this);
             base.Initialize();
         }
 
@@ -41,6 +44,7 @@ namespace TinyShopping.Game {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _splitScreenHandler.LoadContent(Content);
             _ui.LoadContent(Content);
+            _sound.LoadContent(Content);
             base.LoadContent();
         }
 
@@ -49,6 +53,7 @@ namespace TinyShopping.Game {
                 _splitScreenHandler.Update(gameTime);
             }
             _ui.Update(gameTime);
+            _sound.Update(gameTime, _ui);
             base.Update(gameTime);
         }
 
@@ -62,6 +67,10 @@ namespace TinyShopping.Game {
             
             _spriteBatch.End();
             base.Draw(gameTime);
+        }
+
+        public void LoadMainMenu() {
+            Game.ChangeScene(new MainMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
         }
     }
 }

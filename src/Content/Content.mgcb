@@ -62,26 +62,26 @@
 /processorParam:TextureFormat=Color
 /build:crosshair.png
 
-#begin Fun.spritefont
+#begin fonts/Fun.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:Fun.spritefont
+/build:fonts/Fun.spritefont
 
-#begin FunBig.spritefont
+#begin fonts/FunBig.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:FunBig.spritefont
+/build:fonts/FunBig.spritefont
 
-#begin General.spritefont
+#begin fonts/General.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:General.spritefont
+/build:fonts/General.spritefont
 
 #begin main_menu/game_title.png
 /importer:TextureImporter
@@ -119,6 +119,30 @@
 /processorParam:TextureFormat=Color
 /build:main_menu/teaser.png
 
+#begin map_isometric/asset-box-empty.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:map_isometric/asset-box-empty.png
+
+#begin map_isometric/asset-box.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:map_isometric/asset-box.png
+
 #begin map_isometric/map-angled.tmx
 /importer:TiledMapImporter
 /processor:TiledMapProcessor
@@ -139,6 +163,18 @@
 /processor:TiledMapTilesetProcessor
 /build:map/Room_Builder_48x48.tsx
 
+#begin pheromone_particle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:pheromone_particle.png
+
 #begin pheromone.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -151,17 +187,53 @@
 /processorParam:TextureFormat=Color
 /build:pheromone.png
 
-#begin shaders/Macros.fxh
-/copy:shaders/Macros.fxh
+#begin songs/basic_fast.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:songs/basic_fast.wav
 
-#begin shaders/Structures.fxh
-/copy:shaders/Structures.fxh
+#begin songs/basic_supermarket.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:songs/basic_supermarket.wav
 
-#begin shaders/TintMapEffect.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:shaders/TintMapEffect.fx
+#begin songs/basic_without_intro.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:songs/basic_without_intro.wav
+
+#begin songs/drama_fast.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:songs/drama_fast.wav
+
+#begin songs/drama.wav
+/importer:WavImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:songs/drama.wav
+
+#begin sounds/beep-deep.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/beep-deep.wav
+
+#begin sounds/beep-extra-deep.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/beep-extra-deep.wav
+
+#begin sounds/beep.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/beep.wav
 
 #begin sounds/cash_register.mp3
 /importer:Mp3Importer
@@ -192,6 +264,12 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:sounds/insect_dying.mp3
+
+#begin sounds/supermarket_atmosphere.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sounds/supermarket_atmosphere.wav
 
 #begin stats/Ant_Icon.png
 /importer:TextureImporter
