@@ -186,8 +186,8 @@ namespace TinyShopping.Game {
 
             var pos = new Vector2(_scene.Width / 2, _scene.Height / 2);
             Vector2 origin = _fontGeneral.MeasureString(text) / 2;
-            batch.DrawString(_fontGeneral, text, pos - new Vector2(3, 3), Color.Black, 0, origin, 1.3f, SpriteEffects.None, 0);
-            batch.DrawString(_fontGeneral, text, pos, _textColor, 0, origin, 1.3f, SpriteEffects.None, 0);
+            batch.DrawString(_fontGeneral, text, pos - new Vector2(3, 3), Color.Black, 0, origin, 1.0f, SpriteEffects.None, 0);
+            batch.DrawString(_fontGeneral, text, pos, _textColor, 0, origin, 1.0f, SpriteEffects.None, 0);
         }
 
         private void DrawReturnMessage(SpriteBatch batch) {
