@@ -48,7 +48,7 @@ namespace TinyShopping.Game.Pathfinding {
                 Node current = GetNextNode();
                 long currentDistance = current.Position.SquaredDistance(_end);
                 if (currentDistance <= delta * delta) {
-                    IList<Point> path = ConstructPath(current.Position, new Point(end));
+                    IList<Point> path = ConstructPath(current.Position, _end);
                     return path;
                 }
                 else if (currentDistance < minDelta) {

@@ -40,12 +40,12 @@
         /// <summary>
         /// How close a fruit must be for the insect to see it.
         /// </summary>
-        public static readonly int FRUIT_VISIBILITY_RANGE = 64;
+        public static readonly int FRUIT_VISIBILITY_RANGE = 96;
 
         /// <summary>
         /// How close a fruit must be for the insect to pick it up.
         /// </summary>
-        public static readonly int PICKUP_RANGE = 16;
+        public static readonly int PICKUP_RANGE = 24;
 
         /// <summary>
         /// How close a drop off location has to be for the ant to drop off the carried food.
