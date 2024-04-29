@@ -35,9 +35,6 @@ namespace TinyShopping.Game.AI {
             if (dir != null && closestFruit.Contains(insectBounds)) {
                 Insect.IsCarrying = true;
                 closestFruit.EatFruit();
-                if (closestFruit.ShouldRemove) {
-                    _fruits.RemoveFruit(closestFruit);
-                }
                 return true;
             }
             if (dir != null) {

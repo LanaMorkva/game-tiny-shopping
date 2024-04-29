@@ -9,17 +9,17 @@ namespace TinyShopping.Game {
 
     internal abstract class Fruit {
         protected Vector2 Position => BoundingBox.Position;
-        public bool ShouldRemove => _health <= 0;
+        public bool Eaten => _health <= 0;
         public RectangleF BoundingBox { get; protected set; }
 
         private World _world;
 
         protected int _health;
 
-        protected Texture2D _texture;
+        protected Texture2D _fruitTexture;
         public Fruit(World world, Texture2D texture) {
             _world = world;
-            _texture = texture;
+            _fruitTexture = texture;
         }
 
         public abstract void Draw(SpriteBatch _);
@@ -45,7 +45,10 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="handler">The split screen handler to use for rendering.</param>
         public override void Draw(SpriteBatch batch) {
-            batch.Draw(_texture, BoundingBox.ToRectangle(), Color.White);
+            if (Eaten) {
+                return;
+            }
+            batch.Draw(_fruitTexture, BoundingBox.ToRectangle(), Color.White);
         }
 
         public override bool Contains(Rectangle objRect) {
@@ -61,15 +64,18 @@ namespace TinyShopping.Game {
 
         private RectangleF _sourceBox;
         private Obstacle _obstacle;
+
+        private Texture2D _emptyBoxTexture;
         private int _maxHealth = 5;
 
         private int _width;
         private int _height;
     
-        public FruitBox(Vector2 boxLeftCorner, World world, Texture2D texture) : base(world, texture) {
+        public FruitBox(Vector2 boxLeftCorner, World world, Texture2D texture, Texture2D textureEmpty) : base(world, texture) {
             _health = _maxHealth;
-            _height = _texture.Height/6;
-            _width = _texture.Width/3;
+            _height = _fruitTexture.Height/6;
+            _width = _fruitTexture.Width/3;
+            _emptyBoxTexture = textureEmpty;
             int rowNum = Random.Shared.Next(6);
             int colNum = Random.Shared.Next(3);
             _sourceBox = new RectangleF(_width * colNum, _height * rowNum, _width, _height);
@@ -95,13 +101,14 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="handler">The split screen handler to use for rendering.</param>
         public override void Draw(SpriteBatch batch) {
-            batch.Draw(_texture, BoundingBox.ToRectangle(), _sourceBox.ToRectangle(), Color.White);
+            var texture = Eaten ? _emptyBoxTexture : _fruitTexture;
+            batch.Draw(texture, BoundingBox.ToRectangle(), _sourceBox.ToRectangle(), Color.White);
 
 #if DEBUG
             _obstacle.Draw(batch);
 #endif
 
-            if (_health < _maxHealth) {
+            if (_health < _maxHealth && !Eaten) {
                 var barPos = Position.ToPoint() - new Point(0, 8);
                 var healthBar = new Rectangle(barPos, new Size((int)(BoundingBox.Width * _health / _maxHealth), 6));
                 var healthBarBound = new Rectangle(barPos, new Size((int)BoundingBox.Width, 6));

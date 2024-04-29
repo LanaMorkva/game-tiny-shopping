@@ -15,6 +15,7 @@ namespace TinyShopping.Game {
 
         private Texture2D _appleTexture;
         private Texture2D _boxAssets;
+        private Texture2D _boxEmptyAssets;
 
         private List<Fruit> _fruits;
 
@@ -30,13 +31,14 @@ namespace TinyShopping.Game {
         public void LoadContent(ContentManager content) {
             _appleTexture = content.Load<Texture2D>("apple");
             _boxAssets = content.Load<Texture2D>("map_isometric/asset-box");
+            _boxEmptyAssets = content.Load<Texture2D>("map_isometric/asset-box-empty");
             GenerateFruitBoxes();
             GenerateFruits();
         }
 
         private void GenerateFruitBoxes() {
             foreach (var bottomLeftPos in _world.GetBoxPositions()) {
-                _fruits.Add(new FruitBox(bottomLeftPos, _world, _boxAssets));
+                _fruits.Add(new FruitBox(bottomLeftPos, _world, _boxAssets, _boxEmptyAssets));
             }
         }
         
@@ -75,14 +77,6 @@ namespace TinyShopping.Game {
         }
 
         /// <summary>
-        /// Removes the given fruit.
-        /// </summary>
-        /// <param name="fruit">The fruit to remove.</param>
-        public void RemoveFruit(Fruit fruit) {
-            _fruits.Remove(fruit);
-        }
-
-        /// <summary>
         /// Gets the direction to the closest fruit in range.
         /// </summary>
         /// <param name="position">The position to compare to.</param>
@@ -93,6 +87,9 @@ namespace TinyShopping.Game {
             float minDis = float.MaxValue;
             Fruit closest = null;
             foreach (var f in _fruits) {
+                if (f.Eaten) {
+                    continue;
+                }
                 float sqDis = f.BoundingBox.SquaredDistanceTo(position);
                 if (sqDis < minDis) {
                     closest = f;
