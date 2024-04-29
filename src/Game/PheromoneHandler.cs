@@ -34,21 +34,22 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="contentManager">The content manager to use.</param>
         public void LoadContent(ContentManager contentManager) {
-            _texture = contentManager.Load<Texture2D>("pheromone");
+            _texture = contentManager.Load<Texture2D>("pheromone_particle");
             _soundEffects.Add(contentManager.Load<SoundEffect>("sounds/glass_knock"));
         }
 
         /// <summary>
         /// Adds a new pheromone.
         /// </summary>
-        /// <param name="rawPosition">The position of the player's cursor.</param>
+        /// <param name="position">The position of the player's cursor.</param>
         /// <param name="gameTime">The current game time.</param>
         /// <param name="type">The pheromone type to place.</param>
         /// <param name="player">The current player id, 0 or 1.</param>
         /// <param name="priority">The priority of the pheromone, given in miliseconds.</param>
-        public void AddPheromone(Vector2 rawPosition, GameTime gameTime, PheromoneType type, int player, int priority) {
-            Vector2 position = _world.AlignPositionToGridCenter(rawPosition);
-            Pheromone p = new Pheromone(position, _texture, _world, priority, type, player);
+        /// <param name="duration">The effect duration.</param>
+        /// <param name="range">The effect range.</param>
+        public void AddPheromone(Vector2 position, GameTime gameTime, PheromoneType type, int player, int priority, int duration, int range) {
+            Pheromone p = new Pheromone(position, _texture, _world, priority, duration, range, type, player);
             if (type == PheromoneType.RETURN) {
                 _returnPheromones[player].Add(p);
             }
@@ -78,8 +79,10 @@ namespace TinyShopping.Game {
                 List<Pheromone> relevant = new List<Pheromone>(pheromones[id].Count);
                 foreach (var p in pheromones[id]) {
                     p.Update(gameTime);
-                    if (p.Priority > 0) {
+                    if (p.Duration > 0) {
                         relevant.Add(p);
+                    } else {
+                        p.Dispose();
                     }
                 }
                 pheromones[id] = relevant;
@@ -142,7 +145,7 @@ namespace TinyShopping.Game {
                     continue;
                 }
                 float sqDis = Vector2.DistanceSquared(position, p.Position);
-                int range = p.PheromoneRange;
+                int range = p.Range;
                 if (sqDis < range * range) {
                     closest = p;
                     maxPrio = p.Priority;

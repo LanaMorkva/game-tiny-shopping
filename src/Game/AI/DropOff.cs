@@ -22,12 +22,16 @@ namespace TinyShopping.Game.AI {
         /// <param name="gameTime">The current game time.</param>
         /// <returns>True if any action was taken, false otherwise.</returns>
         public override bool Run(GameTime gameTime) {
-            if (!Insect.IsCarrying || Vector2.DistanceSquared(Insect.Position, _colony.DropOff) > World.TileWidth * World.TileWidth) {
-                return false;
+            if (Insect.IsCarrying && Vector2.DistanceSquared(Insect.Position, _colony.DropOff) < Constants.DROP_OFF_RANGE * Constants.DROP_OFF_RANGE) {
+                Insect.IsCarrying = false;
+                _colony.IncreaseFruitCount();
+                return true;
             }
-            Insect.IsCarrying = false;
-            _colony.IncreaseFruitCount();
-            return true;
+            if (Insect.IsCarrying && Vector2.DistanceSquared(Insect.Position, _colony.DropOff) < Constants.PHEROMONE_RANGE * Constants.PHEROMONE_RANGE) {
+                Insect.WalkTo(_colony.DropOff, null, gameTime);
+                return true;
+            }
+            return false;
         }
     }
 }

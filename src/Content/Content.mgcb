@@ -62,26 +62,26 @@
 /processorParam:TextureFormat=Color
 /build:crosshair.png
 
-#begin Fun.spritefont
+#begin fonts/Fun.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:Fun.spritefont
+/build:fonts/Fun.spritefont
 
-#begin FunBig.spritefont
+#begin fonts/FunBig.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:FunBig.spritefont
+/build:fonts/FunBig.spritefont
 
-#begin General.spritefont
+#begin fonts/General.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
 /processorParam:PremultiplyAlpha=True
 /processorParam:TextureFormat=Compressed
-/build:General.spritefont
+/build:fonts/General.spritefont
 
 #begin main_menu/game_title.png
 /importer:TextureImporter
@@ -119,6 +119,18 @@
 /processorParam:TextureFormat=Color
 /build:main_menu/teaser.png
 
+#begin map_isometric/asset-box.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:map_isometric/asset-box.png
+
 #begin map_isometric/map-angled.tmx
 /importer:TiledMapImporter
 /processor:TiledMapProcessor
@@ -139,6 +151,18 @@
 /processor:TiledMapTilesetProcessor
 /build:map/Room_Builder_48x48.tsx
 
+#begin pheromone_particle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:pheromone_particle.png
+
 #begin pheromone.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -150,18 +174,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:pheromone.png
-
-#begin shaders/Macros.fxh
-/copy:shaders/Macros.fxh
-
-#begin shaders/Structures.fxh
-/copy:shaders/Structures.fxh
-
-#begin shaders/TintMapEffect.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:shaders/TintMapEffect.fx
 
 #begin songs/basic_fast.wav
 /importer:WavImporter

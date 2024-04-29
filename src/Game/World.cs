@@ -1,12 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
 using MonoGame.Extended;
-using MonoGame.Extended.Graphics.Effects;
+using MonoGame.Extended.Shapes;
 using System.Collections.Generic;
 
 namespace TinyShopping.Game {
@@ -21,10 +20,8 @@ namespace TinyShopping.Game {
             Objects2,
         };
 
-        private ObstacleLayer _obstacleLayer;
-
-        public float TileWidth {get; private set;}
-        public float TileHeight {get; private set;}
+        private ObstacleLayer _obstacleLayer;      
+        public FruitHandler FruitHandler {get; private set;}
         private TiledMapRenderer _tiledMapRenderer;
         private TiledMap _tiledMap;
         private TiledMapEffect _tintEffect;
@@ -33,21 +30,26 @@ namespace TinyShopping.Game {
 
         public int Height { get; private set; }
 
+        public World() {
+            FruitHandler = new FruitHandler(this);
+        }
+
         /// <summary>
         /// Loads necessary data from disk.
         /// </summary>
         /// <param name="contentManager">The content manager of the main game.</param>
         public void LoadContent(ContentManager contentManager, GraphicsDevice device) {
-            _tintEffect = new TiledMapEffect(contentManager.Load<Effect>("shaders/TintMapEffect"));
+            //_tintEffect = new TiledMapEffect(contentManager.Load<Effect>("shaders/TintMapEffect"));
             _tiledMap = contentManager.Load<TiledMap>("map_isometric/map-angled");
             _tiledMap.GetLayer("Walls").Offset = new Vector2(0, -96);
             _tiledMap.GetLayer("Objects").Offset = new Vector2(0, -64);
             _tiledMapRenderer = new TiledMapRenderer(device, _tiledMap);
             _obstacleLayer = new ObstacleLayer(_tiledMap);
-            TileWidth = _tiledMap.TileWidth;
-            TileHeight = _tiledMap.TileHeight;
+
             Width = _tiledMap.Width;
             Height = _tiledMap.Height;
+            
+            FruitHandler.LoadContent(contentManager);
         }
 
         /// <summary>
@@ -57,7 +59,6 @@ namespace TinyShopping.Game {
         /// <param name="destination">The destination to draw to.</param>
         /// <param name="source">The source rectangle on the texture to use.</param>
         public void DrawFloor(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
-            _tiledMapRenderer.Draw((int)LayerName.BackgroundGroup, viewMatrix, effect: _tintEffect);
             _tiledMapRenderer.Draw((int)LayerName.Floor, viewMatrix);
             _tiledMapRenderer.Draw((int)LayerName.Objects, viewMatrix);
         }
@@ -68,8 +69,11 @@ namespace TinyShopping.Game {
         /// <param name="batch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
         public void DrawObjects(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
+            _tiledMapRenderer.Draw((int)LayerName.BackgroundGroup, viewMatrix);
             _tiledMapRenderer.Draw((int)LayerName.Walls, viewMatrix);
             _tiledMapRenderer.Draw((int)LayerName.Objects2, viewMatrix);
+
+            FruitHandler.Draw(batch);
         }
 
 #if DEBUG
@@ -91,19 +95,26 @@ namespace TinyShopping.Game {
         /// <param name="range">The range to include in the check.</param>
         /// <returns>True if walkable, false otherwise.</returns>
         public bool IsWalkable(int x, int y, int range) {
-            return !_obstacleLayer.HasCollision(x, y, range);
+            Polygon objPoly = new Polygon(new RectangleF(x-range, y-range, range*2, range*2).GetCorners());
+            return !_obstacleLayer.HasCollision(objPoly) & !FruitHandler.HasCollision(objPoly);
         }
 
         /// <summary>
-        /// Aligns the given position to the center of the current grid tile.
+        /// Checks if the path from position start to end of the width is walkable.
         /// </summary>
-        /// <param name="position">The position to align.</param>
-        public Vector2 AlignPositionToGridCenter(Vector2 position) {
-            int xRaw = (int) MathF.Floor((position.X) / TileWidth);
-            int yRaw = (int) MathF.Floor((position.Y) / TileHeight);
-            float x = xRaw * TileWidth + TileWidth / 2;
-            float y = yRaw * TileHeight + TileHeight / 2;
-            return new Vector2(x, y);
+        /// <param name="start">The start coordinate of the path.</param>
+        /// <param name="end">The end coordinate of the path.</param>
+        /// <param name="width">The width of the path.</param>
+        /// <returns>True if walkable, false otherwise.</returns>
+        public bool IsWalkable(Point2 start, Point2 end, int width) {
+            Vector2 direction = end - start;
+            Vector2 perpendicular = new Vector2(-direction.Y, direction.X);
+            perpendicular.Normalize();
+            Vector2 offset = perpendicular * (width / 2);
+
+            Vector2[] corners = {start + offset, end + offset, end - offset, start - offset};
+            Polygon objPoly = new Polygon(corners);
+            return !_obstacleLayer.HasCollision(objPoly) & !FruitHandler.HasCollision(objPoly);
         }
 
         /// <summary>
@@ -114,7 +125,7 @@ namespace TinyShopping.Game {
         /// <returns>The center of the tile in screen pixel coordinates.</returns>
         public Vector2 GetCenterOfTile(int tileX, int tileY) {
             Vector2 tile = GetTopLeftOfTile(tileX, tileY);
-            return new Vector2(tile.X + TileWidth / 2, tile.Y + TileHeight / 2);
+            return new Vector2(tile.X + _tiledMap.TileWidth / 2, tile.Y + _tiledMap.TileHeight / 2);
         } 
 
         /// <summary>
@@ -144,6 +155,15 @@ namespace TinyShopping.Game {
                 spawnPositions.Add(ConvertPosToScreenPosition(obj.Position));
             }
             return spawnPositions;
+        }
+
+        public List<Vector2> GetBoxPositions() {
+            TiledMapObject[] boxes = _tiledMap.GetLayer<TiledMapObjectLayer>("boxes").Objects;
+            List<Vector2> boxPositions = new List<Vector2>();
+            foreach (var obj in boxes) {
+                boxPositions.Add(ConvertPosToScreenPosition(obj.Position));
+            }
+            return boxPositions;
         }
 
         /// <summary>

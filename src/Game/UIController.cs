@@ -49,9 +49,9 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
-            _font = content.Load<SpriteFont>("Fun");
-            _fontBig = content.Load<SpriteFont>("FunBig");
-            _fontGeneral = content.Load<SpriteFont>("General");
+            _font = content.Load<SpriteFont>("fonts/Fun");
+            _fontBig = content.Load<SpriteFont>("fonts/FunBig");
+            _fontGeneral = content.Load<SpriteFont>("fonts/General");
 
             _appleTexture = content.Load<Texture2D>("stats/apple");
             _circleTexture = content.Load<Texture2D>("stats/circle");

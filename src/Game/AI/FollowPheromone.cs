@@ -36,33 +36,31 @@ namespace TinyShopping.Game.AI {
 
         private bool HandleReturnPheromone(GameTime gameTime) {
             Pheromone p = _handler.GetReturnPheromone(Insect.Position, Insect.Owner);
-            if (p == null) {
+            if (p == null || p == Insect.Pheromone) {
                 return false;
             }
-            Insect.TargetDirection = p.Position - Insect.Position;
-            Insect.Walk(gameTime);
+            Insect.WalkTo(p.Position, p, gameTime);
             return true;
 
         }
 
         private bool HandleForwardPheromones(GameTime gameTime) {
             Pheromone p = _handler.GetForwardPheromone(Insect.Position, Insect.Owner);
-            if (p == null) {
+            if (p == null || p == Insect.Pheromone) {
                 return false;
             }
-            Vector2 direction = p.Position - Insect.Position;
+            Vector2 target = p.Position;
             if (p.Type == PheromoneType.FIGHT) {
                 Insect enemy = _colony.GetClosestEnemy(Insect.Position);
                 if (enemy != null) {
-                    direction = enemy.Position - Insect.Position;
-                    float fightRange = World.TileWidth * Constants.FIGHT_RANGE;
+                    target = enemy.Position;
+                    float fightRange = Constants.FIGHT_RANGE;
                     if (Vector2.DistanceSquared(enemy.Position, Insect.Position) < fightRange * fightRange) {
                         enemy.TakeDamage(Insect.Damage);
                     }
                 }
             }
-            Insect.TargetDirection = direction;
-            Insect.Walk(gameTime);
+            Insect.WalkTo(target, p, gameTime);
             return true;
         }
     }

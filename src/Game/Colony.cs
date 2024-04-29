@@ -148,10 +148,10 @@ namespace TinyShopping.Game {
         /// Trades a collected fruit for a new insect.
         /// </summary>
         public void BuyNewInsect() {
-            if (_collectedFruit <= 0) {
+            if (_collectedFruit < Constants.INSECT_PRICE) {
                 return;
             }
-            _collectedFruit -= 1;
+            _collectedFruit -= Constants.INSECT_PRICE;
             _queue += 1;
         }
 
