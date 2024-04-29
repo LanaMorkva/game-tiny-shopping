@@ -115,6 +115,11 @@ namespace TinyShopping.Game {
             if (Priority == 500) {
                 batch.Draw(_particleEffect);
             }
+            else {
+                Rectangle r = new Rectangle((int) Position.X - 16, (int) Position.Y - 16, 32, 32);
+                Color c = new Color(_color, 0.05f);
+                batch.Draw(_texture, r, c);
+            }
         }
 
         /// <summary>

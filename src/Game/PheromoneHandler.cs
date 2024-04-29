@@ -56,7 +56,9 @@ namespace TinyShopping.Game {
             else {
                 _pheromones[player].Add(p);
             }
-            _soundEffects[0].Play();
+            if (priority == 500) {
+                _soundEffects[0].Play();
+            }
         }
 
         /// <summary>
