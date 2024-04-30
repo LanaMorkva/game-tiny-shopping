@@ -169,17 +169,12 @@ namespace TinyShopping.Game {
         public void Update(GameTime gameTime) {
             _pheromoneCooldown -= (float) gameTime.ElapsedGameTime.TotalMilliseconds;
             if (_pheromoneCooldown <= 0) {
-                if (!IsCarrying) {
-                    if (_wasCarrying) {
-                        _pheromonePriority = 300;
-                    }
-                    _pheromoneHandler.AddPheromone(Position, gameTime, PheromoneType.RETURN, Owner, _pheromonePriority--, 30000, 32, false);
+                if (IsCarrying != _wasCarrying) {
+                    _pheromonePriority = Constants.TRAIL_PHEROMONE_START_PRIORITY;
                 }
-                else {
-                    if (!_wasCarrying) {
-                        _pheromonePriority = 300;
-                    }
-                    _pheromoneHandler.AddPheromone(Position, gameTime, PheromoneType.DISCOVER, Owner, _pheromonePriority--, 30000, 32, false);
+                PheromoneType type = IsCarrying ? PheromoneType.DISCOVER : PheromoneType.RETURN;
+                if (_pheromonePriority > 0) {
+                    _pheromoneHandler.AddPheromone(Position, gameTime, type, Owner, _pheromonePriority--, 30000, 32, false);
                 }
                 _pheromoneCooldown = 250;
                 _wasCarrying = IsCarrying;

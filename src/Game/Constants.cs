@@ -106,9 +106,12 @@
         public static readonly float ZOOM_MIN = 1.1f;
         public static readonly float ZOOM_MAX = 2.5f;
         public static readonly float ZOOM_SPEED = 0.05f;
+
         /// <summary>
         /// The number of seconds each game lasts.
         /// </summary>
         public static readonly int TIME_LIMIT_S = 5 * 60;
+
+        public static readonly int TRAIL_PHEROMONE_START_PRIORITY = 400;
     }
 }
