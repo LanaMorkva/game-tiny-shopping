@@ -50,11 +50,12 @@ namespace TinyShopping.Game {
         /// <param name="priority">The priority of the pheromone, given in miliseconds.</param>
         /// <param name="duration">The effect duration.</param>
         /// <param name="range">The effect range.</param>
-        public void AddPheromone(Vector2 position, GameTime gameTime, PheromoneType type, int player, int priority, int duration, int range) {
-            Pheromone p = new Pheromone(position, _texture, priority, duration, range, type, player);
+        /// <param name="isPlayer">If the pheromone is placed by a player.</param>
+        public void AddPheromone(Vector2 position, GameTime gameTime, PheromoneType type, int player, int priority, int duration, int range, bool isPlayer) {
+            Pheromone p = new Pheromone(position, _texture, priority, duration, range, type, player, isPlayer);
             
             Pheromone closest = GetClosestPheromone(position, player, 100, type);
-            if (closest != null) {
+            if (isPlayer && closest != null) {
                 closest.Dispose();
                 if (type == PheromoneType.RETURN) {
                     _returnPheromones[player].Remove(closest);
@@ -70,7 +71,7 @@ namespace TinyShopping.Game {
             else {
                 _pheromones[player].Add(p);
             }
-            if (priority == 500) {
+            if (isPlayer) {
                 _soundEffects[0].Play();
             }
         }

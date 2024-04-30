@@ -37,6 +37,8 @@ namespace TinyShopping.Game {
 
         public int Owner { private set; get; }
 
+        public bool IsPlayer { private set; get; }
+
         /// <summary>
         /// Creates a new pheromone spot.
         /// </summary>
@@ -47,7 +49,8 @@ namespace TinyShopping.Game {
         /// <param name="range">The pheromone effect range.</param>
         /// <param name="type">The pheromone type.</param>
         /// <param name="owner">The player placing the pheromone.</param>
-        public Pheromone(Vector2 position, Texture2D texture, int priority, int duration, int range, PheromoneType type, int owner) {
+        /// <param name="isPlayer">If the pheromone is placed by a player.</param>
+        public Pheromone(Vector2 position, Texture2D texture, int priority, int duration, int range, PheromoneType type, int owner, bool isPlayer) {
             Position = position;
             _texture = texture;
             Priority = priority;
@@ -55,6 +58,7 @@ namespace TinyShopping.Game {
             Owner = owner;
             Range = range;
             Duration = duration;
+            IsPlayer = isPlayer;
             switch (type) {
                 case PheromoneType.RETURN:
                     _color = Color.Blue;
@@ -66,7 +70,18 @@ namespace TinyShopping.Game {
                     _color = Color.Green;
                     break;
             }
-            
+            if (isPlayer) {
+                CreateParticleEffects(position, duration, range);
+            }
+        }
+
+        /// <summary>
+        /// Creates the particle effects.
+        /// </summary>
+        /// <param name="position">The position to use.</param>
+        /// <param name="duration">The duration of the pheromone.</param>
+        /// <param name="range">The pheromone effect range.</param>
+        private void CreateParticleEffects(Vector2 position, int duration, int range) {
             TextureRegion2D textureRegion = new TextureRegion2D(_texture);
             _particleEffect = new ParticleEffect() {
                 Position = position,
@@ -84,7 +99,7 @@ namespace TinyShopping.Game {
                             new RotationModifier {RotationRate = -2.1f},
                             new CircleContainerModifier {Radius = 10, Inside = true},
                         }
-                    }, 
+                    },
                     new ParticleEmitter(textureRegion, 500, System.TimeSpan.FromSeconds(1),
                         Profile.Ring(range, Profile.CircleRadiation.None)) {
                         Parameters = new ParticleReleaseParameters {
@@ -136,8 +151,10 @@ namespace TinyShopping.Game {
         /// Unload all resources that were not loaded via ContentManager
         /// </summary>
         public void Dispose() {
-            _particleEffect.Dispose();
-            _trailEffect.Dispose();
+            if (IsPlayer) {
+                _particleEffect.Dispose();
+                _trailEffect.Dispose();
+            }
         }
 
         /// <summary>
@@ -146,6 +163,13 @@ namespace TinyShopping.Game {
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
+            if (!IsPlayer) {
+                int size = 20;
+                Rectangle r = new Rectangle((int)Position.X - size / 2, (int)Position.Y - size / 2, size, size);
+                Color c = new Color(_color, 0.05f);
+                batch.Draw(_texture, r, c);
+                return;
+            }
             foreach(var path in _antPaths) {
                 if (path.Value.Count == 0) {
                     continue;
@@ -169,8 +193,10 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
-            _particleEffect.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-            _trailEffect.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            if (IsPlayer) {
+                _particleEffect.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+                _trailEffect.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            }
             Duration -= (int) Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
         }
     }

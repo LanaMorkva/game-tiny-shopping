@@ -173,15 +173,13 @@ namespace TinyShopping.Game {
                     if (_wasCarrying) {
                         _pheromonePriority = 300;
                     }
-                    _pheromoneHandler.AddPheromone(Position, gameTime, PheromoneType.RETURN, Owner, _pheromonePriority--, 30000, 32);
-                    //if (Owner == 0) Debug.Print("Return pheromone priority {0}", _pheromonePriority);
+                    _pheromoneHandler.AddPheromone(Position, gameTime, PheromoneType.RETURN, Owner, _pheromonePriority--, 30000, 32, false);
                 }
                 else {
                     if (!_wasCarrying) {
                         _pheromonePriority = 300;
                     }
-                    _pheromoneHandler.AddPheromone(Position, gameTime, PheromoneType.DISCOVER, Owner, _pheromonePriority--, 30000, 32);
-                    //if (Owner == 0) Debug.Print("Forward pheromone priority {0}", _pheromonePriority);
+                    _pheromoneHandler.AddPheromone(Position, gameTime, PheromoneType.DISCOVER, Owner, _pheromonePriority--, 30000, 32, false);
                 }
                 _pheromoneCooldown = 250;
                 _wasCarrying = IsCarrying;
