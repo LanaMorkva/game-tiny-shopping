@@ -33,7 +33,7 @@ namespace TinyShopping.Game.Pathfinding {
         /// <param name="start">The start position.</param>
         /// <param name="end">The end position.</param>
         /// <returns>A list of points leading to the end position.</returns>
-        public IList<Point> FindPath(Vector2 start, Vector2 end) {
+        public List<Point> FindPath(Vector2 start, Vector2 end) {
             _nodes = new Dictionary<Point, Node>(64);
             _queue = new HashSet<Node>(); // TODO: Replace with min heap
             Point startPoint = new Point(start);
@@ -49,7 +49,7 @@ namespace TinyShopping.Game.Pathfinding {
                 Node current = GetNextNode();
                 long currentDistance = current.Position.SquaredDistance(_end);
                 if (currentDistance <= delta * delta) {
-                    IList<Point> path = ConstructPath(current.Position, _end);
+                    List<Point> path = ConstructPath(current.Position, _end);
                     return path;
                 }
                 else if (currentDistance < minDelta) {
@@ -86,7 +86,7 @@ namespace TinyShopping.Game.Pathfinding {
         /// <param name="current">The final point close to the end.</param>
         /// <param name="actualEnd">The initially provided end position that might not be walkable.</param>
         /// <returns>The complete path.</returns>
-        private IList<Point> ConstructPath(Point current, Point actualEnd) {
+        private List<Point> ConstructPath(Point current, Point actualEnd) {
             List<Point> path = new List<Point> {
                 actualEnd,
                 _end

@@ -12,6 +12,7 @@ using MonoGame.Extended.Particles.Modifiers.Interpolators;
 using MonoGame.Extended.Particles.Profiles;
 using MonoGame.Extended.TextureAtlases;
 
+using PFPoint = TinyShopping.Game.Pathfinding.Point;
 
 namespace TinyShopping.Game {
 
@@ -21,7 +22,10 @@ namespace TinyShopping.Game {
 
         private Texture2D _texture;
         private ParticleEffect _particleEffect;
+        private ParticleEffect _trailEffect;
         private Color _color;
+
+        private Dictionary<int, List<PFPoint>> _antPaths = new  Dictionary<int, List<PFPoint>>();
 
         public int Priority { private set; get; }
 
@@ -38,13 +42,12 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="position">The position to use.</param>
         /// <param name="texture">The texture to draw.</param>
-        /// <param name="world">The world to exist in.</param>
         /// <param name="priority">The priority.</param>
         /// <param name="duration">The duration of the pheromone. This will decrease for each passing milisecond.</param>
         /// <param name="range">The pheromone effect range.</param>
         /// <param name="type">The pheromone type.</param>
         /// <param name="owner">The player placing the pheromone.</param>
-        public Pheromone(Vector2 position, Texture2D texture, World world, int priority, int duration, int range, PheromoneType type, int owner) {
+        public Pheromone(Vector2 position, Texture2D texture, int priority, int duration, int range, PheromoneType type, int owner) {
             Position = position;
             _texture = texture;
             Priority = priority;
@@ -63,16 +66,15 @@ namespace TinyShopping.Game {
                     _color = Color.Green;
                     break;
             }
-
             
             TextureRegion2D textureRegion = new TextureRegion2D(_texture);
             _particleEffect = new ParticleEffect() {
                 Position = position,
                 Emitters = new List<ParticleEmitter> {
                     new ParticleEmitter(textureRegion, 100, System.TimeSpan.FromMilliseconds(duration),
-                        Profile.Circle(range / 4, Profile.CircleRadiation.None)) {
+                        Profile.Circle(10, Profile.CircleRadiation.None)) {
                         Parameters = new ParticleReleaseParameters {
-                            Speed = new Range<float>(0f, 70f),
+                            Speed = new Range<float>(0f, 10f),
                             Quantity = 3,
                             Scale = new Range<float>(0.1f, 0.5f),
                             Opacity = new Range<float>(0.5f, 0.5f),
@@ -80,15 +82,15 @@ namespace TinyShopping.Game {
                         Modifiers = { new AgeModifier { Interpolators = {
                             new ColorInterpolator {StartValue = _color.ToHsl(), EndValue = _color.ToHsl()} } },
                             new RotationModifier {RotationRate = -2.1f},
-                            new CircleContainerModifier {Radius = range, Inside = true},
+                            new CircleContainerModifier {Radius = 10, Inside = true},
                         }
                     }, 
-                    new ParticleEmitter(textureRegion, 500, System.TimeSpan.FromMilliseconds(500),
+                    new ParticleEmitter(textureRegion, 500, System.TimeSpan.FromSeconds(1),
                         Profile.Ring(range, Profile.CircleRadiation.None)) {
                         Parameters = new ParticleReleaseParameters {
                             Speed = new Range<float>(0f, 5f),
-                            Quantity = 30,
-                            Scale = new Range<float>(0.1f, 0.5f)
+                            Quantity = 10,
+                            Scale = new Range<float>(0.1f, 0.4f)
                         },
                         Modifiers = {new AgeModifier { Interpolators = {
                             new ColorInterpolator {StartValue = Color.DarkGray.ToHsl(), EndValue = Color.DarkGray.ToHsl()} } },
@@ -96,11 +98,46 @@ namespace TinyShopping.Game {
                     }
                 }
             };
+
+            _trailEffect = new ParticleEffect() {
+                Emitters = new List<ParticleEmitter> {
+                    new ParticleEmitter(textureRegion, 500, System.TimeSpan.FromSeconds(1),
+                    Profile.Line(Vector2.Zero, 30)) {
+                        Parameters = new ParticleReleaseParameters {
+                                Speed = new Range<float>(0f, 5f),
+                                Quantity = 3,
+                                Scale = new Range<float>(0.1f, 0.2f)
+                        },
+                        Modifiers = { new AgeModifier { Interpolators = {
+                            new ColorInterpolator {StartValue = _color.ToHsl(), EndValue = _color.ToHsl()} } },
+                            new RotationModifier {RotationRate = -2.1f},
+                        }
+                    }
+                }
+            };
+            _trailEffect.Emitters[0].AutoTrigger = false;
         }
 
+        /// <summary>
+        /// Add path from Pathfinder to render pheromone trail. Will add new key or update existing key
+        /// </summary>
+        public void AddPathForAnt(int insectHash, List<PFPoint> path) {
+            _antPaths[insectHash] = path; // add or update the path
+        }
 
+        /// <summary>
+        /// Remove path from Pathfinder
+        /// </summary>
+        public void RemovePathForAnt(int insectHash) {
+            _antPaths.Remove(insectHash);
+        }
+
+        /// <summary>
+        /// Unload all resources that were not loaded via ContentManager
+        /// </summary>
         public void Dispose() {
             _particleEffect.Dispose();
+            _trailEffect.Dispose();
         }
 
         /// <summary>
@@ -109,6 +146,21 @@ namespace TinyShopping.Game {
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
+            foreach(var path in _antPaths) {
+                if (path.Value.Count == 0) {
+                    continue;
+                }
+
+                Vector2 current = new Vector2(path.Value[0].X, path.Value[0].Y);
+                for (int i = 1; i < path.Value.Count; i++) {
+                    Vector2 p = new Vector2(path.Value[i].X, path.Value[i].Y);
+                    LineSegment lineSegment = new LineSegment(current, p);
+                    _trailEffect.Trigger(lineSegment);
+                    current = p;
+                }
+            }
+            
+            batch.Draw(_trailEffect);
             batch.Draw(_particleEffect);
         }
 
@@ -118,6 +170,7 @@ namespace TinyShopping.Game {
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
             _particleEffect.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+            _trailEffect.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             Duration -= (int) Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
         }
     }

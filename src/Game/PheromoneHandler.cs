@@ -51,7 +51,8 @@ namespace TinyShopping.Game {
         /// <param name="duration">The effect duration.</param>
         /// <param name="range">The effect range.</param>
         public void AddPheromone(Vector2 position, GameTime gameTime, PheromoneType type, int player, int priority, int duration, int range) {
-            Pheromone p = new Pheromone(position, _texture, _world, priority, duration, range, type, player);
+            Pheromone p = new Pheromone(position, _texture, priority, duration, range, type, player);
+            
             Pheromone closest = GetClosestPheromone(position, player, 100, type);
             if (closest != null) {
                 closest.Dispose();
