@@ -23,6 +23,7 @@ namespace TinyShopping.Game {
         public int rotationSpeed;
         public int maxHealth;
         public int damage;
+        public int damageReload;
     }
 
     internal class Insect {
@@ -92,8 +93,15 @@ namespace TinyShopping.Game {
 
         public int Health { private set; get; }
 
-        public int Damage { 
+        public bool CanGiveDamage { 
             get {
+                return _damageCooldown <= 0;
+            }
+        }
+
+        public int GiveDamage { 
+            get {
+                _damageCooldown = _attributes.damageReload;
                 return _attributes.damage;
             } 
         }
@@ -109,6 +117,7 @@ namespace TinyShopping.Game {
         private Vector2 _target;
 
         private float _pheromoneCooldown;
+        private float _damageCooldown = 0;
 
         private PheromoneHandler _pheromoneHandler;
 
@@ -147,13 +156,20 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current time information.</param>
-        public void Draw(SpriteBatch batch, GameTime gameTime) {
+        public void Draw(SpriteBatch batch, GameTime gameTime, bool playersInsect) {
             //Texture2D texture = IsCarrying ? _textureFull : _texture;
             Rectangle destination = new Rectangle(_position.X - TextureSize / 2, _position.Y - TextureSize / 2, TextureSize, TextureSize);
             Vector2 origin = new Vector2(0, 0);
             //batch.Draw(texture, destination, null, Color.White, _position.Rotation, origin, SpriteEffects.None, 0);
 
             _animationManager.Draw(batch, gameTime, destination, origin);
+
+            var barPos = Position.ToPoint() - new Point2(TextureSize / 2, 8);
+            var healthBar = new RectangleF(barPos, new Size2(destination.Width * Health / _attributes.maxHealth, 3));
+            var healthBarBound = new RectangleF(barPos, new Size2(destination.Width, 3));
+
+            batch.FillRectangle(healthBar, playersInsect ? Color.Green : Color.Red);
+            batch.DrawRectangle(healthBarBound, Color.Black);
 
 #if DEBUG
             batch.DrawRectangle(destination, Color.Red);
@@ -178,6 +194,9 @@ namespace TinyShopping.Game {
                 }
                 _pheromoneCooldown = 250;
                 _wasCarrying = IsCarrying;
+            }
+            if (_damageCooldown > 0) {
+                _damageCooldown -= (float) gameTime.ElapsedGameTime.TotalMilliseconds;
             }
             UpdateAnimationManager(gameTime);
             foreach (var ai in _ais) {

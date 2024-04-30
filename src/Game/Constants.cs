@@ -25,12 +25,12 @@
         /// <summary>
         /// Attributes of ants.
         /// </summary>
-        public static Attributes ANT_ATTRIBUTES = new Attributes { speed = 70, rotationSpeed = 200, maxHealth = 100, damage = 2 };
+        public static Attributes ANT_ATTRIBUTES = new Attributes { speed = 70, rotationSpeed = 200, maxHealth = 20, damage = 2, damageReload = 2000 };
 
         /// <summary>
         /// Attributes of termites.
         /// </summary>
-        public static Attributes TERMITE_ATTRIBUTES = new Attributes { speed = 50, rotationSpeed = 200, maxHealth = 120, damage = 4 };
+        public static Attributes TERMITE_ATTRIBUTES = new Attributes { speed = 50, rotationSpeed = 200, maxHealth = 25, damage = 4, damageReload = 3000 };
 
         /// <summary>
         /// Speed of wandering

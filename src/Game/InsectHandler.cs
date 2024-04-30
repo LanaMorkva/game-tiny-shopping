@@ -58,9 +58,10 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SpriteBatch batch, GameTime gameTime) {
-            foreach(var colony in _colonies) {
-                colony.Draw(batch, gameTime);
+        /// <param name="playerId">The player's id whose screen we are drawing.</param>
+        public void Draw(SpriteBatch batch, GameTime gameTime, int playerId) {
+            for (int i = 0; i < _colonies.Length; i++) {
+                _colonies[i].Draw(batch, gameTime, playerId == i);
             }
         }
 

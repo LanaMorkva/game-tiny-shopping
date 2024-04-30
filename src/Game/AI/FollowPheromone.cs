@@ -54,8 +54,8 @@ namespace TinyShopping.Game.AI {
                 if (enemy != null) {
                     Vector2 target = enemy.Position;
                     float fightRange = Constants.FIGHT_RANGE;
-                    if (Vector2.DistanceSquared(enemy.Position, Insect.Position) < fightRange * fightRange) {
-                        enemy.TakeDamage(Insect.Damage);
+                    if (Insect.CanGiveDamage && Vector2.DistanceSquared(enemy.Position, Insect.Position) < fightRange * fightRange) {
+                        enemy.TakeDamage(Insect.GiveDamage);
                     }
                     Insect.WalkTo(target, p, gameTime);
                     return true;

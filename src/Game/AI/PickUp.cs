@@ -25,10 +25,10 @@ namespace TinyShopping.Game.AI {
             if (Insect.IsCarrying || (Insect.ReachedPheromone != null && Insect.ReachedPheromone.Type == PheromoneType.FIGHT)) {
                 return false; 
             }
-            int size = Insect.TextureSize + Constants.PICKUP_RANGE;
+            int size = Insect.TextureSize + Constants.PICKUP_RANGE * 2;
             Rectangle insectBounds = new Rectangle(
-                (int) Insect.Position.X - Constants.PICKUP_RANGE, 
-                (int) Insect.Position.Y - Constants.PICKUP_RANGE, 
+                (int) Insect.Position.X - size / 2, 
+                (int) Insect.Position.Y - size / 2, 
                 size, 
                 size
             );
