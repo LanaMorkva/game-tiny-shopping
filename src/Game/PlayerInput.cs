@@ -46,9 +46,9 @@ namespace TinyShopping.Game {
 
         private Buttons _discoverButton = Buttons.A;
 
-        private Buttons _returnButton = Buttons.B;
+        private Buttons _returnButton = Buttons.X;
 
-        private Buttons _fightButton = Buttons.X;
+        private Buttons _fightButton = Buttons.B;
 
         private Buttons _newInsectButton = Buttons.Y;
 
