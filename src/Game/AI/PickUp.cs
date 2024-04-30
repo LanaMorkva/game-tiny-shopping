@@ -27,8 +27,8 @@ namespace TinyShopping.Game.AI {
             }
             int size = Insect.TextureSize + Constants.PICKUP_RANGE;
             Rectangle insectBounds = new Rectangle(
-                (int) Insect.Position.X - size/2, 
-                (int) Insect.Position.Y - size/2, 
+                (int) Insect.Position.X - Constants.PICKUP_RANGE, 
+                (int) Insect.Position.Y - Constants.PICKUP_RANGE, 
                 size, 
                 size
             );

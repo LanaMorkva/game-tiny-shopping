@@ -46,21 +46,25 @@ namespace TinyShopping.Game.AI {
 
         private bool HandleForwardPheromones(GameTime gameTime) {
             Pheromone p = _handler.GetForwardPheromone(Insect.Position, Insect.Owner);
-            if (p == null || p == Insect.ReachedPheromone) {
+            if (p == null) {
                 return false;
             }
-            Vector2 target = p.Position;
             if (p.Type == PheromoneType.FIGHT) {
                 Insect enemy = _colony.GetClosestEnemy(Insect.Position);
                 if (enemy != null) {
-                    target = enemy.Position;
+                    Vector2 target = enemy.Position;
                     float fightRange = Constants.FIGHT_RANGE;
                     if (Vector2.DistanceSquared(enemy.Position, Insect.Position) < fightRange * fightRange) {
                         enemy.TakeDamage(Insect.Damage);
                     }
+                    Insect.WalkTo(target, p, gameTime);
+                    return true;
                 }
             }
-            Insect.WalkTo(target, p, gameTime);
+            if (p == Insect.ReachedPheromone) {
+                return false;
+            }
+            Insect.WalkTo(p.Position, p, gameTime);
             return true;
         }
     }
