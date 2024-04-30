@@ -12,6 +12,11 @@
         /// </summary>
         public static readonly int FRUIT_TEXTURE_SIZE = 18;
 
+         /// <summary>
+        /// The size of the fruits.
+        /// </summary>
+        public static readonly int FRUIT_BOX_TEXTURE_SIZE = 128;
+
         /// <summary>
         /// How close an enemy insect must be to deal damage.
         /// </summary>
@@ -65,12 +70,17 @@
         /// <summary>
         /// How close an enemy insect must be for it to be visible.
         /// </summary>
-        public readonly static int ENEMY_VISIBILITY_RANGE = 64;
+        public readonly static int ENEMY_VISIBILITY_RANGE = 96;
 
         /// <summary>
         /// The effect radius of pheromones.
         /// </summary>
-        public static readonly int PHEROMONE_RANGE = 128;
+        public static readonly int PHEROMONE_DROPOFF_RANGE = 128;
+
+        /// <summary>
+        /// The effect radius of pheromones.
+        /// </summary>
+        public static readonly int PHEROMONE_RANGE = 96;
 
         /// <summary>
         /// How long a pheromone spot should exist, in miliseconds.

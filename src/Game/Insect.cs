@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using TinyShopping.Game.AI;
@@ -46,6 +47,9 @@ namespace TinyShopping.Game {
         private readonly AnimationManager _animationManager = new();
 
         public bool IsCarrying { get; set; }
+
+        public Pheromone ReachedPheromone { get; private set; }
+        private Pheromone _targetPheromone;
 
         public enum InsectState {
             Wander = 0, 
@@ -98,7 +102,7 @@ namespace TinyShopping.Game {
 
         private Pathfinder _pathFinder;
 
-        private IList<PFPoint> _path = new List<PFPoint>();
+        private List<PFPoint> _path = new List<PFPoint>();
 
         private int _pathIndex;
 
@@ -125,15 +129,17 @@ namespace TinyShopping.Game {
             _ais = new Task[] {
                 new Spawn(this, _world),
                 new Collide(this, _world),
-                new PickUp(this, _world, services.fruits),
                 new DropOff(this, _world, services.colony),
                 new FollowPheromone(this, _world, services.handler, services.colony),
+                new PickUp(this, _world, services.fruits),
             };
 
             _animationManager.AddAnimation(AnimationKey.Left, new Animation(_texture, 2, 4, 0.2f, 1));
             _animationManager.AddAnimation(AnimationKey.Right, new Animation(_texture, 2, 4, 0.2f, 2));
             _animationManager.AddAnimation(AnimationKey.LeftFull, new Animation(_texture, 2, 4, 0.2f, 3));
             _animationManager.AddAnimation(AnimationKey.RightFull, new Animation(_texture, 2, 4, 0.2f, 4));
+
+            ReachedPheromone = null;
         }
 
         /// <summary>
@@ -153,12 +159,6 @@ namespace TinyShopping.Game {
             batch.DrawRectangle(destination, Color.Red);
             batch.DrawLine(Position, 30, _position.Rotation - (float) Math.PI/2, Color.Blue);
             batch.DrawLine(Position, 30, MathHelper.ToRadians(_position.TargetRotation - 90), Color.Red);
-            Vector2 current = Position;
-            for (int i = _pathIndex; i < _path.Count; i++) {
-                Vector2 p = new Vector2(_path[i].X, _path[i].Y);
-                batch.DrawLine(current, p, Color.Black, 2);
-                current = p;
-            }
 #endif
         }
 
@@ -221,10 +221,18 @@ namespace TinyShopping.Game {
         private void Wander(GameTime gameTime) {
             if (_path.Count > 0) {
                 _path = new List<PFPoint>();
+                // Don't turn right after finding pheromone
+                _nextUpdateTime += 750;
             }
             if (gameTime.TotalGameTime.TotalMilliseconds > _nextUpdateTime) {
                 _nextUpdateTime = gameTime.TotalGameTime.TotalMilliseconds + Random.Shared.Next(5000) + 500;
                 _position.TargetRotation = Random.Shared.Next(360);
+            }
+            if (ReachedPheromone != null) {
+                var dir =  ReachedPheromone.Position - _position.Position;
+                if (dir.Length() > ReachedPheromone.Range) {
+                    _position.TargetDirection = dir.NormalizedCopy();
+                }
             }
             var state = IsCarrying ? InsectState.CarryWander : InsectState.Wander;
             Walk(gameTime, state);
@@ -253,13 +261,20 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="target">The target to walk to.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void WalkTo(Vector2 target, GameTime gameTime) {
+        public void WalkTo(Vector2 target, Pheromone pheromone, GameTime gameTime) {
+            if (_targetPheromone != pheromone) {
+                _targetPheromone?.RemovePathForAnt(this.GetHashCode());
+                _targetPheromone = pheromone;
+            }
+
             if (Vector2.DistanceSquared(target, _target) > 32) {
                 _target = target;
                 _path = _pathFinder.FindPath(Position, target);
                 _pathIndex = 0;
             }
             if (_pathIndex >= _path.Count) {
+                ReachedPheromone = pheromone; 
+                pheromone?.RemovePathForAnt(this.GetHashCode());
                 Wander(gameTime);
                 return;
             }
@@ -270,7 +285,10 @@ namespace TinyShopping.Game {
             if (Vector2.DistanceSquared(nextPoint, Position) < 256) {
                 _pathIndex++;
             }
+            
+            pheromone?.AddPathForAnt(this.GetHashCode(), _path.Skip(_pathIndex).ToList());
         }
+
 
         /// <summary>
         /// Rotates the ant without moving forward.

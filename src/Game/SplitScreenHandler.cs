@@ -92,7 +92,7 @@ namespace TinyShopping.Game {
             _player2 = new Player(_pheromoneHandler, input2, _insectHandler, _world, 1, spawnPositions[1]);
             _player2.LoadContent(content);
             _camera2.LookAt(spawnPositions[1]);
-            _camera2.ZoomOut(0.5f);
+            _camera2.ZoomIn(0.5f);
 
             CreateBorderTexture(new Color(252, 239, 197), 3);
         }

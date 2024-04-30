@@ -2,7 +2,9 @@
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TinyShopping.Game {
 
@@ -49,7 +51,19 @@ namespace TinyShopping.Game {
         /// <param name="duration">The effect duration.</param>
         /// <param name="range">The effect range.</param>
         public void AddPheromone(Vector2 position, GameTime gameTime, PheromoneType type, int player, int priority, int duration, int range) {
-            Pheromone p = new Pheromone(position, _texture, _world, priority, duration, range, type, player);
+            Pheromone p = new Pheromone(position, _texture, priority, duration, range, type, player);
+            
+            Pheromone closest = GetClosestPheromone(position, player, 100, type);
+            if (closest != null) {
+                closest.Dispose();
+                if (type == PheromoneType.RETURN) {
+                    _returnPheromones[player].Remove(closest);
+                } else {
+                    _pheromones[player].Remove(closest);
+                }
+            }
+
+
             if (type == PheromoneType.RETURN) {
                 _returnPheromones[player].Add(p);
             }
@@ -151,6 +165,21 @@ namespace TinyShopping.Game {
                 if (sqDis < range * range) {
                     closest = p;
                     maxPrio = p.Priority;
+                }
+            }
+            return closest;
+        }
+
+
+        private Pheromone GetClosestPheromone(Vector2 position, int player, float range, PheromoneType type) {
+            List<Pheromone> allPheromones = _pheromones[player].Concat(_returnPheromones[player]).ToList();
+            Pheromone closest = null;
+            range *= range;
+            foreach (var p in allPheromones) {
+                float sqDis = Vector2.DistanceSquared(position, p.Position);
+                if (sqDis < range && p.Type == type) {
+                    closest = p;
+                    range = sqDis;
                 }
             }
             return closest;

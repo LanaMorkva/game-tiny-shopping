@@ -34,6 +34,8 @@ namespace TinyShopping {
 
         protected Action _backAction;
 
+        protected MenuInput _menuInput;
+
         public SelectMenu(Rectangle menuRegion, Vector2 itemSize, Action backAction): this(menuRegion, new Vector2(0, 0), itemSize, backAction) {
         }
 
@@ -46,6 +48,7 @@ namespace TinyShopping {
             _soundEffects = new List<SoundEffect>();
             _menuItems = new List<MenuItem>();
             _backAction = backAction;
+            _menuInput = CreateMenuInput(PlayerIndex.One);
         }
 
 
@@ -54,7 +57,9 @@ namespace TinyShopping {
         /// </summary>
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
-            _soundEffects.Add(content.Load<SoundEffect>("sounds/glass_knock"));
+            _soundEffects.Add(content.Load<SoundEffect>("sounds/beep-deep"));
+            _soundEffects.Add(content.Load<SoundEffect>("sounds/cash_register"));
+            _soundEffects.Add(content.Load<SoundEffect>("sounds/beep-extra-deep"));
             foreach (var menuItem in _menuItems) {
                 menuItem.LoadContent(content);
             }
@@ -65,65 +70,31 @@ namespace TinyShopping {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
-            // TODO: Remove unnessecary code duplication by adding better menu input controller
-            GamePadState state = GamePad.GetState(PlayerIndex.One);
-            if (state.IsConnected) {
-                // Use Gamepad inputs
-                if (state.IsButtonDown(Buttons.DPadDown)) {
-                    _nextPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
-                } else if (_nextPressed > 0) {
-                    nextItem();
-                    _nextPressed = 0;
-                }
-                if (state.IsButtonDown(Buttons.DPadUp)) {
-                    _previousPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
-                } else if (_previousPressed > 0) {
-                    previousItem();
-                    _previousPressed = 0;
-                }
-                if (state.IsButtonDown(Buttons.A)) {
-                    _submitPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
-                } else if (_submitPressed > 0) {
-                    _submitPressed = 0;
-                    _soundEffects[0].Play();
-                    _menuItems[_currentSelection].ApplyAction();
-                }
-                if (state.IsButtonDown(Buttons.B)) {
-                    _backPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
-                } else if (_backPressed > 0) {
-                    _backPressed = 0;
-                    _soundEffects[0].Play();
-                    _backAction();
-                }
-            } else {
-                // Use keyboard inputs
-                KeyboardState kstate = Keyboard.GetState();
-                if (kstate.IsKeyDown(Keys.Down)) {
-                    _nextPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
-                } else if (_nextPressed > 0) {
-                    nextItem();
-                    _nextPressed = 0;
-                }
-                if (kstate.IsKeyDown(Keys.Up)) {
-                    _previousPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
-                } else if (_previousPressed > 0) {
-                    previousItem();
-                    _previousPressed = 0;
-                }
-                if (kstate.IsKeyDown(Keys.Enter)) {
-                    _submitPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
-                } else if (_submitPressed > 0) {
-                    _submitPressed = 0;
-                    _soundEffects[0].Play();
-                    _menuItems[_currentSelection].ApplyAction();
-                }
-                if (kstate.IsKeyDown(Keys.Back)) {
-                    _backPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
-                } else if (_backPressed > 0) {
-                    _backPressed = 0;
-                    _soundEffects[0].Play();
-                    _backAction();
-                }
+            if (_menuInput.IsNextPressed()) {
+                _nextPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
+            } else if (_nextPressed > 0) {
+                nextItem();
+                _nextPressed = 0;
+            }
+            if (_menuInput.IsPreviousPressed()) {
+                _previousPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
+            } else if (_previousPressed > 0) {
+                previousItem();
+                _previousPressed = 0;
+            }
+            if (_menuInput.IsSelectPressed()) {
+                _submitPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
+            } else if (_submitPressed > 0) {
+                _submitPressed = 0;
+                _soundEffects[2].Play();
+                _menuItems[_currentSelection].ApplyAction();
+            }
+            if (_menuInput.IsBackPressed()) {
+                _backPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
+            } else if (_backPressed > 0) {
+                _backPressed = 0;
+                _soundEffects[2].Play();
+                _backAction();
             }
 
             setActiveItem();
@@ -190,6 +161,14 @@ namespace TinyShopping {
                 menuItem.Draw(batch, itemRect);
                 menuLocation += new Vector2(0, _itemSize.Y + _itemPadding);
             }
+        }
+
+        private MenuInput CreateMenuInput(PlayerIndex playerIndex) {
+            GamePadState state = GamePad.GetState(playerIndex);
+            if (state.IsConnected) {
+                return new GamePadMenuInput(playerIndex);
+            }
+            return new KeyboardMenuInput(playerIndex);
         }
     }
 }

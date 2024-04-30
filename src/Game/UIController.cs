@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
@@ -37,11 +38,16 @@ namespace TinyShopping.Game {
 
         private int _winner;
 
+        private MenuInput _playerOne;
+
+        private bool _selectPressed;
+
         public UIController(GraphicsDevice device, SplitScreenHandler handler, Scene scene) {
             _handler = handler;
             _runtimeMs = 0;
             _scene = scene;
             _soundEffects = new List<SoundEffect>();
+            _playerOne = CreateMenuInput(PlayerIndex.One);
         }
 
         /// <summary>
@@ -107,6 +113,22 @@ namespace TinyShopping.Game {
                 _soundEffects[1].Play();
             }
 
+            if (_scene.IsOver && _playerOne.IsSelectPressed()) {
+                _selectPressed = true;
+            }
+            else if (_selectPressed) {
+                _selectPressed = false;
+                _scene.LoadMainMenu();
+            }
+
+        }
+
+        private MenuInput CreateMenuInput(PlayerIndex playerIndex) {
+            GamePadState state = GamePad.GetState(playerIndex);
+            if (state.IsConnected) {
+                return new GamePadMenuInput(playerIndex);
+            }
+            return new KeyboardMenuInput(playerIndex);
         }
 
         /// <summary>
@@ -123,6 +145,7 @@ namespace TinyShopping.Game {
             }
             if (_scene.IsOver) {
                 DrawWinMessage(batch);
+                DrawReturnMessage(batch);
             }
 #if DEBUG
             int fps = (int) Math.Round((1000 / gameTime.ElapsedGameTime.TotalMilliseconds));
@@ -163,12 +186,26 @@ namespace TinyShopping.Game {
 
             var pos = new Vector2(_scene.Width / 2, _scene.Height / 2);
             Vector2 origin = _fontGeneral.MeasureString(text) / 2;
-            batch.DrawString(_fontGeneral, text, pos - new Vector2(3, 3), Color.Black, 0, origin, 1.3f, SpriteEffects.None, 0);
-            batch.DrawString(_fontGeneral, text, pos, _textColor, 0, origin, 1.3f, SpriteEffects.None, 0);
+            batch.DrawString(_fontGeneral, text, pos - new Vector2(3, 3), Color.Black, 0, origin, 1.0f, SpriteEffects.None, 0);
+            batch.DrawString(_fontGeneral, text, pos, _textColor, 0, origin, 1.0f, SpriteEffects.None, 0);
+        }
+
+        private void DrawReturnMessage(SpriteBatch batch) {
+            string text = "Press ";
+            if (GamePad.GetState(PlayerIndex.One).IsConnected) {
+                text += "A ";
+            } else {
+                text += "Enter ";
+            }
+            text += "to return to main menu";
+
+            Vector2 origin = _fontGeneral.MeasureString(text) / 2;
+            var pos = new Vector2(_scene.Width / 2, _scene.Height - origin.Y - 10);
+            batch.DrawString(_fontGeneral, text, pos, _textColor, 0, origin, 0.5f, SpriteEffects.None, 0);
         }
 
         /// <summary>
-        /// Draws the tiem countdown.
+        /// Draws the time countdown.
         /// </summary>
         /// <param name="batch"></param>
         private void DrawRemainingTime(SpriteBatch batch) {
@@ -188,6 +225,16 @@ namespace TinyShopping.Game {
                 time = "00:00";
             }
             DrawString(batch, time, new Vector2(_scene.Width / 2, offsetTop));
+        }
+
+        public float GetRemainingTime() {
+            if (!_scene.IsStarted) {
+                return Constants.TIME_LIMIT_S;
+            } else if (_scene.IsOver) {
+                return 0f;
+            } else {
+                return (float) (Constants.TIME_LIMIT_S - (_runtimeMs / 1000f));
+            }
         }
 
         /// <summary>

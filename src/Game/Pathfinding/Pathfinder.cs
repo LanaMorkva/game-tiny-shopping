@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using MonoGame.Extended;
 using MonoGame.Extended.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,11 +33,11 @@ namespace TinyShopping.Game.Pathfinding {
         /// <param name="start">The start position.</param>
         /// <param name="end">The end position.</param>
         /// <returns>A list of points leading to the end position.</returns>
-        public IList<Point> FindPath(Vector2 start, Vector2 end) {
+        public List<Point> FindPath(Vector2 start, Vector2 end) {
             _nodes = new Dictionary<Point, Node>(64);
             _queue = new HashSet<Node>(); // TODO: Replace with min heap
             Point startPoint = new Point(start);
-            _end = FindViableEndPosition(end);
+            _end = FindViableEndPosition(start, end);
             Node startNode = new Node(startPoint, 0, startPoint.SquaredDistance(_end));
             _nodes.Add(startPoint, startNode);
             _queue.Add(startNode);
@@ -48,7 +49,7 @@ namespace TinyShopping.Game.Pathfinding {
                 Node current = GetNextNode();
                 long currentDistance = current.Position.SquaredDistance(_end);
                 if (currentDistance <= delta * delta) {
-                    IList<Point> path = ConstructPath(current.Position, new Point(end));
+                    List<Point> path = ConstructPath(current.Position, _end);
                     return path;
                 }
                 else if (currentDistance < minDelta) {
@@ -67,20 +68,13 @@ namespace TinyShopping.Game.Pathfinding {
         /// </summary>
         /// <param name="end">The initial end position, might be unwalkable.</param>
         /// <returns>A position close to the initial position that is walkable.</returns>
-        private Point FindViableEndPosition(Vector2 end) {
+        private Point FindViableEndPosition(Vector2 start, Vector2 end) {
+            Vector2 dir = (start - end).NormalizedCopy();
             int distance = 0;
             while (true) {
-                for (int dX = -1; dX <= 1; dX++) {
-                    for (int dY = -1; dY <= 1; dY++) {
-                        if (dX == 0 && dY == 0) {
-                            continue;
-                        }
-                        int x = (int)end.X + dX * distance;
-                        int y = (int)end.Y + dY * distance;
-                        if (_world.IsWalkable(x, y, RANGE / 2)) {
-                            return new Point(x, y);
-                        }
-                    }
+                var newEnd = (end + dir * distance).ToPoint();
+                if (_world.IsWalkable(newEnd.X, newEnd.Y, RANGE / 2)) {
+                    return new Point(newEnd.X, newEnd.Y);
                 }
                 distance += RANGE;
             }
@@ -92,7 +86,7 @@ namespace TinyShopping.Game.Pathfinding {
         /// <param name="current">The final point close to the end.</param>
         /// <param name="actualEnd">The initially provided end position that might not be walkable.</param>
         /// <returns>The complete path.</returns>
-        private IList<Point> ConstructPath(Point current, Point actualEnd) {
+        private List<Point> ConstructPath(Point current, Point actualEnd) {
             List<Point> path = new List<Point> {
                 actualEnd,
                 _end

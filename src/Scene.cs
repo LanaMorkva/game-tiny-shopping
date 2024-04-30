@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using TinyShopping.MainMenu;
+using Microsoft.Xna.Framework.Media;
 
 namespace TinyShopping {
 
@@ -18,7 +18,7 @@ namespace TinyShopping {
 
         protected Renderer Game { get; private set; }
 
-        protected SettingsHandler SettingsHandler { get; private set; }
+        public SettingsHandler SettingsHandler { get; private set; }
 
         protected Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) {
             Content = content;
@@ -36,9 +36,13 @@ namespace TinyShopping {
 
         }
 
+        public virtual void Terminate() {
+            MediaPlayer.Stop();
+        }
+
         public virtual void Update(GameTime gameTime) {
 #if DEBUG
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape)) {
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Tab)) {
                 Game.Exit();
             }
 #endif

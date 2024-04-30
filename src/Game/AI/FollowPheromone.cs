@@ -36,17 +36,17 @@ namespace TinyShopping.Game.AI {
 
         private bool HandleReturnPheromone(GameTime gameTime) {
             Pheromone p = _handler.GetReturnPheromone(Insect.Position, Insect.Owner);
-            if (p == null) {
+            if (p == null || p == Insect.ReachedPheromone) {
                 return false;
             }
-            Insect.WalkTo(p.Position, gameTime);
+            Insect.WalkTo(p.Position, p, gameTime);
             return true;
 
         }
 
         private bool HandleForwardPheromones(GameTime gameTime) {
             Pheromone p = _handler.GetForwardPheromone(Insect.Position, Insect.Owner);
-            if (p == null) {
+            if (p == null || p == Insect.ReachedPheromone) {
                 return false;
             }
             Vector2 target = p.Position;
@@ -60,7 +60,7 @@ namespace TinyShopping.Game.AI {
                     }
                 }
             }
-            Insect.WalkTo(target, gameTime);
+            Insect.WalkTo(target, p, gameTime);
             return true;
         }
     }
