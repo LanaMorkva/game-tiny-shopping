@@ -14,18 +14,6 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin ants/ant_full_texture.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:ants/ant_full_texture.png
-
 #begin ants/ant_texture.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -147,22 +135,6 @@
 /importer:TiledMapImporter
 /processor:TiledMapProcessor
 /build:map_isometric/map-angled.tmx
-
-#begin map/Grocery_store_48x48.tsx
-/importer:TiledMapTilesetImporter
-/processor:TiledMapTilesetProcessor
-/build:map/Grocery_store_48x48.tsx
-
-#begin map/map_48x48.tmx
-/importer:TiledMapImporter
-/processor:TiledMapProcessor
-/build:map/map_48x48.tmx
-
-#begin map/Room_Builder_48x48.tsx
-/importer:TiledMapTilesetImporter
-/processor:TiledMapTilesetProcessor
-/build:map/Room_Builder_48x48.tsx
-
 #begin pheromone_particle.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -174,18 +146,6 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:pheromone_particle.png
-
-#begin pheromone.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:pheromone.png
 
 #begin songs/basic_fast.wav
 /importer:WavImporter
