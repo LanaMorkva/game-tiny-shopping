@@ -54,8 +54,9 @@ namespace TinyShopping.MainMenu
 
 
             Vector2 centerOffset = new Vector2(0, -(menuRegion.Y / 3));
-
-            _selectMenu = new MainSelectMenu(menuRegion, centerOffset, menuItemSize);
+            
+            Rectangle explanationRegion = new Rectangle(50, Height - 150, 300, 100);
+            _selectMenu = new MainSelectMenu(menuRegion, centerOffset, menuItemSize, explanationRegion);
             _selectMenu.AddItem(new MainMenuItem("New Game", StartGame));
             _selectMenu.AddItem(new MainMenuItem("How to play", NotImplementedScene));
             _selectMenu.AddItem(new MainMenuItem("Settings", SettingsMenu));
