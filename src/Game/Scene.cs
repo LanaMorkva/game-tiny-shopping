@@ -48,6 +48,12 @@ namespace TinyShopping.Game {
             base.LoadContent();
         }
 
+        public override void UnloadContent()
+        {
+            _splitScreenHandler.UnloadContent(Content);
+            base.UnloadContent();
+        }
+
         public override void Update(GameTime gameTime) {
             if (!IsOver && IsStarted) {
                 _splitScreenHandler.Update(gameTime);

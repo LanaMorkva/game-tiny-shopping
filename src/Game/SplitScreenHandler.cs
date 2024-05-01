@@ -97,6 +97,10 @@ namespace TinyShopping.Game {
             CreateBorderTexture(new Color(252, 239, 197), 3);
         }
 
+        public void UnloadContent(ContentManager content) {
+            _world.UnloadContent(content, _device);
+        }
+
         /// <summary>
         /// Updates the game objects.
         /// </summary>
