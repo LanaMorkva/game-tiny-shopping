@@ -193,9 +193,9 @@ namespace TinyShopping.Game {
         private void DrawReturnMessage(SpriteBatch batch) {
             string text = "Press ";
             if (GamePad.GetState(PlayerIndex.One).IsConnected) {
-                text += "A ";
+                text += "<A> ";
             } else {
-                text += "Enter ";
+                text += "<Enter> ";
             }
             text += "to return to main menu";
 

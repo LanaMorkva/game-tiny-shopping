@@ -54,6 +54,10 @@ namespace TinyShopping.Game {
             FruitHandler.LoadContent(contentManager);
         }
 
+        public void UnloadContent(ContentManager contentManager, GraphicsDevice device) {
+            contentManager.UnloadAsset("map_isometric/map-angled");
+        }
+
         /// <summary>
         /// Draws an area of the world to the sprite batch.
         /// </summary>
