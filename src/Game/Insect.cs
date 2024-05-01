@@ -2,12 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Diagnostics;
 using TinyShopping.Game.AI;
-using TinyShopping.Game.Pathfinding;
-using PFPoint = TinyShopping.Game.Pathfinding.Point;
 
 namespace TinyShopping.Game {
 
@@ -41,16 +36,13 @@ namespace TinyShopping.Game {
 
         public int TextureSize { get; private set; } // equal to Constants.ANT_TEXTURE_SIZE, can be removed
 
-        private double _nextUpdateTime;
-
         private InsectPos _position;
 
         private readonly AnimationManager _animationManager = new();
 
         public bool IsCarrying { get; set; }
 
-        public Pheromone ReachedPheromone { get; private set; }
-        private Pheromone _targetPheromone;
+        public Pheromone ActivePheromone { get; set; }
 
         public enum InsectState {
             Wander = 0, 
@@ -106,16 +98,6 @@ namespace TinyShopping.Game {
             } 
         }
 
-        private Task[] _ais;
-
-        private Pathfinder _pathFinder;
-
-        private List<PFPoint> _path = new List<PFPoint>();
-
-        private int _pathIndex;
-
-        private Vector2 _target;
-
         private float _pheromoneCooldown;
         private float _damageCooldown = 0;
 
@@ -125,30 +107,26 @@ namespace TinyShopping.Game {
 
         private int _pheromonePriority = 100;
 
+
+        private AIHandler _aiHandler;
+
         public Insect(Services services, Vector2 spawn, int spawnRotation, Texture2D texture, int owner, Attributes attributes) {
             _world = services.world;
             _pheromoneHandler = services.handler;
-            _pathFinder = new Pathfinder(_world);
             _position = new InsectPos((int)spawn.X, (int)spawn.Y, spawnRotation);
             _texture = texture;
             _attributes = attributes;
             TextureSize = Constants.ANT_TEXTURE_SIZE;
             Owner = owner;
             Health = attributes.maxHealth;
-            _ais = new Task[] {
-                new Spawn(this, _world),
-                new Collide(this, _world),
-                new DropOff(this, _world, services.colony),
-                new FollowPheromone(this, _world, services.handler, services.colony),
-                new PickUp(this, _world, services.fruits),
-            };
+            _aiHandler = new AIHandler(this, services);
 
             _animationManager.AddAnimation(AnimationKey.Left, new Animation(_texture, 2, 4, 0.2f, 1));
             _animationManager.AddAnimation(AnimationKey.Right, new Animation(_texture, 2, 4, 0.2f, 2));
             _animationManager.AddAnimation(AnimationKey.LeftFull, new Animation(_texture, 2, 4, 0.2f, 3));
             _animationManager.AddAnimation(AnimationKey.RightFull, new Animation(_texture, 2, 4, 0.2f, 4));
 
-            ReachedPheromone = null;
+            ActivePheromone = null;
         }
 
         /// <summary>
@@ -199,12 +177,7 @@ namespace TinyShopping.Game {
                 _damageCooldown -= (float) gameTime.ElapsedGameTime.TotalMilliseconds;
             }
             UpdateAnimationManager(gameTime);
-            foreach (var ai in _ais) {
-                if (ai.Run(gameTime)) {
-                    return;
-                }
-            }
-            Wander(gameTime);
+            _aiHandler.Update(gameTime);
         }
 
         /// <summary>
@@ -226,29 +199,6 @@ namespace TinyShopping.Game {
             }
         }
 
-        /// <summary>
-        /// Moves around randomly.
-        /// </summary>
-        /// <param name="gameTime">The current game time.</param>
-        private void Wander(GameTime gameTime) {
-            if (_path.Count > 0) {
-                _path = new List<PFPoint>();
-                // Don't turn right after finding pheromone
-                _nextUpdateTime += 750;
-            }
-            if (gameTime.TotalGameTime.TotalMilliseconds > _nextUpdateTime) {
-                _nextUpdateTime = gameTime.TotalGameTime.TotalMilliseconds + Random.Shared.Next(5000) + 500;
-                _position.TargetRotation = Random.Shared.Next(360);
-            }
-            if (ReachedPheromone != null) {
-                var dir =  ReachedPheromone.Position - _position.Position;
-                if (dir.Length() > ReachedPheromone.Range) {
-                    _position.TargetDirection = dir.NormalizedCopy();
-                }
-            }
-            var state = IsCarrying ? InsectState.CarryWander : InsectState.Wander;
-            Walk(gameTime, state);
-        }
 
         /// <summary>
         /// Turns towards the target and walks towards it.
@@ -267,40 +217,6 @@ namespace TinyShopping.Game {
                 case InsectState.Run: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed); break;}
             }
         }
-
-        /// <summary>
-        /// Walks towards the given target.
-        /// </summary>
-        /// <param name="target">The target to walk to.</param>
-        /// <param name="gameTime">The current game time.</param>
-        public void WalkTo(Vector2 target, Pheromone pheromone, GameTime gameTime) {
-            if (_targetPheromone != pheromone) {
-                _targetPheromone?.RemovePathForAnt(this.GetHashCode());
-                _targetPheromone = pheromone;
-            }
-
-            if (Vector2.DistanceSquared(target, _target) > 32) {
-                _target = target;
-                _path = _pathFinder.FindPath(Position, target);
-                _pathIndex = 0;
-            }
-            if (_pathIndex >= _path.Count) {
-                ReachedPheromone = pheromone; 
-                pheromone?.RemovePathForAnt(this.GetHashCode());
-                Wander(gameTime);
-                return;
-            }
-            Vector2 nextPoint = new Vector2(_path[_pathIndex].X, _path[_pathIndex].Y);
-            TargetDirection = nextPoint - Position;
-            var state = IsCarrying ? InsectState.CarryRun : InsectState.Run;
-            Walk(gameTime, state);
-            if (Vector2.DistanceSquared(nextPoint, Position) < 256) {
-                _pathIndex++;
-            }
-            
-            pheromone?.AddPathForAnt(this.GetHashCode(), _path.Skip(_pathIndex).ToList());
-        }
-
 
         /// <summary>
         /// Rotates the ant without moving forward.

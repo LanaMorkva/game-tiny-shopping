@@ -15,7 +15,7 @@ namespace TinyShopping.Game.AI {
         /// <param name="world">The world to exist in.</param>
         /// <param name="handler">The pheromone handler to use.</param>
         /// <param name="colony">The insect's colony.</param>
-        public FollowPheromone(Insect insect, World world, PheromoneHandler handler, Colony colony) : base(insect, world) {
+        public FollowPheromone(Insect insect, World world, AIHandler aiHandler, PheromoneHandler handler, Colony colony) : base(insect, world, aiHandler) {
             _handler = handler;
             _colony = colony;
         }
@@ -36,10 +36,10 @@ namespace TinyShopping.Game.AI {
 
         private bool HandleReturnPheromone(GameTime gameTime) {
             Pheromone p = _handler.GetReturnPheromone(Insect.Position, Insect.Owner);
-            if (p == null || p == Insect.ReachedPheromone) {
+            if (p == null || p == Insect.ActivePheromone) {
                 return false;
             }
-            Insect.WalkTo(p.Position, p, gameTime);
+            AIHandler.WalkTo(p.Position, p, gameTime);
             return true;
 
         }
@@ -57,15 +57,17 @@ namespace TinyShopping.Game.AI {
                     if (Insect.CanGiveDamage && Vector2.DistanceSquared(enemy.Position, Insect.Position) < fightRange * fightRange) {
                         enemy.TakeDamage(Insect.GiveDamage);
                     }
-                    Insect.WalkTo(target, p, gameTime);
+                    AIHandler.WalkTo(target, p, gameTime);
                     return true;
                 }
             }
-            if (p == Insect.ReachedPheromone) {
+            if (p == Insect.ActivePheromone) {
                 return false;
             }
-            Insect.WalkTo(p.Position, p, gameTime);
+            AIHandler.WalkTo(p.Position, p, gameTime);
             return true;
         }
+
+
     }
 }

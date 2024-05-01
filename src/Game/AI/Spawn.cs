@@ -11,7 +11,7 @@ namespace TinyShopping.Game.AI {
         /// </summary>
         /// <param name="insect">The insect to control.</param>
         /// <param name="world">The world to exist in.</param>
-        public Spawn(Insect insect, World world) : base(insect, world) {
+        public Spawn(Insect insect, World world, AIHandler aiHandler) : base(insect, world, aiHandler) {
         }
 
         /// <summary>
