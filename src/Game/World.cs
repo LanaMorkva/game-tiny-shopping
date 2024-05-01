@@ -17,8 +17,9 @@ namespace TinyShopping.Game {
             Floor,
             Walls,
             Walls2,
-            Objects,
+            SpawnObjects,
             Posters,
+            Baskets,
         };
 
         private ObstacleLayer _obstacleLayer;      
@@ -45,6 +46,7 @@ namespace TinyShopping.Game {
             _tiledMap.GetLayer("Walls").Offset = new Vector2(0, -96);
             _tiledMap.GetLayer("Walls2").Offset = new Vector2(0, -96);
             _tiledMap.GetLayer("Posters").Offset = new Vector2(0, -32);
+            _tiledMap.GetLayer("Baskets").Offset = new Vector2(0, -50);
             _tiledMapRenderer = new TiledMapRenderer(device, _tiledMap);
             _obstacleLayer = new ObstacleLayer(_tiledMap);
 
@@ -80,8 +82,9 @@ namespace TinyShopping.Game {
             batch.End();
             batch.Begin(transformMatrix: viewMatrix, blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp);
             _tiledMapRenderer.Draw((int)LayerName.Walls2, viewMatrix); // some walls must be rendered on top of fruits
-            _tiledMapRenderer.Draw((int)LayerName.Objects, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.SpawnObjects, viewMatrix);
             _tiledMapRenderer.Draw((int)LayerName.Posters, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.Baskets, viewMatrix);
         }
 
 #if DEBUG
