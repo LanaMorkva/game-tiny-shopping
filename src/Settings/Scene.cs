@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -44,7 +45,12 @@ namespace TinyShopping.SettingsMenu
             _imageRegion = new Rectangle((int)(menuW / 1.5), menuPosY / 3, (int)(Width - menuW / 1.5),
                 Height - menuPosY / 3);
 
-            _selectMenu = new SelectMenu(menuRegion, menuItemSize, LoadMainMenu);
+            Rectangle explanationRegion = new Rectangle(50, Height - 150, 300, 100);
+            List<MenuExplanation> explanations = new List<MenuExplanation> {
+                new("<A>", "Change Setting", Color.Green),
+                new("<B>", "Back", Color.Red)
+            };
+            _selectMenu = new SelectMenu(menuRegion, menuItemSize, LoadMainMenu, explanationRegion, explanations);
             _selectMenu.AddItem(new MenuItemBool("Music", ChangeMusicSettings, SettingsHandler.settings.music));
             _selectMenu.AddItem(new MenuItemBool("Sound Effects", ChangeSoundEffectsSettings, SettingsHandler.settings.soundEffects));
             _selectMenu.AddItem(new MenuItemBool("Fullscreen", ChangeFullScreenSettings, SettingsHandler.settings.fullScreen));
