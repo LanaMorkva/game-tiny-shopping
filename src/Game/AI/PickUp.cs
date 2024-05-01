@@ -22,7 +22,7 @@ namespace TinyShopping.Game.AI {
         /// <param name="gameTime">The current game time.</param>
         /// <returns>True if any action was taken, false otherwise.</returns>
         public override bool Run(GameTime gameTime) {
-            if (Insect.IsCarrying || (Insect.ActivePheromone != null && Insect.ActivePheromone.Type == PheromoneType.FIGHT)) {
+            if (Insect.IsCarrying || (AIHandler.ActivePheromone != null && AIHandler.ActivePheromone.Type == PheromoneType.FIGHT)) {
                 return false; 
             }
             int size = Insect.TextureSize + Constants.PICKUP_RANGE * 2;
@@ -39,7 +39,7 @@ namespace TinyShopping.Game.AI {
                 return true;
             }
             if (dir != null) {
-                AIHandler.WalkTo(closestFruit.Center, Insect.ActivePheromone, gameTime);
+                AIHandler.WalkTo(closestFruit.Center, AIHandler.ActivePheromone, gameTime);
                 return true;
             }
             return false;

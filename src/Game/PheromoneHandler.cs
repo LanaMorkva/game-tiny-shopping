@@ -149,6 +149,26 @@ namespace TinyShopping.Game {
         }
 
         /// <summary>
+        /// Gets the highest-priority forward trail in range.
+        /// </summary>
+        /// <param name="position">The position to compare to.</param>
+        /// <param name="player">The id of the current player, 0 or 1.</param>
+        /// <returns>The pheromone instance or null if no pheromone is in range.</returns>
+        public Pheromone GetForwardTrail(Vector2 position, int player) {
+            return GetHighestPriorityTrail(position, _pheromones[player]);
+        }
+
+        /// <summary>
+        /// Gets the highest-priority return trail in range.
+        /// </summary>
+        /// <param name="position">The position to compare to.</param>
+        /// <param name="player">The id of the current palyer, 0 or 1.</param>
+        /// <returns>The pheromone instance or null if no pheromone is in range.</returns>
+        public Pheromone GetReturnTrail(Vector2 position, int player) {
+            return GetHighestPriorityTrail(position, _returnPheromones[player]);
+        }
+
+        /// <summary>
         /// Returns the pheromone with the highest priority in the list.
         /// </summary>
         /// <param name="position">The position of the insect to consider.</param>
@@ -158,7 +178,7 @@ namespace TinyShopping.Game {
             int maxPrio = 0;
             Pheromone closest = null;
             foreach (var p in pheromones) {
-                if (p.Priority < maxPrio) {
+                if (!p.IsPlayer || p.Priority < maxPrio) {
                     continue;
                 }
                 float sqDis = Vector2.DistanceSquared(position, p.Position);
@@ -171,6 +191,28 @@ namespace TinyShopping.Game {
             return closest;
         }
 
+        /// <summary>
+        /// Returns the trail with the highest priority in the list.
+        /// </summary>
+        /// <param name="position">The position of the insect to consider.</param>
+        /// <param name="pheromones">The pheromones to search through.</param>
+        /// <returns>Highest-priority trail in the list within range of the insect position.</returns>
+        private Pheromone GetHighestPriorityTrail(Vector2 position, List<Pheromone> pheromones) {
+            int maxPrio = 0;
+            Pheromone closest = null;
+            foreach (var p in pheromones) {
+                if (p.IsPlayer || p.Priority < maxPrio) {
+                    continue;
+                }
+                float sqDis = Vector2.DistanceSquared(position, p.Position);
+                int range = p.Range;
+                if (sqDis < range * range) {
+                    closest = p;
+                    maxPrio = p.Priority;
+                }
+            }
+            return closest;
+        }
 
         private Pheromone GetClosestPheromone(Vector2 position, int player, float range, PheromoneType type) {
             List<Pheromone> allPheromones = _pheromones[player].Concat(_returnPheromones[player]).ToList();

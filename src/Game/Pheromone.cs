@@ -39,6 +39,8 @@ namespace TinyShopping.Game {
 
         public bool IsPlayer { private set; get; }
 
+        public List<Insect> ReachedInsects;
+
         /// <summary>
         /// Creates a new pheromone spot.
         /// </summary>
@@ -59,6 +61,7 @@ namespace TinyShopping.Game {
             Range = range;
             Duration = duration;
             IsPlayer = isPlayer;
+            ReachedInsects = new List<Insect>();
             switch (type) {
                 case PheromoneType.RETURN:
                     _color = Color.Blue;

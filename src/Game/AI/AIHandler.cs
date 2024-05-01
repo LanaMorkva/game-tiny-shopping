@@ -23,6 +23,8 @@ namespace TinyShopping.Game.AI {
         private int _pathIndex;
         private Vector2 _target;
 
+        public Pheromone ActivePheromone {get; private set;}
+
         public AIHandler(Insect insect, Services services) {
             _insect = insect;
             _ais = new Task[] {
@@ -31,6 +33,7 @@ namespace TinyShopping.Game.AI {
                 new DropOff(insect, services.world, this, services.colony),
                 new FollowPheromone(insect, services.world, this, services.handler, services.colony),
                 new PickUp(insect, services.world, this, services.fruits),
+                new Autopilot(insect, services.world, this, services.handler),
             };
             _pathFinder = new Pathfinder(services.world);
         }
@@ -41,11 +44,10 @@ namespace TinyShopping.Game.AI {
                     return;
                 }
             }
-            Wander(gameTime);
         }
 
-
         public void WalkTo(Vector2 target, Pheromone pheromone, GameTime gameTime) {
+            ActivePheromone = pheromone;
             if (Vector2.DistanceSquared(target, _target) > 32) {
                 _target = target;
                 _path = _pathFinder.FindPath(_insect.Position, target);
@@ -62,13 +64,12 @@ namespace TinyShopping.Game.AI {
                 pheromone?.AddPathForAnt(_insect.GetHashCode(), _path.Skip(_pathIndex).ToList());
                 return;
             }
-            
-            _insect.ActivePheromone = pheromone; 
+            pheromone?.ReachedInsects.Add(_insect);
             pheromone?.RemovePathForAnt(_insect.GetHashCode());
             Wander(gameTime);
         }
 
-        private void Wander(GameTime gameTime) {
+        public void Wander(GameTime gameTime) {
             if (_path.Count > 0) {
                 _path = new List<PFPoint>();
                 // Don't turn right after finding pheromone
@@ -78,9 +79,9 @@ namespace TinyShopping.Game.AI {
                 _nextUpdateTime = gameTime.TotalGameTime.TotalMilliseconds + Random.Shared.Next(5000) + 500;
                 _insect.TargetRotation = Random.Shared.Next(360);
             }
-            if (_insect.ActivePheromone != null) {
-                Vector2 dir = _insect.ActivePheromone.Position - _insect.Position;
-                if (dir.Length() > _insect.ActivePheromone.Range) {
+            if (ActivePheromone != null) {
+                Vector2 dir = ActivePheromone.Position - _insect.Position;
+                if (dir.Length() > ActivePheromone.Range) {
                     _insect.TargetDirection = dir.NormalizedCopy();
                 }
             }

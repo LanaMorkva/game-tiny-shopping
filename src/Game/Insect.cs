@@ -42,8 +42,6 @@ namespace TinyShopping.Game {
 
         public bool IsCarrying { get; set; }
 
-        public Pheromone ActivePheromone { get; set; }
-
         public enum InsectState {
             Wander = 0, 
             Run = 1,
@@ -125,8 +123,6 @@ namespace TinyShopping.Game {
             _animationManager.AddAnimation(AnimationKey.Right, new Animation(_texture, 2, 4, 0.2f, 2));
             _animationManager.AddAnimation(AnimationKey.LeftFull, new Animation(_texture, 2, 4, 0.2f, 3));
             _animationManager.AddAnimation(AnimationKey.RightFull, new Animation(_texture, 2, 4, 0.2f, 4));
-
-            ActivePheromone = null;
         }
 
         /// <summary>
