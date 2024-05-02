@@ -100,11 +100,11 @@ namespace TinyShopping.Game {
                 }
                 if (_handler.GetNumberOfAnts(0) == 0) {
                     _scene.IsOver = true;
-                    _winner = 1;
+                    _winner = 2;
                 }
                 if (_handler.GetNumberOfAnts(1) == 0) {
                     _scene.IsOver = true;
-                    _winner = 2;
+                    _winner = 1;
                 }
 
             }
