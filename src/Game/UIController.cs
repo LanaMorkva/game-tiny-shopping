@@ -98,11 +98,11 @@ namespace TinyShopping.Game {
                         _winner = 2;
                     }
                 }
-                if (_handler.GetNumberOfAnts(0) == 0 && _handler.GetNumberOfFruits(0) == 0) {
+                if (_handler.GetNumberOfAnts(0) == 0) {
                     _scene.IsOver = true;
                     _winner = 1;
                 }
-                if (_handler.GetNumberOfAnts(1) == 0 && _handler.GetNumberOfFruits(1) == 0) {
+                if (_handler.GetNumberOfAnts(1) == 0) {
                     _scene.IsOver = true;
                     _winner = 2;
                 }
