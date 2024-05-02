@@ -45,8 +45,10 @@ namespace TinyShopping.Game.Pathfinding {
             int delta = RANGE;
             long minDelta = long.MaxValue;
             Node bestApprox = null;
-            while (_queue.Count > 0) {
+            int numberOfNodes = 0;
+            while (_queue.Count > 0 && numberOfNodes < 150) {
                 Node current = GetNextNode();
+                numberOfNodes++;
                 long currentDistance = current.Position.SquaredDistance(_end);
                 if (currentDistance <= delta * delta) {
                     List<Point> path = ConstructPath(current.Position, _end);
@@ -58,8 +60,6 @@ namespace TinyShopping.Game.Pathfinding {
                 }
                 EnqueueNeighbors(current);
             }
-            bool targetWalkable = _world.IsWalkable(_end.X, _end.Y, RANGE / 2);
-            Debug.Print("Pathfinding finished without result. Best approx distance {0} larger than {1}. Target walkable: {2}", minDelta, delta, targetWalkable);
             return ConstructPath(bestApprox.Position, new Point(end));
         }
 
