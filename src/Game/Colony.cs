@@ -24,7 +24,7 @@ namespace TinyShopping.Game {
 
         private Texture2D _termiteTexture;
 
-        private List<Insect> _insects = new List<Insect>();
+        public List<Insect> Insects { get; private set; } = new List<Insect>();
 
         private int _queue;
 
@@ -42,7 +42,7 @@ namespace TinyShopping.Game {
 
         public int FruitsNum => _collectedFruit;
 
-        public int AntsNum => _insects.Count;
+        public int AntsNum => Insects.Count;
 
         List<SoundEffect> _soundEffects;
 
@@ -98,10 +98,10 @@ namespace TinyShopping.Game {
                 _spawnCooldown = 1000;
                 _queue -= 1;
                 Insect ant = GetNewInsect();
-                _insects.Add(ant);
+                Insects.Add(ant);
             }
-            List<Insect> remaining = new List<Insect>(_insects.Count);
-            foreach (Insect insect in _insects) {
+            List<Insect> remaining = new List<Insect>(Insects.Count);
+            foreach (Insect insect in Insects) {
                 if (insect.Health > 0) {
                     insect.Update(gameTime);
                     remaining.Add(insect);
@@ -109,7 +109,7 @@ namespace TinyShopping.Game {
                     _soundEffects[1].Play();
                 }
             }
-            _insects = remaining;
+            Insects = remaining;
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace TinyShopping.Game {
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime, bool playersColony) {
-            foreach (Insect insect in _insects) {
+            foreach (Insect insect in Insects) {
                 insect.Draw(batch, gameTime, playersColony);
             }
         }
@@ -173,7 +173,7 @@ namespace TinyShopping.Game {
         public Insect GetClosestToInRange(Vector2 position, float range) {
             float minDis = float.MaxValue;
             Insect closest = null;
-            foreach (var i in _insects) {
+            foreach (var i in Insects) {
                 float sqDis = Vector2.DistanceSquared(position, i.Position);
                 if (sqDis < range*range && sqDis < minDis) {
                     closest = i;

@@ -42,12 +42,15 @@ namespace TinyShopping.Game {
 
         private bool _selectPressed;
 
+        private UIInsectController _insectController;
+
         public UIController(GraphicsDevice device, SplitScreenHandler handler, Scene scene) {
             _handler = handler;
             _runtimeMs = 0;
             _scene = scene;
             _soundEffects = new List<SoundEffect>();
             _playerOne = CreateMenuInput(PlayerIndex.One);
+            _insectController = new UIInsectController(handler);
         }
 
         /// <summary>
@@ -67,6 +70,8 @@ namespace TinyShopping.Game {
 
             _soundEffects.Add(content.Load<SoundEffect>("sounds/countdown_3_seconds"));
             _soundEffects.Add(content.Load<SoundEffect>("sounds/final_whistle"));
+
+            _insectController.LoadContent(content);
         }
 
         /// <summary>
@@ -140,6 +145,7 @@ namespace TinyShopping.Game {
             DrawBorder(batch);
             DrawStatistics(batch);
             DrawRemainingTime(batch);
+            _insectController.Draw(batch, gameTime);
             if (!_scene.IsStarted) {
                 DrawCountdown(batch);
             }

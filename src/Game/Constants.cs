@@ -113,5 +113,7 @@
         public static readonly int TIME_LIMIT_S = 5 * 60;
 
         public static readonly int TRAIL_PHEROMONE_START_PRIORITY = 400;
+
+        public static readonly int SLEEP_ICON_SIZE = 32;
     }
 }
