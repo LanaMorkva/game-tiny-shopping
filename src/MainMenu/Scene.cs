@@ -58,7 +58,7 @@ namespace TinyShopping.MainMenu
             Rectangle explanationRegion = new Rectangle(50, Height - 150, 300, 100);
             _selectMenu = new MainSelectMenu(menuRegion, centerOffset, menuItemSize, explanationRegion);
             _selectMenu.AddItem(new MainMenuItem("New Game", StartGame));
-            _selectMenu.AddItem(new MainMenuItem("How to play", NotImplementedScene));
+            _selectMenu.AddItem(new MainMenuItem("How to play", ControlsTutorial));
             _selectMenu.AddItem(new MainMenuItem("Settings", SettingsMenu));
             _selectMenu.AddItem(new MainMenuItem("Quit", ExitGame));
             base.Initialize();
@@ -126,9 +126,9 @@ namespace TinyShopping.MainMenu
             Game.ChangeScene(new SettingsMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
         }
 
-        public void NotImplementedScene()
+        public void ControlsTutorial()
         {
-            // empty
+            Game.ChangeScene(new ControlsTutorial.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
         }
 
         public void ExitGame()
