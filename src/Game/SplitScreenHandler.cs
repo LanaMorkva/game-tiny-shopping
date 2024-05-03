@@ -216,7 +216,7 @@ namespace TinyShopping.Game {
         /// <param name="player">The current player.</param>
         /// <param name="cursorPos">The cursor world position.</param>
         /// <param name="speed">The speed of the scrolling.</param>
-        public void UpdateCameraState(int player, Vector2 cursorPos, int speed, float zoom) {
+        public void UpdateCameraState(int player, Vector2 cursorPos, int speed, float zoom, Vector2 cameraMotion) {
             Camera2D currentCamera;
             if  (player == 0) {
                 currentCamera = _camera1;
@@ -225,7 +225,7 @@ namespace TinyShopping.Game {
             }
             
             RectangleF cameraRect = currentCamera.BoundingRectangle();
-            Vector2 cameraMoveDirection = Vector2.Zero;
+            Vector2 cameraMoveDirection = cameraMotion * speed;
             Rectangle worldRect = _world.GetWorldBoundary();
             float moveThreshold = 100f / currentCamera.Zoom;
             if (cameraRect.Right - cursorPos.X < moveThreshold && cameraRect.Right < worldRect.Right) {

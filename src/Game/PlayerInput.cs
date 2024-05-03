@@ -15,6 +15,13 @@ namespace TinyShopping.Game {
         /// <exception cref="Exception">Thrown if no input was received.</exception>
         public abstract Vector2 GetMotion();
 
+        /// <summary>
+        /// Reads the desired player camera motion from the input.
+        /// </summary>
+        /// <returns>A Vector2 of motion input.</returns>
+        /// <exception cref="Exception">Thrown if no input was received.</exception>
+        public abstract Vector2 GetCameraMotion();
+
         public abstract float GetZoom();
 
         /// <summary>
@@ -68,8 +75,18 @@ namespace TinyShopping.Game {
 
         public override float GetZoom() {
             GamePadState state = GamePad.GetState(_playerIndex);
+            float zoom_change = state.Triggers.Left - state.Triggers.Right;
+            return zoom_change * -1 * Constants.ZOOM_SPEED;
+        }
+
+        public override Vector2 GetCameraMotion() {
+            GamePadState state = GamePad.GetState(_playerIndex);
+            if (!state.IsConnected) {
+                throw new Exception("Unable to read player input, no available input methods left!");
+            }
             Vector2 motion = state.ThumbSticks.Right;
-            return motion.Y * -1 * Constants.ZOOM_SPEED;
+            motion.Y *= -1;
+            return motion;
         }
 
 
@@ -155,6 +172,11 @@ namespace TinyShopping.Game {
                 motion.Normalize();
             }
             return motion;
+        }
+
+        public override Vector2 GetCameraMotion()
+        {
+            return new Vector2(0, 0);
         }
 
         public override float GetZoom() {

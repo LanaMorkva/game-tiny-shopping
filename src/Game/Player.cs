@@ -86,7 +86,7 @@ namespace TinyShopping.Game {
             PlacePheromones(gameTime);
             UpdatePosition(speed);
             ClipCursorToWorld();
-            handler.UpdateCameraState(_id, _position, speed, _input.GetZoom());
+            handler.UpdateCameraState(_id, _position, speed, _input.GetZoom(), _input.GetCameraMotion());
 
             _cursorSize = (int)(Constants.CURSOR_SIZE / handler.GetZoomValue(_id));
         }
