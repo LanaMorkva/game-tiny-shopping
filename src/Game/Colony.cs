@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
+using System.Linq;
 
 namespace TinyShopping.Game {
 
@@ -67,7 +68,7 @@ namespace TinyShopping.Game {
             _owner = owner;
             _insectHandler = insectHandler;
             _soundEffects = new List<SoundEffect>();
-            _services = new Services { colony = this, fruits = fruits, handler = handler, world = world };
+            _services = new Services { colony = this, fruits = fruits, handler = handler, world = world, coloniesHandler = insectHandler };
             _type = type;
         }
 
@@ -162,6 +163,10 @@ namespace TinyShopping.Game {
         /// <returns>An insect instance or null.</returns>
         public Insect GetClosestEnemy(Vector2 position) {
             return _insectHandler.GetClosestEnemy(_owner, position);
+        }
+
+        public List<Rectangle> GetOtherInsectBoxes(Insect insect) {
+            return _insects.Where(i => i != insect).Select(i => i.BoundingBox).ToList();
         }
 
         /// <summary>

@@ -25,7 +25,7 @@ namespace TinyShopping.Game.AI {
                 Pheromone p = Insect.IsCarrying ? _handler.GetReturnTrail(Insect.Position, Insect.Owner) :
                                                   _handler.GetForwardTrail(Insect.Position, Insect.Owner);
                 if (p != null) {
-                    AIHandler.WalkTo(p.Position, p, gameTime);
+                    AIHandler.WalkTo(p.Position, p, gameTime, 10);
                     return true;
                 }
             }

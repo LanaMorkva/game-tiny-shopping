@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 
 namespace TinyShopping.Game {
 
@@ -119,6 +120,14 @@ namespace TinyShopping.Game {
         /// <returns>The number of fruits collected.</returns>
         public int GetNumberOfFruits(int player) {
             return _colonies[player].FruitsNum;
+        }
+
+        public List<Rectangle> GetOtherInsectBoxes(Insect insect) {
+            var boxes = new List<Rectangle>();
+            foreach (var colony in _colonies) {
+                boxes.AddRange(colony.GetOtherInsectBoxes(insect));
+            }
+            return boxes;
         }
     }
 }

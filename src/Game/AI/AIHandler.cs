@@ -46,13 +46,18 @@ namespace TinyShopping.Game.AI {
             }
         }
 
-        public void WalkTo(Vector2 target, Pheromone pheromone, GameTime gameTime) {
-            ActivePheromone = pheromone;
+        public void WalkTo(Vector2 target, Pheromone pheromone, GameTime gameTime, int targetMaxOffset = 0) {
             if (Vector2.DistanceSquared(target, _target) > 32) {
                 _target = target;
-                _path = _pathFinder.FindPath(_insect.Position, target);
+
+                // introduce some randomization for the pheromone target for every ant
+                Random.Shared.NextUnitVector(out Vector2 randomDir);
+                var targetOffset = randomDir * Random.Shared.Next(targetMaxOffset);
+
+                _path = _pathFinder.FindPath(_insect.Position, target + targetOffset);
                 _pathIndex = 0;
             }
+            ActivePheromone = pheromone;
             if (_pathIndex < _path.Count) {
                 var nextPoint = new Vector2(_path[_pathIndex].X, _path[_pathIndex].Y);
                 _insect.TargetDirection = nextPoint - _insect.Position; 

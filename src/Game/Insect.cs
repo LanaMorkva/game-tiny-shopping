@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using System;
+using System.Linq;
 using TinyShopping.Game.AI;
 
 namespace TinyShopping.Game {
@@ -11,6 +12,7 @@ namespace TinyShopping.Game {
         public PheromoneHandler handler;
         public FruitHandler fruits;
         public Colony colony;
+        public InsectHandler coloniesHandler;
     }
 
     internal struct Attributes {
@@ -31,6 +33,8 @@ namespace TinyShopping.Game {
         }
 
         private readonly World _world;
+
+        private InsectHandler _coloniesHandler;
 
         private Texture2D _texture;
 
@@ -57,6 +61,9 @@ namespace TinyShopping.Game {
                 return _position.Position;
             }
         }
+
+        // This is bounding box of main part of the insect - it is smaller than a whole texture
+        public Rectangle BoundingBox => new(Position.ToPoint() - new Point(TextureSize/2, 0), new(TextureSize, TextureSize/2));
 
         public int TargetRotation {
             get {
@@ -111,6 +118,7 @@ namespace TinyShopping.Game {
         public Insect(Services services, Vector2 spawn, int spawnRotation, Texture2D texture, int owner, Attributes attributes) {
             _world = services.world;
             _pheromoneHandler = services.handler;
+            _coloniesHandler = services.coloniesHandler;
             _position = new InsectPos((int)spawn.X, (int)spawn.Y, spawnRotation);
             _texture = texture;
             _attributes = attributes;
@@ -205,13 +213,18 @@ namespace TinyShopping.Game {
                 _position.Rotate((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.rotationSpeed);
                 _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed / 3);
                 return;
-            }
+            } 
             switch (state) {
                 case InsectState.CarryWander:
                 case InsectState.Wander: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * Constants.WANDER_SPEED); break;}
                 case InsectState.CarryRun: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed * 3/5); break;}
                 case InsectState.Run: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed); break;}
             }
+        }
+
+        private void UpdateToAvailablePos(Vector2 prevPos) {
+            var insectBoxes = _coloniesHandler.GetOtherInsectBoxes(this);
+            bool notAvailable = insectBoxes.Any(box => box.Intersects(BoundingBox));
         }
 
         /// <summary>
