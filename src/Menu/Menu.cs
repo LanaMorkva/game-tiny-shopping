@@ -80,8 +80,7 @@ namespace TinyShopping {
 
         private static List<MenuExplanation> CreateDefaultExplanations() {
             return new List<MenuExplanation> {
-                new("<A>", "Select", Color.Green),
-                new("<B>", "Back", Color.Red)
+                new("<A>", "Select", Color.Green)
             };
         }
 
@@ -217,6 +216,10 @@ namespace TinyShopping {
                 return new GamePadMenuInput(playerIndex);
             }
             return new KeyboardMenuInput(playerIndex);
+        }
+
+        public void ResetActiveItem() {
+            _currentSelection = 0;
         }
     }
 }
