@@ -47,6 +47,8 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <returns>True if the button is pressed, false otherwise.</returns>
         public abstract bool IsNewInsectPressed();
+
+        public abstract bool IsStartedPressed();
     }
 
     internal class GamePadInput : PlayerInput {
@@ -58,6 +60,8 @@ namespace TinyShopping.Game {
         private Buttons _fightButton = Buttons.B;
 
         private Buttons _newInsectButton = Buttons.Y;
+
+        private Buttons _startButton = Buttons.Start;
 
         public GamePadInput(PlayerIndex playerIndex) {
             _playerIndex = playerIndex;
@@ -109,6 +113,12 @@ namespace TinyShopping.Game {
             GamePadState cState = GamePad.GetState(_playerIndex);
             return cState.IsButtonDown(_newInsectButton);
         }
+
+        public override bool IsStartedPressed()
+        {
+            GamePadState cState = GamePad.GetState(_playerIndex);
+            return cState.IsButtonDown(_startButton);
+        }
     }
 
     internal class KeyboardInput : PlayerInput {
@@ -128,6 +138,8 @@ namespace TinyShopping.Game {
         private Keys _fightKey = Keys.D3;
 
         private Keys _newInsectKey = Keys.D4;
+
+        private Keys _startKey = Keys.Escape;
 
         private Keys _zoomIn = Keys.Q;
         private Keys _zoomOut = Keys.E;
@@ -209,6 +221,12 @@ namespace TinyShopping.Game {
         public override bool IsNewInsectPressed() {
             KeyboardState kState = Keyboard.GetState();
             return kState.IsKeyDown(_newInsectKey);
+        }
+
+        public override bool IsStartedPressed()
+        {
+            KeyboardState kState = Keyboard.GetState();
+            return kState.IsKeyDown(_startKey);
         }
     }
 }

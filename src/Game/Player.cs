@@ -81,8 +81,11 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime"></param>
         /// <param name="handler">The split screen handler to use.</param>
-        public void Update(GameTime gameTime, SplitScreenHandler handler) {
+        public void Update(GameTime gameTime, SplitScreenHandler handler, Scene scene) {
             int speed = (int)(gameTime.ElapsedGameTime.TotalSeconds * Constants.CURSOR_SPEED / handler.GetZoomValue(_id));
+            if (_input.IsStartedPressed()) {
+                scene.IsPaused = true;
+            }
             PlacePheromones(gameTime);
             UpdatePosition(speed);
             ClipCursorToWorld();
