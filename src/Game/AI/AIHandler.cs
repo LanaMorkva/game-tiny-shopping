@@ -46,7 +46,10 @@ namespace TinyShopping.Game.AI {
         }
 
         public void WalkTo(Vector2 target, Pheromone pheromone, GameTime gameTime, InsectState state, int targetMaxOffset = 0) {
-            ActivePheromone = pheromone;
+            if (pheromone != ActivePheromone) {
+                ActivePheromone?.RemovePathForAnt(_insect.GetHashCode());
+                ActivePheromone = pheromone;
+            }
             if (Vector2.DistanceSquared(target, _target) > 32) {
                 _target = target;
 
