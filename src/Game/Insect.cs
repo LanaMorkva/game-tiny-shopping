@@ -91,7 +91,8 @@ namespace TinyShopping.Game {
             }
         }
 
-        private Attributes _attributes;
+        private readonly Attributes _attributes;
+        private readonly ColonyType _insectType;
 
         public int Health { private set; get; }
 
@@ -120,16 +121,17 @@ namespace TinyShopping.Game {
 
         private AIHandler _aiHandler;
 
-        public Insect(Services services, Vector2 spawn, int spawnRotation, Texture2D texture, int owner, Attributes attributes) {
+        public Insect(Services services, Vector2 spawn, int spawnRotation, Texture2D texture, ColonyType insectType) {
             _world = services.world;
             _pheromoneHandler = services.handler;
             _coloniesHandler = services.coloniesHandler;
             _position = new InsectPos((int)spawn.X, (int)spawn.Y, spawnRotation);
             _texture = texture;
-            _attributes = attributes;
+            _insectType = insectType;
+            _attributes = insectType == ColonyType.ANT ? Constants.ANT_ATTRIBUTES : Constants.TERMITE_ATTRIBUTES;
             TextureSize = Constants.ANT_TEXTURE_SIZE;
-            Owner = owner;
-            Health = attributes.maxHealth;
+            Owner = (int)insectType;
+            Health = _attributes.maxHealth;
             _aiHandler = new AIHandler(this, services);
 
             _animationManager.AddAnimation(AnimationKey.Left, new Animation(_texture, 2, 4, 0.2f, 1));
@@ -229,14 +231,22 @@ namespace TinyShopping.Game {
                 _position.Rotate((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.rotationSpeed);
                 _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed / 3);
                 return;
-            } 
+            }
+            float speed = _attributes.speed;
             switch (_state) {
                 case InsectState.FightWander:
                 case InsectState.CarryWander:
-                case InsectState.Wander: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * Constants.WANDER_SPEED); break;}
-                case InsectState.CarryRun: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed * 3/5); break;}
-                default: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed); break;}
+                case InsectState.Wander: speed = Constants.WANDER_SPEED; break;
+                case InsectState.CarryRun: {
+                    if (_insectType == ColonyType.ANT) {
+                        speed = _attributes.speed * 3/5;
+                    } else {
+                        speed = _attributes.speed * 4/5;
+                    }
+                    break;
+                }
             }
+            _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * speed);
         }
 
         private void UpdateToAvailablePos(Vector2 prevPos) {
