@@ -6,6 +6,17 @@ using System.Linq;
 using TinyShopping.Game.AI;
 
 namespace TinyShopping.Game {
+    enum InsectState {
+        Wander = 0, 
+        Run = 1,
+        CarryWander = 2,
+        CarryRun = 3,
+
+        FightRun = 4,
+        FightWander = 5,
+        // active fight
+        Fight = 6,
+    }
 
     internal struct Services {
         public World world;
@@ -44,15 +55,9 @@ namespace TinyShopping.Game {
 
         private readonly AnimationManager _animationManager = new();
 
-        public bool IsCarrying { get; set; }
+        private InsectState _state;
 
-        public enum InsectState {
-            Wander = 0, 
-            Run = 1,
-            CarryWander = 2,
-            CarryRun = 3,
-            Fight = 4
-        }
+        public bool IsCarrying { get; set; }
 
         public int Owner { get; private set; }
 
@@ -154,7 +159,17 @@ namespace TinyShopping.Game {
             batch.DrawRectangle(healthBarBound, Color.Black);
 
 #if DEBUG
-            batch.DrawRectangle(destination, Color.Red);
+            var color = Color.White;
+            switch(_state) {
+                case InsectState.Run: color = Color.Green; break;
+                case InsectState.Wander: color = Color.LightGreen; break;
+                case InsectState.CarryRun: color = Color.Blue; break;
+                case InsectState.CarryWander: color = Color.LightBlue; break;
+                case InsectState.Fight: color = Color.Red; break;
+                case InsectState.FightWander:
+                case InsectState.FightRun: color = Color.Pink; break;
+            };
+            batch.DrawRectangle(destination, color);
             batch.DrawLine(Position, 30, _position.Rotation - (float) Math.PI/2, Color.Blue);
             batch.DrawLine(Position, 30, MathHelper.ToRadians(_position.TargetRotation - 90), Color.Red);
 #endif
@@ -181,7 +196,7 @@ namespace TinyShopping.Game {
                 _damageCooldown -= (float) gameTime.ElapsedGameTime.TotalMilliseconds;
             }
             UpdateAnimationManager(gameTime);
-            _aiHandler.Update(gameTime);
+            _aiHandler.RunNextTask(gameTime);
         }
 
         /// <summary>
@@ -209,16 +224,18 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Walk(GameTime gameTime, InsectState state) {
+            _state = state;
             if (_position.IsTurning) {
                 _position.Rotate((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.rotationSpeed);
                 _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed / 3);
                 return;
             } 
-            switch (state) {
+            switch (_state) {
+                case InsectState.FightWander:
                 case InsectState.CarryWander:
                 case InsectState.Wander: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * Constants.WANDER_SPEED); break;}
                 case InsectState.CarryRun: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed * 3/5); break;}
-                case InsectState.Run: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed); break;}
+                default: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed); break;}
             }
         }
 

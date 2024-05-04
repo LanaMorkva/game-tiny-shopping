@@ -39,7 +39,7 @@ namespace TinyShopping.Game.AI {
             if (p == null || p.ReachedInsects.Contains(Insect)) {
                 return false;
             }
-            AIHandler.WalkTo(p.Position, p, gameTime, Constants.PHEROMONE_RANGE / 2);
+            AIHandler.WalkTo(p.Position, p, gameTime, InsectState.CarryRun, Constants.PHEROMONE_RANGE / 2);
             return true;
 
         }
@@ -60,14 +60,15 @@ namespace TinyShopping.Game.AI {
                     Vector2 target = enemy.Position;
                     Vector2 dirTarget = Vector2.Normalize(target - Insect.Position);
                     Vector2 offsetTarget = dirTarget * fightRange / 2;
-                    AIHandler.WalkTo(target - offsetTarget, p, gameTime, 20);
+                    AIHandler.WalkTo(target - offsetTarget, p, gameTime, InsectState.Fight);
                     return true;
                 }
             }
             if (p.ReachedInsects.Contains(Insect)) {
                 return false;
             }
-            AIHandler.WalkTo(p.Position, p, gameTime, Constants.PHEROMONE_RANGE / 2);
+            AIHandler.WalkTo(p.Position, p, gameTime, p.Type == PheromoneType.FIGHT ? InsectState.FightRun : InsectState.Run, 
+                            Constants.PHEROMONE_RANGE / 2);
             return true;
         }
     }

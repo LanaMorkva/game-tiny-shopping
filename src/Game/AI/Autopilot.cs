@@ -21,15 +21,18 @@ namespace TinyShopping.Game.AI {
         /// <param name="gameTime">The current game time.</param>
         /// <returns>True if any action was taken, false otherwise.</returns>
         public override bool Run(GameTime gameTime) {
-            if (AIHandler.ActivePheromone?.Type != PheromoneType.FIGHT) {
-                Pheromone p = Insect.IsCarrying ? _handler.GetReturnTrail(Insect.Position, Insect.Owner) :
-                                                  _handler.GetForwardTrail(Insect.Position, Insect.Owner);
-                if (p != null) {
-                    AIHandler.WalkTo(p.Position, p, gameTime, 10);
-                    return true;
-                }
+            bool isFightAlert = AIHandler.ActivePheromone?.Type == PheromoneType.FIGHT;
+            if (isFightAlert) {
+                AIHandler.Wander(gameTime, InsectState.FightWander);
+                return true;
             }
-            AIHandler.Wander(gameTime);
+            Pheromone p = Insect.IsCarrying ? _handler.GetReturnTrail(Insect.Position, Insect.Owner) :
+                                              _handler.GetForwardTrail(Insect.Position, Insect.Owner);
+            if (p != null) {
+                AIHandler.WalkTo(p.Position, p, gameTime, Insect.IsCarrying ? InsectState.CarryRun : InsectState.Run, 10);
+            } else {
+                AIHandler.Wander(gameTime, Insect.IsCarrying ? InsectState.CarryWander : InsectState.Wander);
+            }
             return true;
         }
     }
