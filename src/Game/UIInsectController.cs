@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended;
 using System.Collections.Generic;
 
 namespace TinyShopping.Game {
@@ -13,7 +12,15 @@ namespace TinyShopping.Game {
 
         private SplitScreenHandler _handler;
 
+        private Texture2D _iconBorderH;
+
+        private Texture2D _iconBorderV;
+
         private Texture2D _sleepIcon;
+
+        private Vector2 _borderDimension;
+
+        private int _borderPadding;
 
         public UIInsectController(SplitScreenHandler handler) {
             _handler = handler;
@@ -24,7 +31,11 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
+            _iconBorderV = content.Load<Texture2D>("icon_border_v");
+            _iconBorderH = content.Load<Texture2D>("icon_border_h");
             _sleepIcon = content.Load<Texture2D>("sleep_indicator");
+            _borderPadding = 18;
+            _borderDimension = new Vector2(Constants.INSECT_ICON_SIZE + _borderPadding * 2, Constants.INSECT_ICON_SIZE + _borderPadding * 2);
         }
 
         /// <summary>
@@ -38,16 +49,41 @@ namespace TinyShopping.Game {
                 if (!insect.IsWandering) {
                     continue;
                 }
-                DrawSleepIcon(batch, insect.Position, Constants.SLEEP_ICON_SIZE, _handler.Player1Area);
+                DrawSleepIcon(batch, insect.Position, Constants.INSECT_ICON_SIZE, _handler.Player1Area);
             }
         }
 
         private void DrawSleepIcon(SpriteBatch batch, Vector2 pos, int size, Rectangle viewArea) {
             Vector3 pos3 = WorldToScreenCoordinate(pos);
-            Rectangle r = new Rectangle((int)pos3.X, (int)pos3.Y - size, size, size);
-            if (r.Right > viewArea.Right) {
-                r.X = viewArea.Right - r.Width;
+            Rectangle borderR = new Rectangle(
+                (int)(pos3.X - _borderDimension.X / 2), 
+                (int)(pos3.Y - _borderDimension.Y - _borderDimension.Y / 2), 
+                (int)_borderDimension.X,
+                (int)_borderDimension.Y);
+            SpriteEffects effect = SpriteEffects.None;
+            bool needBorder = false;
+            if (borderR.Right > viewArea.Right) {
+                needBorder = true;
+                borderR.X = (int)(viewArea.Right - _borderDimension.X);
             }
+            if (borderR.Left < viewArea.Left) {
+                needBorder = true;
+                effect = SpriteEffects.FlipHorizontally;
+                borderR.X = viewArea.Left;
+            }
+            if (borderR.Top < viewArea.Top) {
+                needBorder = true;
+                borderR.Y = (int)(viewArea.Top);
+            }
+            if (borderR.Bottom > viewArea.Bottom) {
+                needBorder = true;
+                borderR.Y = (int)(viewArea.Bottom - _borderDimension.X);
+                effect = SpriteEffects.FlipVertically;
+            }
+            if (needBorder) {
+                batch.Draw(_iconBorderH, borderR, null, Color.White, 0, new Vector2(), effect, 0);
+            }
+            Rectangle r = new Rectangle(borderR.Center.X - size / 2, borderR.Center.Y - size / 2, size, size);
             batch.Draw(_sleepIcon, r, Color.White);
         }
 

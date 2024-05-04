@@ -114,6 +114,6 @@
 
         public static readonly int TRAIL_PHEROMONE_START_PRIORITY = 400;
 
-        public static readonly int SLEEP_ICON_SIZE = 32;
+        public static readonly int INSECT_ICON_SIZE = 32;
     }
 }
