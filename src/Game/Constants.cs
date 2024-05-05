@@ -94,6 +94,11 @@
         public static readonly int PHEROMONE_RANGE_COEFFICIENT = 256;
 
         /// <summary>
+        /// The maximum range a pheromone spot can have.
+        /// </summary>
+        public static readonly int PHEROMONE_MAX_RANGE = 400;
+
+        /// <summary>
         /// The size of the players' cursors.
         /// </summary>
         public static readonly int CURSOR_SIZE = 50;
@@ -113,5 +118,7 @@
         public static readonly int TIME_LIMIT_S = 5 * 60;
 
         public static readonly int TRAIL_PHEROMONE_START_PRIORITY = 400;
+
+        public static readonly int INSECT_ICON_SIZE = 32;
     }
 }

@@ -122,6 +122,15 @@ namespace TinyShopping.Game {
             return _colonies[player].FruitsNum;
         }
 
+        /// <summary>
+        /// Gets all insects in the colony of the given player.
+        /// </summary>
+        /// <param name="player">The player to use.</param>
+        /// <returns>A list of insects.</returns>
+        public IList<Insect> GetAllInsects(int player) {
+            return _colonies[player].Insects;
+        }
+
         public List<Rectangle> GetOtherInsectBoxes(Insect insect) {
             var boxes = new List<Rectangle>();
             foreach (var colony in _colonies) {

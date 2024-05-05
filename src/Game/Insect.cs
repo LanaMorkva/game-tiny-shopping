@@ -85,6 +85,12 @@ namespace TinyShopping.Game {
             }
         }
 
+        public bool IsWandering {
+            get {
+                return _aiHandler.IsWandering;
+            }
+        }
+
         public Vector2 TargetDirection {
             set {
                 _position.TargetDirection = value;
@@ -146,11 +152,8 @@ namespace TinyShopping.Game {
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current time information.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime, bool playersInsect) {
-            //Texture2D texture = IsCarrying ? _textureFull : _texture;
             Rectangle destination = new Rectangle(_position.X - TextureSize / 2, _position.Y - TextureSize / 2, TextureSize, TextureSize);
             Vector2 origin = new Vector2(0, 0);
-            //batch.Draw(texture, destination, null, Color.White, _position.Rotation, origin, SpriteEffects.None, 0);
-
             _animationManager.Draw(batch, gameTime, destination, origin);
 
             var barPos = Position.ToPoint() - new Point2(TextureSize / 2, 8);

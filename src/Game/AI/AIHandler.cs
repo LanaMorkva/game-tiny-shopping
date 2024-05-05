@@ -24,6 +24,8 @@ namespace TinyShopping.Game.AI {
         private InsectState _insectState;
         public Pheromone ActivePheromone {get; private set;}
 
+        public bool IsWandering { get; private set;}
+
         public AIHandler(Insect insect, Services services) {
             _insect = insect;
             _ais = new Task[] {
@@ -46,6 +48,7 @@ namespace TinyShopping.Game.AI {
         }
 
         public void WalkTo(Vector2 target, Pheromone pheromone, GameTime gameTime, InsectState state, int targetMaxOffset = 0) {
+            IsWandering = false;
             if (pheromone != ActivePheromone) {
                 ActivePheromone?.RemovePathForAnt(_insect.GetHashCode());
                 ActivePheromone = pheromone;
@@ -78,6 +81,7 @@ namespace TinyShopping.Game.AI {
         }
 
         public void Wander(GameTime gameTime, InsectState state) {
+            IsWandering = true;
             if (_path.Count > 0) {
                 _path = new List<PFPoint>();
                 // Don't turn right after finding pheromone
