@@ -39,17 +39,29 @@ namespace TinyShopping.Game {
         }
 
         /// <summary>
-        /// Draws the statistics and fps counter.
+        /// Draws icons.
         /// </summary>
         /// <param name="batch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
-            IList<Insect> insects = _handler.GetAllInsects(0);
+            DrawSleepIconForPlayer(batch, 0, _handler.Player1Area, _handler.Camera1);
+            DrawSleepIconForPlayer(batch, 1, _handler.Player2Area, _handler.Camera2);
+        }
+
+        /// <summary>
+        /// Draws the sleep icon for the insects of the given player. 
+        /// </summary>
+        /// <param name="batch">The batch to draw to.</param>
+        /// <param name="player">The player to draw the icons for.</param>
+        /// <param name="playerArea">The screen area to draw to.</param>
+        /// <param name="camera">The camera to draw to.</param>
+        private void DrawSleepIconForPlayer(SpriteBatch batch, int player, Rectangle playerArea, Camera2D camera) {
+            IList<Insect> insects = _handler.GetAllInsects(player);
             foreach (var insect in insects) {
                 if (!insect.IsWandering) {
                     continue;
                 }
-                DrawSleepIcon(batch, insect.Position, Constants.INSECT_ICON_SIZE, _handler.Player1Area);
+                DrawSleepIcon(batch, insect.Position, Constants.INSECT_ICON_SIZE, playerArea, camera);
             }
         }
 
@@ -60,10 +72,11 @@ namespace TinyShopping.Game {
         /// <param name="pos">The world position to draw at.</param>
         /// <param name="size">The size of the icon.</param>
         /// <param name="viewArea">The view area of the player.</param>
-        private void DrawSleepIcon(SpriteBatch batch, Vector2 pos, int size, Rectangle viewArea) {
-            Vector3 pos3 = WorldToScreenCoordinate(pos);
+        /// <param name="camera">The camera to draw to.</param>
+        private void DrawSleepIcon(SpriteBatch batch, Vector2 pos, int size, Rectangle viewArea, Camera2D camera) {
+            Vector3 pos3 = WorldToScreenCoordinate(pos, camera);
             Rectangle borderR = new Rectangle(
-                (int)(pos3.X - _borderSize / 2), 
+                (int)(pos3.X + viewArea.X - _borderSize / 2), 
                 (int)(pos3.Y - _borderSize / 2 - 24), 
                 _borderSize,
                 _borderSize);
@@ -102,9 +115,9 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="pos">The world position to convert.</param>
         /// <returns>The screen position.</returns>
-        private Vector3 WorldToScreenCoordinate(Vector2 pos) {
+        private Vector3 WorldToScreenCoordinate(Vector2 pos, Camera2D camera) {
             Vector3 pos3 = new Vector3(pos.X, pos.Y, 0);
-            return (Matrix.CreateTranslation(pos3) * _handler.Camera1.GetViewMatrix()).Translation;
+            return (Matrix.CreateTranslation(pos3) * camera.GetViewMatrix()).Translation;
         }
     }
 }
