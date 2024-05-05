@@ -18,7 +18,7 @@ namespace TinyShopping.Game {
 
         private Texture2D _sleepIcon;
 
-        private Vector2 _borderDimension;
+        private int _borderSize;
 
         private int _borderPadding;
 
@@ -34,8 +34,8 @@ namespace TinyShopping.Game {
             _iconBorderV = content.Load<Texture2D>("icon_border_v");
             _iconBorderH = content.Load<Texture2D>("icon_border_h");
             _sleepIcon = content.Load<Texture2D>("sleep_indicator");
-            _borderPadding = 18;
-            _borderDimension = new Vector2(Constants.INSECT_ICON_SIZE + _borderPadding * 2, Constants.INSECT_ICON_SIZE + _borderPadding * 2);
+            _borderPadding = 24;
+            _borderSize = Constants.INSECT_ICON_SIZE + _borderPadding * 2;
         }
 
         /// <summary>
@@ -53,18 +53,26 @@ namespace TinyShopping.Game {
             }
         }
 
+        /// <summary>
+        /// Draws a sleep icon at the given location or the border of the screen.
+        /// </summary>
+        /// <param name="batch">The batch to draw to.</param>
+        /// <param name="pos">The world position to draw at.</param>
+        /// <param name="size">The size of the icon.</param>
+        /// <param name="viewArea">The view area of the player.</param>
         private void DrawSleepIcon(SpriteBatch batch, Vector2 pos, int size, Rectangle viewArea) {
             Vector3 pos3 = WorldToScreenCoordinate(pos);
             Rectangle borderR = new Rectangle(
-                (int)(pos3.X - _borderDimension.X / 2), 
-                (int)(pos3.Y - _borderDimension.Y - _borderDimension.Y / 2), 
-                (int)_borderDimension.X,
-                (int)_borderDimension.Y);
+                (int)(pos3.X - _borderSize / 2), 
+                (int)(pos3.Y - _borderSize / 2 - 24), 
+                _borderSize,
+                _borderSize);
             SpriteEffects effect = SpriteEffects.None;
+            Texture2D border = _iconBorderH;
             bool needBorder = false;
             if (borderR.Right > viewArea.Right) {
                 needBorder = true;
-                borderR.X = (int)(viewArea.Right - _borderDimension.X);
+                borderR.X = viewArea.Right - _borderSize;
             }
             if (borderR.Left < viewArea.Left) {
                 needBorder = true;
@@ -73,20 +81,27 @@ namespace TinyShopping.Game {
             }
             if (borderR.Top < viewArea.Top) {
                 needBorder = true;
-                borderR.Y = (int)(viewArea.Top);
+                borderR.Y = viewArea.Top;
+                border = _iconBorderV;
             }
             if (borderR.Bottom > viewArea.Bottom) {
                 needBorder = true;
-                borderR.Y = (int)(viewArea.Bottom - _borderDimension.X);
+                borderR.Y = viewArea.Bottom - _borderSize - 32;
                 effect = SpriteEffects.FlipVertically;
+                border = _iconBorderV;
             }
             if (needBorder) {
-                batch.Draw(_iconBorderH, borderR, null, Color.White, 0, new Vector2(), effect, 0);
+                batch.Draw(border, borderR, null, Color.White, 0, new Vector2(), effect, 0);
             }
             Rectangle r = new Rectangle(borderR.Center.X - size / 2, borderR.Center.Y - size / 2, size, size);
             batch.Draw(_sleepIcon, r, Color.White);
         }
 
+        /// <summary>
+        /// Converts the given world position to screen coordinates.
+        /// </summary>
+        /// <param name="pos">The world position to convert.</param>
+        /// <returns>The screen position.</returns>
         private Vector3 WorldToScreenCoordinate(Vector2 pos) {
             Vector3 pos3 = new Vector3(pos.X, pos.Y, 0);
             return (Matrix.CreateTranslation(pos3) * _handler.Camera1.GetViewMatrix()).Translation;
