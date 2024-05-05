@@ -159,7 +159,7 @@ namespace TinyShopping.Game {
         }
 
         public List<Rectangle> GetOtherInsectBoxes(Insect insect) {
-            return _insects.Where(i => i != insect).Select(i => i.BoundingBox).ToList();
+            return Insects.Where(i => i != insect).Select(i => i.BoundingBox).ToList();
         }
 
         /// <summary>
