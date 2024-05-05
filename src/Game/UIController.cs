@@ -11,8 +11,9 @@ namespace TinyShopping.Game {
 
     internal class UIController {
 
-        private static readonly Color _borderColor = new Color(247, 140, 52);
-        private static readonly Color _textColor = new Color(69, 49, 33);
+        private static readonly Color _borderColor = new Color(255, 157, 118);
+        private static readonly Color _textColor = new Color(83, 47, 85);
+        private static readonly float _fontScale = 0.4f;
 
         private SpriteFont _font;
         private SpriteFont _fontBig;
@@ -55,8 +56,8 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
-            _font = content.Load<SpriteFont>("fonts/Fun");
-            _fontBig = content.Load<SpriteFont>("fonts/FunBig");
+            _font = content.Load<SpriteFont>("fonts/General");
+            _fontBig = content.Load<SpriteFont>("fonts/General"); //FunBig
             _fontGeneral = content.Load<SpriteFont>("fonts/General");
 
             _appleTexture = content.Load<Texture2D>("stats/apple");
@@ -149,7 +150,7 @@ namespace TinyShopping.Game {
             }
 #if DEBUG
             int fps = (int) Math.Round((1000 / gameTime.ElapsedGameTime.TotalMilliseconds));
-            DrawString(batch, "FPS: " + fps.ToString(), new Vector2(80, 20));
+            DrawString(batch, "FPS: " + fps.ToString(), new Vector2(80, 20), _fontScale);
 #endif
         }
 
@@ -167,10 +168,10 @@ namespace TinyShopping.Game {
             timeBorderBig.Inflate(3, 3);
 
             batch.FillRectangle(splitBorderBig, _textColor);
-            batch.Draw(_roundRectTexture, timeBorderBig, _textColor);
+            //batch.Draw(_roundRectTexture, timeBorderBig, _textColor);
 
             batch.FillRectangle(splitBorder, _borderColor);
-            batch.Draw(_roundRectTexture, timeBorder, _borderColor);
+            batch.Draw(_roundRectTexture, timeBorder, Color.White);
         }
 
         /// <summary>
@@ -224,7 +225,7 @@ namespace TinyShopping.Game {
             if (secs < 0) {
                 time = "00:00";
             }
-            DrawString(batch, time, new Vector2(_scene.Width / 2, offsetTop));
+            DrawString(batch, time, new Vector2(_scene.Width / 2, offsetTop), _fontScale);
         }
 
         public float GetRemainingTime() {
@@ -254,9 +255,9 @@ namespace TinyShopping.Game {
         private void DrawDimScreen(SpriteBatch batch) {
             batch.FillRectangle(new Rectangle(0, 0, _scene.Width, _scene.Height), new Color(122, 119, 110, 120));
         }
-        private void DrawString(SpriteBatch batch, String text, Vector2 position) {
+        private void DrawString(SpriteBatch batch, String text, Vector2 position, float scale) {
             Vector2 origin = _font.MeasureString(text) / 2;
-            batch.DrawString(_font, text, position, _textColor, 0, origin, 0.95f, SpriteEffects.None, 0);
+            batch.DrawString(_font, text, position, _textColor, 0, origin, scale, SpriteEffects.None, 0); // scale used to be 0.95f
         }
         private void DrawBoldString(SpriteBatch batch, String text, Vector2 position, float scale, float border = .005f) {
             Vector2 origin = _fontBig.MeasureString(text) / 2;
@@ -270,10 +271,10 @@ namespace TinyShopping.Game {
             rectBig.Inflate(border, border);
 
             if (!flipped) {
-                batch.Draw(texture, rectBig, _textColor);
+                //batch.Draw(texture, rectBig, _textColor);
                 batch.Draw(texture, rect, color);
             } else {
-                batch.Draw(texture, rectBig, null, _textColor, 0, new Vector2(0, 0), SpriteEffects.FlipHorizontally, 0);
+                //batch.Draw(texture, rectBig, null, _textColor, 0, new Vector2(0, 0), SpriteEffects.FlipHorizontally, 0);
                 batch.Draw(texture, rect, null, color, 0, new Vector2(0, 0), SpriteEffects.FlipHorizontally, 0);
             }
         }
@@ -293,22 +294,22 @@ namespace TinyShopping.Game {
             var antsRect2 = new Rectangle(_scene.Width - 170, 130, 70, 70);
 
             DrawOutlinedTexture(batch, _appleTexture, appleRect1, Color.White, 3);
-            DrawOutlinedTexture(batch, _circleTexture, antsRect1, new Color(240, 137, 55), 2);
+            DrawOutlinedTexture(batch, _circleTexture, antsRect1, Color.White, 2);
 
             DrawOutlinedTexture(batch, _appleTexture, appleRect2, Color.White, 3, true);
-            DrawOutlinedTexture(batch, _circleTexture, antsRect2, new Color(240, 137, 55), 2);
+            DrawOutlinedTexture(batch, _circleTexture, antsRect2, Color.White, 2);
 
             String AntsNum1 = "x" + _handler.GetNumberOfAnts(0);
-            DrawString(batch, AntsNum1, antsRect1.Center.ToVector2());
+            DrawString(batch, AntsNum1, antsRect1.Center.ToVector2(), _fontScale);
 
             String FruitsNum1 = "x" + _handler.GetNumberOfFruits(0);
-            DrawString(batch, FruitsNum1, appleRect1.Center.ToVector2() - new Vector2(4, -6));
+            DrawString(batch, FruitsNum1, appleRect1.Center.ToVector2() - new Vector2(-2, 2), _fontScale);
 
             String AntsNum2 = "x" + _handler.GetNumberOfAnts(1);
-            DrawString(batch, AntsNum2, antsRect2.Center.ToVector2());
+            DrawString(batch, AntsNum2, antsRect2.Center.ToVector2(), _fontScale);
 
             String FruitsNum2 = "x" + _handler.GetNumberOfFruits(1);
-            DrawString(batch, FruitsNum2, appleRect2.Center.ToVector2() - new Vector2(-4, -6));
+            DrawString(batch, FruitsNum2, appleRect2.Center.ToVector2() - new Vector2(-1, -1), _fontScale);
 
         }
     }

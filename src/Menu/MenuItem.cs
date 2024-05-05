@@ -16,7 +16,7 @@ namespace TinyShopping {
         protected SpriteFont _font;
 
         protected static readonly Color _rectColor = new Color(241, 164, 132);
-        protected static readonly Color _textColor = new Color(69, 49, 33);
+        protected static readonly Color _textColor = new Color(83, 47, 85);
 
         public MenuItem(string name): this(name, NonAction) {}
 
