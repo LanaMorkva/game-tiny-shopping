@@ -71,13 +71,30 @@ namespace TinyShopping.Game.Pathfinding {
         private Point FindViableEndPosition(Vector2 start, Vector2 end) {
             Vector2 dir = (start - end).NormalizedCopy();
             int distance = 0;
-            while (true) {
+            while (distance <= RANGE * 4) {
                 var newEnd = (end + dir * distance).ToPoint();
                 if (_world.IsWalkable(newEnd.X, newEnd.Y, RANGE / 2)) {
                     return new Point(newEnd.X, newEnd.Y);
                 }
                 distance += RANGE;
             }
+            distance = RANGE;
+            while (true) {
+                for (int dX = -1; dX <= 1; dX++) {
+                    for (int dY = -1; dY <= 1; dY++) {
+                        if (dX == 0 && dY == 0) {
+                            continue;
+                        }
+                        int x = (int)end.X + dX * distance;
+                        int y = (int)end.Y + dY * distance;
+                        if (_world.IsWalkable(x, y, RANGE / 2)) {
+                            return new Point(x, y);
+                        }
+                    }
+                }
+                distance += RANGE;
+            }
+
         }
 
         /// <summary>

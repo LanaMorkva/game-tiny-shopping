@@ -90,7 +90,7 @@ namespace TinyShopping.Game {
                     _scene.IsStarted = true;
                 }
             } else {
-                if (!_scene.IsOver) {
+                if (!_scene.IsOver && !_scene.IsPaused) {
                     _runtimeMs += gameTime.ElapsedGameTime.TotalMilliseconds;
                 }
 

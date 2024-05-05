@@ -39,7 +39,7 @@ namespace TinyShopping.Game.AI {
             if (p == null || p.ReachedInsects.Contains(Insect)) {
                 return false;
             }
-            AIHandler.WalkTo(p.Position, p, gameTime);
+            AIHandler.WalkTo(p.Position, p, gameTime, InsectState.CarryRun, Constants.PHEROMONE_RANGE / 2);
             return true;
 
         }
@@ -52,19 +52,23 @@ namespace TinyShopping.Game.AI {
             if (p.Type == PheromoneType.FIGHT) {
                 Insect enemy = _colony.GetClosestEnemy(Insect.Position);
                 if (enemy != null) {
-                    Vector2 target = enemy.Position;
                     float fightRange = Constants.FIGHT_RANGE;
                     if (Insect.CanGiveDamage && Vector2.DistanceSquared(enemy.Position, Insect.Position) < fightRange * fightRange) {
                         enemy.TakeDamage(Insect.GiveDamage);
                     }
-                    AIHandler.WalkTo(target, p, gameTime);
+                    
+                    Vector2 target = enemy.Position;
+                    Vector2 dirTarget = Vector2.Normalize(target - Insect.Position);
+                    Vector2 offsetTarget = dirTarget * fightRange / 2;
+                    AIHandler.WalkTo(target - offsetTarget, p, gameTime, InsectState.Fight);
                     return true;
                 }
             }
             if (p.ReachedInsects.Contains(Insect)) {
                 return false;
             }
-            AIHandler.WalkTo(p.Position, p, gameTime);
+            AIHandler.WalkTo(p.Position, p, gameTime, p.Type == PheromoneType.FIGHT ? InsectState.FightRun : InsectState.Run, 
+                            Constants.PHEROMONE_RANGE / 2);
             return true;
         }
     }

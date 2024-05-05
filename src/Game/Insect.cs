@@ -2,15 +2,28 @@
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using System;
+using System.Linq;
 using TinyShopping.Game.AI;
 
 namespace TinyShopping.Game {
+    enum InsectState {
+        Wander = 0, 
+        Run = 1,
+        CarryWander = 2,
+        CarryRun = 3,
+
+        FightRun = 4,
+        FightWander = 5,
+        // active fight
+        Fight = 6,
+    }
 
     internal struct Services {
         public World world;
         public PheromoneHandler handler;
         public FruitHandler fruits;
         public Colony colony;
+        public InsectHandler coloniesHandler;
     }
 
     internal struct Attributes {
@@ -32,6 +45,8 @@ namespace TinyShopping.Game {
 
         private readonly World _world;
 
+        private InsectHandler _coloniesHandler;
+
         private Texture2D _texture;
 
         public int TextureSize { get; private set; } // equal to Constants.ANT_TEXTURE_SIZE, can be removed
@@ -40,15 +55,9 @@ namespace TinyShopping.Game {
 
         private readonly AnimationManager _animationManager = new();
 
-        public bool IsCarrying { get; set; }
+        private InsectState _state;
 
-        public enum InsectState {
-            Wander = 0, 
-            Run = 1,
-            CarryWander = 2,
-            CarryRun = 3,
-            Fight = 4
-        }
+        public bool IsCarrying { get; set; }
 
         public int Owner { get; private set; }
 
@@ -57,6 +66,9 @@ namespace TinyShopping.Game {
                 return _position.Position;
             }
         }
+
+        // This is bounding box of main part of the insect - it is smaller than a whole texture
+        public Rectangle BoundingBox => new(Position.ToPoint() - new Point(TextureSize/2, 0), new(TextureSize, TextureSize/2));
 
         public int TargetRotation {
             get {
@@ -85,7 +97,8 @@ namespace TinyShopping.Game {
             }
         }
 
-        private Attributes _attributes;
+        private readonly Attributes _attributes;
+        private readonly ColonyType _insectType;
 
         public int Health { private set; get; }
 
@@ -114,15 +127,17 @@ namespace TinyShopping.Game {
 
         private AIHandler _aiHandler;
 
-        public Insect(Services services, Vector2 spawn, int spawnRotation, Texture2D texture, int owner, Attributes attributes) {
+        public Insect(Services services, Vector2 spawn, int spawnRotation, Texture2D texture, ColonyType insectType) {
             _world = services.world;
             _pheromoneHandler = services.handler;
+            _coloniesHandler = services.coloniesHandler;
             _position = new InsectPos((int)spawn.X, (int)spawn.Y, spawnRotation);
             _texture = texture;
-            _attributes = attributes;
+            _insectType = insectType;
+            _attributes = insectType == ColonyType.ANT ? Constants.ANT_ATTRIBUTES : Constants.TERMITE_ATTRIBUTES;
             TextureSize = Constants.ANT_TEXTURE_SIZE;
-            Owner = owner;
-            Health = attributes.maxHealth;
+            Owner = (int)insectType;
+            Health = _attributes.maxHealth;
             _aiHandler = new AIHandler(this, services);
 
             _animationManager.AddAnimation(AnimationKey.Left, new Animation(_texture, 2, 4, 0.2f, 1));
@@ -149,7 +164,17 @@ namespace TinyShopping.Game {
             batch.DrawRectangle(healthBarBound, Color.Black);
 
 #if DEBUG
-            batch.DrawRectangle(destination, Color.Red);
+            var color = Color.White;
+            switch(_state) {
+                case InsectState.Run: color = Color.Green; break;
+                case InsectState.Wander: color = Color.LightGreen; break;
+                case InsectState.CarryRun: color = Color.Blue; break;
+                case InsectState.CarryWander: color = Color.LightBlue; break;
+                case InsectState.Fight: color = Color.Red; break;
+                case InsectState.FightWander:
+                case InsectState.FightRun: color = Color.Pink; break;
+            };
+            batch.DrawRectangle(destination, color);
             batch.DrawLine(Position, 30, _position.Rotation - (float) Math.PI/2, Color.Blue);
             batch.DrawLine(Position, 30, MathHelper.ToRadians(_position.TargetRotation - 90), Color.Red);
 #endif
@@ -176,7 +201,7 @@ namespace TinyShopping.Game {
                 _damageCooldown -= (float) gameTime.ElapsedGameTime.TotalMilliseconds;
             }
             UpdateAnimationManager(gameTime);
-            _aiHandler.Update(gameTime);
+            _aiHandler.RunNextTask(gameTime);
         }
 
         /// <summary>
@@ -204,17 +229,32 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Walk(GameTime gameTime, InsectState state) {
+            _state = state;
             if (_position.IsTurning) {
                 _position.Rotate((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.rotationSpeed);
                 _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed / 3);
                 return;
             }
-            switch (state) {
+            float speed = _attributes.speed;
+            switch (_state) {
+                case InsectState.FightWander:
                 case InsectState.CarryWander:
-                case InsectState.Wander: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * Constants.WANDER_SPEED); break;}
-                case InsectState.CarryRun: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed * 3/5); break;}
-                case InsectState.Run: {_position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * _attributes.speed); break;}
+                case InsectState.Wander: speed = Constants.WANDER_SPEED; break;
+                case InsectState.CarryRun: {
+                    if (_insectType == ColonyType.ANT) {
+                        speed = _attributes.speed * 3/5;
+                    } else {
+                        speed = _attributes.speed * 4/5;
+                    }
+                    break;
+                }
             }
+            _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * speed);
+        }
+
+        private void UpdateToAvailablePos(Vector2 prevPos) {
+            var insectBoxes = _coloniesHandler.GetOtherInsectBoxes(this);
+            bool notAvailable = insectBoxes.Any(box => box.Intersects(BoundingBox));
         }
 
         /// <summary>

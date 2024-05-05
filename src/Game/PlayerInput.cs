@@ -15,6 +15,13 @@ namespace TinyShopping.Game {
         /// <exception cref="Exception">Thrown if no input was received.</exception>
         public abstract Vector2 GetMotion();
 
+        /// <summary>
+        /// Reads the desired player camera motion from the input.
+        /// </summary>
+        /// <returns>A Vector2 of motion input.</returns>
+        /// <exception cref="Exception">Thrown if no input was received.</exception>
+        public abstract Vector2 GetCameraMotion();
+
         public abstract float GetZoom();
 
         /// <summary>
@@ -40,6 +47,8 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <returns>True if the button is pressed, false otherwise.</returns>
         public abstract bool IsNewInsectPressed();
+
+        public abstract bool IsStartedPressed();
     }
 
     internal class GamePadInput : PlayerInput {
@@ -51,6 +60,8 @@ namespace TinyShopping.Game {
         private Buttons _fightButton = Buttons.B;
 
         private Buttons _newInsectButton = Buttons.Y;
+
+        private Buttons _startButton = Buttons.Start;
 
         public GamePadInput(PlayerIndex playerIndex) {
             _playerIndex = playerIndex;
@@ -68,8 +79,18 @@ namespace TinyShopping.Game {
 
         public override float GetZoom() {
             GamePadState state = GamePad.GetState(_playerIndex);
+            float zoom_change = state.Triggers.Left - state.Triggers.Right;
+            return zoom_change * -1 * Constants.ZOOM_SPEED;
+        }
+
+        public override Vector2 GetCameraMotion() {
+            GamePadState state = GamePad.GetState(_playerIndex);
+            if (!state.IsConnected) {
+                throw new Exception("Unable to read player input, no available input methods left!");
+            }
             Vector2 motion = state.ThumbSticks.Right;
-            return motion.Y * -1 * Constants.ZOOM_SPEED;
+            motion.Y *= -1;
+            return motion;
         }
 
 
@@ -92,6 +113,12 @@ namespace TinyShopping.Game {
             GamePadState cState = GamePad.GetState(_playerIndex);
             return cState.IsButtonDown(_newInsectButton);
         }
+
+        public override bool IsStartedPressed()
+        {
+            GamePadState cState = GamePad.GetState(_playerIndex);
+            return cState.IsButtonDown(_startButton);
+        }
     }
 
     internal class KeyboardInput : PlayerInput {
@@ -111,6 +138,8 @@ namespace TinyShopping.Game {
         private Keys _fightKey = Keys.D3;
 
         private Keys _newInsectKey = Keys.D4;
+
+        private Keys _startKey = Keys.Escape;
 
         private Keys _zoomIn = Keys.Q;
         private Keys _zoomOut = Keys.E;
@@ -157,6 +186,11 @@ namespace TinyShopping.Game {
             return motion;
         }
 
+        public override Vector2 GetCameraMotion()
+        {
+            return new Vector2(0, 0);
+        }
+
         public override float GetZoom() {
             KeyboardState state = Keyboard.GetState();
             float zoom = 0f;
@@ -187,6 +221,12 @@ namespace TinyShopping.Game {
         public override bool IsNewInsectPressed() {
             KeyboardState kState = Keyboard.GetState();
             return kState.IsKeyDown(_newInsectKey);
+        }
+
+        public override bool IsStartedPressed()
+        {
+            KeyboardState kState = Keyboard.GetState();
+            return kState.IsKeyDown(_startKey);
         }
     }
 }

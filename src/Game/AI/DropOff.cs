@@ -28,7 +28,7 @@ namespace TinyShopping.Game.AI {
                 return true;
             }
             if (Insect.IsCarrying && Vector2.DistanceSquared(Insect.Position, _colony.DropOff) < Constants.PHEROMONE_DROPOFF_RANGE * Constants.PHEROMONE_DROPOFF_RANGE) {
-                AIHandler.WalkTo(_colony.DropOff, null, gameTime);
+                AIHandler.WalkTo(_colony.DropOff, null, gameTime, InsectState.CarryRun);
                 return true;
             }
             return false;

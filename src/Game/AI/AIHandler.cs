@@ -9,8 +9,6 @@ using PFPoint = TinyShopping.Game.Pathfinding.Point;
 
 namespace TinyShopping.Game.AI {
     internal class AIHandler {
-        private float _pheromoneCooldown = 0;
-        private float _damageCooldown = 0;
         private double _nextUpdateTime = 0;
 
         private Insect _insect;
@@ -23,6 +21,7 @@ namespace TinyShopping.Game.AI {
         private int _pathIndex;
         private Vector2 _target;
 
+        private InsectState _insectState;
         public Pheromone ActivePheromone {get; private set;}
 
         public bool IsWandering { get; private set;}
@@ -40,7 +39,7 @@ namespace TinyShopping.Game.AI {
             _pathFinder = new Pathfinder(services.world);
         }
 
-        public void Update(GameTime gameTime) {
+        public void RunNextTask(GameTime gameTime) {
             foreach (var ai in _ais) {
                 if (ai.Run(gameTime)) {
                     return;
@@ -48,18 +47,25 @@ namespace TinyShopping.Game.AI {
             }
         }
 
-        public void WalkTo(Vector2 target, Pheromone pheromone, GameTime gameTime) {
+        public void WalkTo(Vector2 target, Pheromone pheromone, GameTime gameTime, InsectState state, int targetMaxOffset = 0) {
             IsWandering = false;
-            ActivePheromone = pheromone;
+            if (pheromone != ActivePheromone) {
+                ActivePheromone?.RemovePathForAnt(_insect.GetHashCode());
+                ActivePheromone = pheromone;
+            }
             if (Vector2.DistanceSquared(target, _target) > 32) {
                 _target = target;
-                _path = _pathFinder.FindPath(_insect.Position, target);
+
+                // introduce some randomization for the pheromone target for every ant
+                Random.Shared.NextUnitVector(out Vector2 randomDir);
+                var targetOffset = randomDir * Random.Shared.Next(targetMaxOffset);
+
+                _path = _pathFinder.FindPath(_insect.Position, target + targetOffset);
                 _pathIndex = 0;
             }
             if (_pathIndex < _path.Count) {
                 var nextPoint = new Vector2(_path[_pathIndex].X, _path[_pathIndex].Y);
                 _insect.TargetDirection = nextPoint - _insect.Position; 
-                var state = _insect.IsCarrying ? Insect.InsectState.CarryRun : Insect.InsectState.Run;
                 _insect.Walk(gameTime, state);
                 if (Vector2.DistanceSquared(nextPoint, _insect.Position) < 256) {
                     _pathIndex++;
@@ -69,10 +75,12 @@ namespace TinyShopping.Game.AI {
             }
             pheromone?.ReachedInsects.Add(_insect);
             pheromone?.RemovePathForAnt(_insect.GetHashCode());
-            Wander(gameTime);
+            if (state != InsectState.Fight) {
+                Wander(gameTime, state);
+            }
         }
 
-        public void Wander(GameTime gameTime) {
+        public void Wander(GameTime gameTime, InsectState state) {
             IsWandering = true;
             if (_path.Count > 0) {
                 _path = new List<PFPoint>();
@@ -89,7 +97,6 @@ namespace TinyShopping.Game.AI {
                     _insect.TargetDirection = dir.NormalizedCopy();
                 }
             }
-            var state = _insect.IsCarrying ? Insect.InsectState.CarryWander : Insect.InsectState.Wander;
             _insect.Walk(gameTime, state);
         }
     }

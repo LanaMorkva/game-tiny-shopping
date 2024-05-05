@@ -130,5 +130,13 @@ namespace TinyShopping.Game {
         public IList<Insect> GetAllInsects(int player) {
             return _colonies[player].Insects;
         }
+
+        public List<Rectangle> GetOtherInsectBoxes(Insect insect) {
+            var boxes = new List<Rectangle>();
+            foreach (var colony in _colonies) {
+                boxes.AddRange(colony.GetOtherInsectBoxes(insect));
+            }
+            return boxes;
+        }
     }
 }
