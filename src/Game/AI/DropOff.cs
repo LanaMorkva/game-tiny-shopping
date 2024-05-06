@@ -12,7 +12,7 @@ namespace TinyShopping.Game.AI {
         /// <param name="insect">The insect to control.</param>
         /// <param name="world">The world to exist in.</param>
         /// <param name="colony">The insect's colony.</param>
-        public DropOff(Insect insect, World world, Colony colony) : base(insect, world) {
+        public DropOff(Insect insect, World world, AIHandler aiHandler, Colony colony) : base(insect, world, aiHandler) {
             _colony = colony;
         }
 
@@ -28,7 +28,7 @@ namespace TinyShopping.Game.AI {
                 return true;
             }
             if (Insect.IsCarrying && Vector2.DistanceSquared(Insect.Position, _colony.DropOff) < Constants.PHEROMONE_DROPOFF_RANGE * Constants.PHEROMONE_DROPOFF_RANGE) {
-                Insect.WalkTo(_colony.DropOff, null, gameTime);
+                AIHandler.WalkTo(_colony.DropOff, null, gameTime, InsectState.CarryRun);
                 return true;
             }
             return false;

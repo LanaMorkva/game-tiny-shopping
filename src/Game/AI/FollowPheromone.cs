@@ -15,7 +15,7 @@ namespace TinyShopping.Game.AI {
         /// <param name="world">The world to exist in.</param>
         /// <param name="handler">The pheromone handler to use.</param>
         /// <param name="colony">The insect's colony.</param>
-        public FollowPheromone(Insect insect, World world, PheromoneHandler handler, Colony colony) : base(insect, world) {
+        public FollowPheromone(Insect insect, World world, AIHandler aiHandler, PheromoneHandler handler, Colony colony) : base(insect, world, aiHandler) {
             _handler = handler;
             _colony = colony;
         }
@@ -36,31 +36,39 @@ namespace TinyShopping.Game.AI {
 
         private bool HandleReturnPheromone(GameTime gameTime) {
             Pheromone p = _handler.GetReturnPheromone(Insect.Position, Insect.Owner);
-            if (p == null || p == Insect.Pheromone) {
+            if (p == null || p.ReachedInsects.Contains(Insect)) {
                 return false;
             }
-            Insect.WalkTo(p.Position, p, gameTime);
+            AIHandler.WalkTo(p.Position, p, gameTime, InsectState.CarryRun, Constants.PHEROMONE_RANGE / 2);
             return true;
 
         }
 
         private bool HandleForwardPheromones(GameTime gameTime) {
             Pheromone p = _handler.GetForwardPheromone(Insect.Position, Insect.Owner);
-            if (p == null || p == Insect.Pheromone) {
+            if (p == null) {
                 return false;
             }
-            Vector2 target = p.Position;
             if (p.Type == PheromoneType.FIGHT) {
                 Insect enemy = _colony.GetClosestEnemy(Insect.Position);
                 if (enemy != null) {
-                    target = enemy.Position;
                     float fightRange = Constants.FIGHT_RANGE;
-                    if (Vector2.DistanceSquared(enemy.Position, Insect.Position) < fightRange * fightRange) {
-                        enemy.TakeDamage(Insect.Damage);
+                    if (Insect.CanGiveDamage && Vector2.DistanceSquared(enemy.Position, Insect.Position) < fightRange * fightRange) {
+                        enemy.TakeDamage(Insect.GiveDamage);
                     }
+                    
+                    Vector2 target = enemy.Position;
+                    Vector2 dirTarget = Vector2.Normalize(target - Insect.Position);
+                    Vector2 offsetTarget = dirTarget * fightRange / 2;
+                    AIHandler.WalkTo(target - offsetTarget, p, gameTime, InsectState.Fight);
+                    return true;
                 }
             }
-            Insect.WalkTo(target, p, gameTime);
+            if (p.ReachedInsects.Contains(Insect)) {
+                return false;
+            }
+            AIHandler.WalkTo(p.Position, p, gameTime, p.Type == PheromoneType.FIGHT ? InsectState.FightRun : InsectState.Run, 
+                            Constants.PHEROMONE_RANGE / 2);
             return true;
         }
     }

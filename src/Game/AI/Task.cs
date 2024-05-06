@@ -8,9 +8,12 @@ namespace TinyShopping.Game.AI {
 
         public World World { get; private set; }
 
-        public Task(Insect insect, World world) {
+        public AIHandler AIHandler { get; private set; }
+
+        public Task(Insect insect, World world, AIHandler aiHandler) {
             Insect = insect;
             World = world;
+            AIHandler = aiHandler;
         }
 
         /// <summary>

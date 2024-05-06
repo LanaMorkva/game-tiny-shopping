@@ -15,6 +15,8 @@ namespace TinyShopping.Game {
         public virtual float VisibleRange => Constants.FRUIT_VISIBILITY_RANGE;
 
         public virtual Point2 Center => _boundingBox.Center;
+
+        public virtual int Size => (int)Math.Min(_boundingBox.Width, _boundingBox.Height);
         protected RectangleF _boundingBox;
 
         public virtual bool ShouldPickUp(Rectangle rect) {
@@ -83,6 +85,8 @@ namespace TinyShopping.Game {
         private int _height;
 
         public override float VisibleRange => Constants.FRUIT_BOX_TEXTURE_SIZE / 2 + Constants.FRUIT_VISIBILITY_RANGE;
+
+        public override int Size => Constants.BOX_BOTTOM_H * 2;
 
         public override bool ShouldPickUp(Rectangle rect) {
             Polygon objPoly = new Polygon(rect.ToRectangleF().GetCorners());

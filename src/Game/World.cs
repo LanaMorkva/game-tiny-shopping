@@ -15,9 +15,11 @@ namespace TinyShopping.Game {
         enum LayerName {
             BackgroundGroup = 0,
             Floor,
-            Objects,
             Walls,
-            Objects2,
+            Walls2,
+            SpawnObjects,
+            Posters,
+            Baskets,
         };
 
         private ObstacleLayer _obstacleLayer;      
@@ -42,7 +44,9 @@ namespace TinyShopping.Game {
             //_tintEffect = new TiledMapEffect(contentManager.Load<Effect>("shaders/TintMapEffect"));
             _tiledMap = contentManager.Load<TiledMap>("map_isometric/map-angled");
             _tiledMap.GetLayer("Walls").Offset = new Vector2(0, -96);
-            _tiledMap.GetLayer("Objects").Offset = new Vector2(0, -64);
+            _tiledMap.GetLayer("Walls2").Offset = new Vector2(0, -96);
+            _tiledMap.GetLayer("Posters").Offset = new Vector2(0, -32);
+            _tiledMap.GetLayer("Baskets").Offset = new Vector2(0, -50);
             _tiledMapRenderer = new TiledMapRenderer(device, _tiledMap);
             _obstacleLayer = new ObstacleLayer(_tiledMap);
 
@@ -52,6 +56,10 @@ namespace TinyShopping.Game {
             FruitHandler.LoadContent(contentManager);
         }
 
+        public void UnloadContent(ContentManager contentManager, GraphicsDevice device) {
+            contentManager.UnloadAsset("map_isometric/map-angled");
+        }
+
         /// <summary>
         /// Draws an area of the world to the sprite batch.
         /// </summary>
@@ -59,8 +67,8 @@ namespace TinyShopping.Game {
         /// <param name="destination">The destination to draw to.</param>
         /// <param name="source">The source rectangle on the texture to use.</param>
         public void DrawFloor(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
+            _tiledMapRenderer.Draw((int)LayerName.BackgroundGroup, viewMatrix);
             _tiledMapRenderer.Draw((int)LayerName.Floor, viewMatrix);
-            _tiledMapRenderer.Draw((int)LayerName.Objects, viewMatrix);
         }
 
         /// <summary>
@@ -69,11 +77,14 @@ namespace TinyShopping.Game {
         /// <param name="batch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
         public void DrawObjects(SpriteBatch batch, Matrix viewMatrix, Vector2 position) {
-            _tiledMapRenderer.Draw((int)LayerName.BackgroundGroup, viewMatrix);
             _tiledMapRenderer.Draw((int)LayerName.Walls, viewMatrix);
-            _tiledMapRenderer.Draw((int)LayerName.Objects2, viewMatrix);
-
             FruitHandler.Draw(batch);
+            batch.End();
+            batch.Begin(transformMatrix: viewMatrix, blendState: BlendState.AlphaBlend, samplerState: SamplerState.PointClamp);
+            _tiledMapRenderer.Draw((int)LayerName.Walls2, viewMatrix); // some walls must be rendered on top of fruits
+            _tiledMapRenderer.Draw((int)LayerName.SpawnObjects, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.Posters, viewMatrix);
+            _tiledMapRenderer.Draw((int)LayerName.Baskets, viewMatrix);
         }
 
 #if DEBUG

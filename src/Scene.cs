@@ -36,6 +36,10 @@ namespace TinyShopping {
 
         }
 
+        public virtual void UnloadContent() {
+
+        }
+
         public virtual void Terminate() {
             MediaPlayer.Stop();
         }

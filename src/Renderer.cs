@@ -35,6 +35,12 @@ namespace TinyShopping {
             base.LoadContent();
         }
 
+        protected override void UnloadContent()
+        {
+            _scene.UnloadContent();
+            base.UnloadContent();
+        }
+
         protected override void Update(GameTime gameTime) {
             _scene.Update(gameTime);
             base.Update(gameTime);
@@ -48,6 +54,7 @@ namespace TinyShopping {
 
         public void ChangeScene(Scene newScene) {
             _scene.Terminate();
+            _scene.UnloadContent();
             newScene.Initialize();
             newScene.LoadContent();
             _scene = newScene;

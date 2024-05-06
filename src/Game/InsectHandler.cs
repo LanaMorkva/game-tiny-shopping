@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 
 namespace TinyShopping.Game {
 
@@ -58,9 +59,10 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SpriteBatch batch, GameTime gameTime) {
-            foreach(var colony in _colonies) {
-                colony.Draw(batch, gameTime);
+        /// <param name="playerId">The player's id whose screen we are drawing.</param>
+        public void Draw(SpriteBatch batch, GameTime gameTime, int playerId) {
+            for (int i = 0; i < _colonies.Length; i++) {
+                _colonies[i].Draw(batch, gameTime, playerId == i);
             }
         }
 
@@ -118,6 +120,23 @@ namespace TinyShopping.Game {
         /// <returns>The number of fruits collected.</returns>
         public int GetNumberOfFruits(int player) {
             return _colonies[player].FruitsNum;
+        }
+
+        /// <summary>
+        /// Gets all insects in the colony of the given player.
+        /// </summary>
+        /// <param name="player">The player to use.</param>
+        /// <returns>A list of insects.</returns>
+        public IList<Insect> GetAllInsects(int player) {
+            return _colonies[player].Insects;
+        }
+
+        public List<Rectangle> GetOtherInsectBoxes(Insect insect) {
+            var boxes = new List<Rectangle>();
+            foreach (var colony in _colonies) {
+                boxes.AddRange(colony.GetOtherInsectBoxes(insect));
+            }
+            return boxes;
         }
     }
 }

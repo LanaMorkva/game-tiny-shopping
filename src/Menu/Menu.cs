@@ -9,9 +9,23 @@ using System.Linq;
 
 namespace TinyShopping {
 
+    struct MenuExplanation {
+        public string button;
+        public string text;
+        public Color buttonColor;
+
+        public MenuExplanation(string Button, string Text, Color ButtonColor) {
+            button = Button;
+            text = Text;
+            buttonColor = ButtonColor;
+        }
+    }
+
     class SelectMenu {
 
         protected List<SoundEffect> _soundEffects;
+
+        protected SpriteFont _font;
 
         protected int _currentSelection;
 
@@ -36,10 +50,20 @@ namespace TinyShopping {
 
         protected MenuInput _menuInput;
 
-        public SelectMenu(Rectangle menuRegion, Vector2 itemSize, Action backAction): this(menuRegion, new Vector2(0, 0), itemSize, backAction) {
+        protected Rectangle _explanationRegion;
+
+        protected List<MenuExplanation> _explanations;
+
+        public SelectMenu(Rectangle menuRegion, Vector2 itemSize, Action backAction, Rectangle explanationRegion): this(menuRegion, new Vector2(0, 0), itemSize, backAction, explanationRegion, CreateDefaultExplanations()) {
         }
 
-        public SelectMenu(Rectangle menuRegion, Vector2 centerOffset, Vector2 itemSize, Action backAction) {
+        public SelectMenu(Rectangle menuRegion, Vector2 itemSize, Action backAction, Rectangle explanationRegion, List<MenuExplanation> explanations): this(menuRegion, new Vector2(0, 0), itemSize, backAction, explanationRegion, explanations) {
+        }
+
+        public SelectMenu(Rectangle menuRegion, Vector2 centerOffset, Vector2 itemSize, Action backAction, Rectangle explanationRegion): this(menuRegion, centerOffset, itemSize, backAction, explanationRegion, CreateDefaultExplanations()) {
+        }
+
+        public SelectMenu(Rectangle menuRegion, Vector2 centerOffset, Vector2 itemSize, Action backAction, Rectangle explanationRegion, List<MenuExplanation> explanations) {
             _menuRegion = menuRegion;
             _centerOffset = centerOffset;
             _itemSize = itemSize;
@@ -49,6 +73,15 @@ namespace TinyShopping {
             _menuItems = new List<MenuItem>();
             _backAction = backAction;
             _menuInput = CreateMenuInput(PlayerIndex.One);
+
+            _explanationRegion = explanationRegion;
+            _explanations = explanations;
+        }
+
+        private static List<MenuExplanation> CreateDefaultExplanations() {
+            return new List<MenuExplanation> {
+                new("<A>", "Select", Color.Green)
+            };
         }
 
 
@@ -57,6 +90,7 @@ namespace TinyShopping {
         /// </summary>
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
+            _font = content.Load<SpriteFont>("fonts/General");
             _soundEffects.Add(content.Load<SoundEffect>("sounds/beep-deep"));
             _soundEffects.Add(content.Load<SoundEffect>("sounds/cash_register"));
             _soundEffects.Add(content.Load<SoundEffect>("sounds/beep-extra-deep"));
@@ -161,6 +195,19 @@ namespace TinyShopping {
                 menuItem.Draw(batch, itemRect);
                 menuLocation += new Vector2(0, _itemSize.Y + _itemPadding);
             }
+            
+            //batch.DrawRectangle(_explanationRegion, Color.Red);
+            int i = 0;
+            foreach (var explanation in _explanations) {
+                float scale = 0.5f;
+                Vector2 buttonSize = _font.MeasureString(explanation.button) * scale;
+                float x = _explanationRegion.X;
+                float y = i * (_explanationRegion.Height / _explanations.Count) + _explanationRegion.Y;
+                Vector2 origin = new Vector2(_explanationRegion.X, _explanationRegion.Y);
+                batch.DrawString(_font, explanation.text, new Vector2(x + buttonSize.X + 10, y), Color.Black, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+                batch.DrawString(_font, explanation.button, new Vector2(x, y), explanation.buttonColor, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+                i++;
+            }
         }
 
         private MenuInput CreateMenuInput(PlayerIndex playerIndex) {
@@ -169,6 +216,10 @@ namespace TinyShopping {
                 return new GamePadMenuInput(playerIndex);
             }
             return new KeyboardMenuInput(playerIndex);
+        }
+
+        public void ResetActiveItem() {
+            _currentSelection = 0;
         }
     }
 }

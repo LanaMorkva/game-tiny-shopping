@@ -1,7 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.Extended;
 using System;
 
 namespace TinyShopping {
@@ -17,7 +16,11 @@ namespace TinyShopping {
         protected SpriteFont _font;
 
         protected static readonly Color _rectColor = new Color(241, 164, 132);
-        protected static readonly Color _textColor = new Color(69, 49, 33);
+        protected static readonly Color _textColor = new Color(83, 47, 85);
+
+        public MenuItem(string name): this(name, NonAction) {}
+
+        private static void NonAction() {}
 
         public MenuItem(string name, Action selectAction) {
             _name = name;
@@ -34,7 +37,7 @@ namespace TinyShopping {
             //batch.Draw(_roundRectTexture, itemRect, color);
 
             Vector2 origin = _font.MeasureString(text) / 2;
-            batch.DrawString(_font, text, itemRect.Center.ToVector2(), _textColor, 0, origin, 0.7f, 
+            batch.DrawString(_font, text, itemRect.Center.ToVector2(), color, 0, origin, 0.7f, 
                 SpriteEffects.None, 0);
         }
 

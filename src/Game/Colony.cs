@@ -4,12 +4,13 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
+using System.Linq;
 
 namespace TinyShopping.Game {
 
     internal enum ColonyType {
-        ANT,
-        TERMITE
+        ANT = 0,
+        TERMITE = 1,
     }
 
     internal class Colony {
@@ -20,11 +21,9 @@ namespace TinyShopping.Game {
 
         private Services _services;
 
-        private Texture2D _antTexture;
+        private Texture2D _texture;
 
-        private Texture2D _termiteTexture;
-
-        private List<Insect> _insects = new List<Insect>();
+        public List<Insect> Insects { get; private set; } = new List<Insect>();
 
         private int _queue;
 
@@ -42,7 +41,7 @@ namespace TinyShopping.Game {
 
         public int FruitsNum => _collectedFruit;
 
-        public int AntsNum => _insects.Count;
+        public int AntsNum => Insects.Count;
 
         List<SoundEffect> _soundEffects;
 
@@ -67,7 +66,7 @@ namespace TinyShopping.Game {
             _owner = owner;
             _insectHandler = insectHandler;
             _soundEffects = new List<SoundEffect>();
-            _services = new Services { colony = this, fruits = fruits, handler = handler, world = world };
+            _services = new Services { colony = this, fruits = fruits, handler = handler, world = world, coloniesHandler = insectHandler };
             _type = type;
         }
 
@@ -82,8 +81,8 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
-            _antTexture = content.Load<Texture2D>("ants/ant_texture");
-            _termiteTexture = content.Load<Texture2D>("termites/termite_texture");
+            var texturePath = _type == ColonyType.ANT ? "ants/ant_texture" : "termites/termite_texture";
+            _texture = content.Load<Texture2D>(texturePath);
             _soundEffects.Add(content.Load<SoundEffect>("sounds/cash_register"));
             _soundEffects.Add(content.Load<SoundEffect>("sounds/insect_dying"));
         }
@@ -98,10 +97,10 @@ namespace TinyShopping.Game {
                 _spawnCooldown = 1000;
                 _queue -= 1;
                 Insect ant = GetNewInsect();
-                _insects.Add(ant);
+                Insects.Add(ant);
             }
-            List<Insect> remaining = new List<Insect>(_insects.Count);
-            foreach (Insect insect in _insects) {
+            List<Insect> remaining = new List<Insect>(Insects.Count);
+            foreach (Insect insect in Insects) {
                 if (insect.Health > 0) {
                     insect.Update(gameTime);
                     remaining.Add(insect);
@@ -109,7 +108,7 @@ namespace TinyShopping.Game {
                     _soundEffects[1].Play();
                 }
             }
-            _insects = remaining;
+            Insects = remaining;
         }
 
         /// <summary>
@@ -117,12 +116,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <returns>An Ant or Termite.</returns>
         private Insect GetNewInsect() {
-            if (_type == ColonyType.ANT) {
-                return new Insect(_services, _spawn, _spawnRotation, _antTexture, _owner, Constants.ANT_ATTRIBUTES);
-            }
-            else {
-                return new Insect(_services, _spawn, _spawnRotation, _termiteTexture, _owner, Constants.TERMITE_ATTRIBUTES);
-            }
+            return new Insect(_services, _spawn, _spawnRotation, _texture, _type);
         }
 
         /// <summary>
@@ -130,9 +124,9 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="handler">The split screen handler to use for rendering.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SpriteBatch batch, GameTime gameTime) {
-            foreach (Insect insect in _insects) {
-                insect.Draw(batch, gameTime);
+        public void Draw(SpriteBatch batch, GameTime gameTime, bool playersColony) {
+            foreach (Insect insect in Insects) {
+                insect.Draw(batch, gameTime, playersColony);
             }
         }
 
@@ -164,6 +158,10 @@ namespace TinyShopping.Game {
             return _insectHandler.GetClosestEnemy(_owner, position);
         }
 
+        public List<Rectangle> GetOtherInsectBoxes(Insect insect) {
+            return Insects.Where(i => i != insect).Select(i => i.BoundingBox).ToList();
+        }
+
         /// <summary>
         /// Gets the closest insect to the given position.
         /// </summary>
@@ -173,7 +171,7 @@ namespace TinyShopping.Game {
         public Insect GetClosestToInRange(Vector2 position, float range) {
             float minDis = float.MaxValue;
             Insect closest = null;
-            foreach (var i in _insects) {
+            foreach (var i in Insects) {
                 float sqDis = Vector2.DistanceSquared(position, i.Position);
                 if (sqDis < range*range && sqDis < minDis) {
                     closest = i;
