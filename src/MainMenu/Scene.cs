@@ -46,7 +46,7 @@ namespace TinyShopping.MainMenu
             Rectangle explanationRegion = new Rectangle(50, Height - 150, 300, 100);
             _selectMenu = new MainSelectMenu(menuRegion, centerOffset, menuItemSize, explanationRegion);
             _selectMenu.AddItem(new MainMenuItem("New Game", StartGame));
-            _selectMenu.AddItem(new MainMenuItem("Tutorial", StartGame));
+            _selectMenu.AddItem(new MainMenuItem("Tutorial", StartTutorial));
             _selectMenu.AddItem(new MainMenuItem("Controls", ControlsTutorial));
             _selectMenu.AddItem(new MainMenuItem("Settings", SettingsMenu));
             _selectMenu.AddItem(new MainMenuItem("Quit", ExitGame));

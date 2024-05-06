@@ -23,7 +23,7 @@ namespace TinyShopping.Game {
 
         public GameScene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
             base(content, graphics, manager, game, settingsHandler) {
-            _world = new World();
+            _world = new World("map_isometric/map-angled");
             _pheromoneHandler = new PheromoneHandler(_world);
             _insectHandler = new InsectHandler(_world, _pheromoneHandler, _world.FruitHandler);
             _splitScreenHandler = new SplitScreenHandler(this, _world, _insectHandler, _pheromoneHandler);

@@ -160,6 +160,11 @@
 /processor:TiledMapProcessor
 /build:map_isometric/map-angled.tmx
 
+#begin map_isometric/map-tutorial.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:map_isometric/map-tutorial.tmx
+
 #begin pheromone_particle.png
 /importer:TextureImporter
 /processor:TextureProcessor
