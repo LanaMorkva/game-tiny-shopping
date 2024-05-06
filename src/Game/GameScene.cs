@@ -19,17 +19,10 @@ namespace TinyShopping.Game {
 
         private SplitScreenHandler _splitScreenHandler;
 
-        private Rectangle _player1Area;
-
-        private Rectangle _player2Area;
-
         private SelectMenu _pauseMenu;
 
         public GameScene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
             base(content, graphics, manager, game, settingsHandler) {
-            _player1Area = new Rectangle(0, 0, Width / 2, Height);
-            _player2Area = new Rectangle(Width / 2, 0, Width / 2, Height);
-
             _world = new World();
             _pheromoneHandler = new PheromoneHandler(_world);
             _insectHandler = new InsectHandler(_world, _pheromoneHandler, _world.FruitHandler);
