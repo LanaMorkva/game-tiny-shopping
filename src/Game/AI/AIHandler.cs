@@ -58,18 +58,18 @@ namespace TinyShopping.Game.AI {
         }
 
         private bool IsTargetAvailable(Vector2 target) {
-            return _insectsColony.TargetPositions.Where(p => Vector2.Distance(p, target) < 32).Count() == 0;
+            return _insectsColony.TargetPositions.Where(p => Vector2.Distance(p, target) < 24).Count() == 0;
         }
 
         private Vector2 GetAvailableTarget(Vector2 target) {
             if (IsTargetAvailable(target)) {
                 return target;
             }
-            int offsetStep = 16;
+            int offsetStep = 8;
             var dirFromTarget = (_insect.Position - target).NormalizedCopy(); 
             var closestAvailable = target;
             float closestDist = float.MaxValue;
-            float maxDistFromTarget = 124;
+            float maxDistFromTarget = 96;
 
             for (int degree = -80; degree <= 80; degree+=10) {
                 float angleInRadians = MathHelper.ToRadians(degree); 
