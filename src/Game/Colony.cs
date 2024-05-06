@@ -44,6 +44,7 @@ namespace TinyShopping.Game {
         public int AntsNum => Insects.Count;
 
         List<SoundEffect> _soundEffects;
+        public List<Vector2> TargetPositions {get; set;}
 
 
         /// <summary>
@@ -68,6 +69,7 @@ namespace TinyShopping.Game {
             _soundEffects = new List<SoundEffect>();
             _services = new Services { colony = this, fruits = fruits, handler = handler, world = world, coloniesHandler = insectHandler };
             _type = type;
+            TargetPositions = new List<Vector2>();
         }
 
         /// <summary>
@@ -92,6 +94,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
+            TargetPositions.Clear();
             _spawnCooldown -= (int) Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
             if (_spawnCooldown < 0 && _queue > 0) {
                 _spawnCooldown = 1000;
@@ -156,10 +159,6 @@ namespace TinyShopping.Game {
         /// <returns>An insect instance or null.</returns>
         public Insect GetClosestEnemy(Vector2 position) {
             return _insectHandler.GetClosestEnemy(_owner, position);
-        }
-
-        public List<Rectangle> GetOtherInsectBoxes(Insect insect) {
-            return Insects.Where(i => i != insect).Select(i => i.BoundingBox).ToList();
         }
 
         /// <summary>
