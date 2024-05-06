@@ -105,11 +105,14 @@ namespace TinyShopping.Game {
             }
         }
 
-        public int GiveDamage { 
+        public int GetDamagePower { 
             get {
-                _damageCooldown = _attributes.damageReload;
                 return _attributes.damage;
             } 
+        }
+
+        public void SendShot() {
+            _damageCooldown = _attributes.damageReload;
         }
 
         private float _pheromoneCooldown;

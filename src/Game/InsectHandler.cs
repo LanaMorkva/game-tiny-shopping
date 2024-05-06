@@ -1,9 +1,43 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MonoGame.Extended;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TinyShopping.Game {
+
+    internal class Shot {
+        public int Owner {get;}
+        public int Damage {get;}
+        public bool ShouldRemove {set; get;}
+        private Vector2 _end;        
+        private Vector2 _dir;        
+        public Vector2 Position {get; private set;}
+
+        public Shot(int owner, int damage, Vector2 start, Vector2 end) {
+            Owner = owner;
+            Damage = damage;
+            Position = start;
+            _end = end;
+            _dir = (end - start).NormalizedCopy();
+            ShouldRemove = false;
+        }
+
+        public void Update(GameTime gameTime) {
+            Position += (float)gameTime.ElapsedGameTime.TotalSeconds * 160 * _dir;
+            ShouldRemove = Vector2.Dot(_end - Position, _dir) < 0;
+        }
+
+        public void Draw(SpriteBatch batch) {
+            // big thickness to draw filled circle
+            if (Owner == 0) {
+                batch.DrawCircle(Position, 3.5f, 8, new Color(66, 50, 38, 150), 3.5f);
+                return;
+            }
+            batch.DrawCircle(Position, 4.5f, 8, new Color(130, 56, 7, 150), 4.5f);
+        }
+    }
 
     /// <summary>
     /// The InsectHandler takes care of the existing insect colonies.
@@ -17,6 +51,7 @@ namespace TinyShopping.Game {
         private FruitHandler _fruitHandler;
 
         private Colony[] _colonies;
+        private List<Shot> _shots;
 
         /// <summary>
         /// Creates a new instance.
@@ -28,6 +63,8 @@ namespace TinyShopping.Game {
             _world = world;
             _pheromoneHandler = pheromones;
             _fruitHandler = fruits;
+
+            _shots = new List<Shot>();
         }
 
         /// <summary>
@@ -52,6 +89,18 @@ namespace TinyShopping.Game {
             foreach (var colony in _colonies) {
                 colony.Update(gameTime);
             }
+            foreach (var shot in _shots) {
+                shot.Update(gameTime);
+                int enemyIndex = 1 - shot.Owner;
+                Colony c = _colonies[enemyIndex];
+                float range = 10;
+                var enemy = c.GetClosestToInRange(shot.Position, range);       
+                if (enemy != null) {
+                    enemy.TakeDamage(shot.Damage);
+                    shot.ShouldRemove = true;
+                }
+            }
+            _shots = _shots.Where(obj => !obj.ShouldRemove).ToList();
         }
 
         /// <summary>
@@ -63,6 +112,10 @@ namespace TinyShopping.Game {
         public void Draw(SpriteBatch batch, GameTime gameTime, int playerId) {
             for (int i = 0; i < _colonies.Length; i++) {
                 _colonies[i].Draw(batch, gameTime, playerId == i);
+            }
+
+            foreach (var shot in _shots) {
+                shot.Draw(batch);
             }
         }
 
@@ -130,5 +183,10 @@ namespace TinyShopping.Game {
         public IList<Insect> GetAllInsects(int player) {
             return _colonies[player].Insects;
         }
+
+        public void AddShot(int owner, int damagePower, Vector2 start, Vector2 end) {
+            _shots.Add(new Shot(owner, damagePower, start, end));
+        }
+
     }
 }

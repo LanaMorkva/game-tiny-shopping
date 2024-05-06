@@ -94,7 +94,6 @@ namespace TinyShopping.Game.AI {
             }
         }
 
-
         public void WalkTo(Vector2 target, Pheromone pheromone, GameTime gameTime, InsectState state) {
             IsWandering = false;
             if (pheromone != ActivePheromone) {

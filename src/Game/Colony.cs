@@ -161,6 +161,10 @@ namespace TinyShopping.Game {
             return _insectHandler.GetClosestEnemy(_owner, position);
         }
 
+        public void AddShot(int damagePower, Vector2 start, Vector2 end) {
+            _insectHandler.AddShot(_owner, damagePower, start, end);
+        }
+
         /// <summary>
         /// Gets the closest insect to the given position.
         /// </summary>

@@ -54,12 +54,13 @@ namespace TinyShopping.Game.AI {
                 if (enemy != null) {
                     float fightRange = Constants.FIGHT_RANGE;
                     if (Insect.CanGiveDamage && Vector2.DistanceSquared(enemy.Position, Insect.Position) < fightRange * fightRange) {
-                        enemy.TakeDamage(Insect.GiveDamage);
+                        Insect.SendShot();
+                        _colony.AddShot(Insect.GetDamagePower, Insect.Position, enemy.Position);
                     }
                     
                     Vector2 target = enemy.Position;
                     Vector2 dirTarget = Vector2.Normalize(target - Insect.Position);
-                    Vector2 offsetTarget = dirTarget * fightRange / 2;
+                    Vector2 offsetTarget = dirTarget * fightRange / 1.5f;
                     AIHandler.WalkTo(target - offsetTarget, p, gameTime, InsectState.Fight);
                     return true;
                 }
