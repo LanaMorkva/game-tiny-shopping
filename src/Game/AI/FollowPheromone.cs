@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using MonoGame.Extended;
 
 namespace TinyShopping.Game.AI {
 
@@ -54,8 +55,9 @@ namespace TinyShopping.Game.AI {
                 if (enemy != null) {
                     float fightRange = Constants.FIGHT_RANGE;
                     if (Insect.CanGiveDamage && Vector2.DistanceSquared(enemy.Position, Insect.Position) < fightRange * fightRange) {
+                        var shotEndPos = Insect.Position + (enemy.Position-Insect.Position).NormalizedCopy() * fightRange;
                         Insect.SendShot();
-                        _colony.AddShot(Insect.GetDamagePower, Insect.Position, enemy.Position);
+                        _colony.AddShot(Insect.GetDamagePower, Insect.Position, shotEndPos);
                     }
                     
                     Vector2 target = enemy.Position;
