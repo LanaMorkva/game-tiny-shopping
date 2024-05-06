@@ -56,7 +56,7 @@ namespace TinyShopping.Game {
             FruitHandler.LoadContent(contentManager);
         }
 
-        public void UnloadContent(ContentManager contentManager, GraphicsDevice device) {
+        public void UnloadContent(ContentManager contentManager) {
             contentManager.UnloadAsset("map_isometric/map-angled");
         }
 

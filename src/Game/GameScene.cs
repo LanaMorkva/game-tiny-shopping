@@ -11,6 +11,12 @@ namespace TinyShopping.Game {
 
         private SoundController _sound;
 
+        private World _world;
+
+        private InsectHandler _insectHandler;
+
+        private PheromoneHandler _pheromoneHandler;
+
         private SplitScreenHandler _splitScreenHandler;
 
         private Rectangle _player1Area;
@@ -21,14 +27,13 @@ namespace TinyShopping.Game {
 
         public GameScene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
             base(content, graphics, manager, game, settingsHandler) {
-        }
-
-        public override void Initialize() {
-            base.Initialize();
             _player1Area = new Rectangle(0, 0, Width / 2, Height);
             _player2Area = new Rectangle(Width / 2, 0, Width / 2, Height);
-            _splitScreenHandler = new SplitScreenHandler(_player1Area, _player2Area, GraphicsDevice, this);
-            _splitScreenHandler.Initialize();
+
+            _world = new World();
+            _pheromoneHandler = new PheromoneHandler(_world);
+            _insectHandler = new InsectHandler(_world, _pheromoneHandler, _world.FruitHandler);
+            _splitScreenHandler = new SplitScreenHandler(this, _world, _insectHandler, _pheromoneHandler);
             _ui = new UIController(GraphicsDevice, _splitScreenHandler, this);
             _sound = new SoundController(this);
 
@@ -41,12 +46,21 @@ namespace TinyShopping.Game {
                 new("<B>", "Resume Game", Color.Red)
             };
             _pauseMenu = new SelectMenu(menuRegion, menuItemSize, ResumeGame, explanationRegion, explanations);
+        }
+
+        public override void Initialize() {
+            _splitScreenHandler.Initialize();
             _pauseMenu.AddItem(new MenuItem("Resume", ResumeGame));
             _pauseMenu.AddItem(new MenuItem("Exit Game", LoadMainMenu));
+            base.Initialize();
         }
 
         public override void LoadContent() {
+            _world.LoadContent(Content, GraphicsDevice);
+            _insectHandler.LoadContent(Content);
+            _pheromoneHandler.LoadContent(Content);
             _splitScreenHandler.LoadContent(Content);
+
             _ui.LoadContent(Content);
             _sound.LoadContent(Content);
 
@@ -56,7 +70,7 @@ namespace TinyShopping.Game {
 
         public override void UnloadContent()
         {
-            _splitScreenHandler.UnloadContent(Content);
+            _world.UnloadContent(Content);
             base.UnloadContent();
         }
 

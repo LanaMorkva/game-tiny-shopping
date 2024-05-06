@@ -18,7 +18,7 @@ namespace TinyShopping {
 
         protected ContentManager Content { get; private set; }
 
-        protected GraphicsDevice GraphicsDevice { get; private set; }
+        public GraphicsDevice GraphicsDevice { get; private set; }
 
         protected GraphicsDeviceManager GraphicsDeviceManager { get; private set; }
 

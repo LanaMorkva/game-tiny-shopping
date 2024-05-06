@@ -36,12 +36,10 @@ namespace TinyShopping.MainMenu
             int menuPosY = (int)(Height / 10);
             int menuW = (int)(Width / 2.3);
             var menuRegion = new Rectangle(menuW / 10, menuPosY, menuW, Height - menuPosY);
-            var menuItemSize = new Vector2((int)(Width / 2.8), Height / 10);
+            var menuItemSize = new Vector2((int)(Width / 3.5), Height / 12);
 
-            _imageRegion = new Rectangle((int)(menuW / 1.5), menuPosY / 3, (int)(Width - menuW / 1.5),
-                Height - menuPosY / 3);
+            _imageRegion = new Rectangle((int)(menuW / 1.5), menuPosY / 3, (int)(Width - menuW / 1.5), Height - menuPosY / 3);
             _titleLocation = new Vector2(menuW / 8, (int)(menuPosY / 3));
-
 
             Vector2 centerOffset = new Vector2(0, -(menuRegion.Y / 3));
             

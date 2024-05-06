@@ -16,8 +16,6 @@ namespace TinyShopping.Game {
 
         private GraphicsDevice _device;
 
-        private Texture2D _borderTexture;
-
         private World _world;
 
         private InsectHandler _insectHandler;
@@ -48,21 +46,17 @@ namespace TinyShopping.Game {
         /// <param name="area1">The area where the first screen should be drawn.</param>
         /// <param name="area2">The area where the second screen should be drawn.</param>
         /// <param name="device">The device to render to.</param>
-        public SplitScreenHandler(Rectangle area1, Rectangle area2, GraphicsDevice device, Scene scene) {
-            Player1Area = area1;
-            Player2Area = area2;
-            _device = device;
-            _batch = new SpriteBatch(device);
-            _scene = scene;
-        }
+        public SplitScreenHandler(Scene scene, World world, InsectHandler insectHandler, PheromoneHandler pheromoneHandler) {
 
-        /// <summary>
-        /// Initializes the necessary data.
-        /// </summary>
-        public void Initialize() {
-            _world = new World();
-            _pheromoneHandler = new PheromoneHandler(_world);
-            _insectHandler = new InsectHandler(_world, _pheromoneHandler, _world.FruitHandler);
+            Player1Area = new Rectangle(0, 0, scene.Width / 2, scene.Height);
+            Player2Area = new Rectangle(scene.Width / 2, 0, scene.Width / 2, scene.Height);
+
+            _world = world;
+            _insectHandler = insectHandler;
+            _pheromoneHandler = pheromoneHandler;
+
+            _device = scene.GraphicsDevice;
+            _batch = new SpriteBatch(_device);
             
             Camera1 = new Camera2D(Player1Area.Width, Player1Area.Height);
             Camera2 = new Camera2D(Player2Area.Width, Player2Area.Height);
@@ -75,35 +69,29 @@ namespace TinyShopping.Game {
         }
 
         /// <summary>
+        /// Initializes the necessary data.
+        /// </summary>
+        public void Initialize() {
+        }
+
+        /// <summary>
         /// Loads the necessary content from disk.
         /// </summary>
         /// <param name="content">The content manager to use.</param>
         public void LoadContent(ContentManager content) {
-            _world.LoadContent(content, _device);
-            _insectHandler.LoadContent(content);
-            _pheromoneHandler.LoadContent(content);
-            
             var spawnPositions = _world.GetSpawnPositions();
-
             PlayerInput input1 = CreatePlayerInput(PlayerIndex.One, content);
-            Controls1 = input1.Controls;
             _player1 = new Player(_pheromoneHandler, input1, _insectHandler, _world, 0, spawnPositions[0]);
+            PlayerInput input2 = CreatePlayerInput(PlayerIndex.Two, content);
+            _player2 = new Player(_pheromoneHandler, input2, _insectHandler, _world, 1, spawnPositions[1]);
+            
             _player1.LoadContent(content);
+            _player2.LoadContent(content);
+
             Camera1.LookAt(spawnPositions[0]);
             Camera1.ZoomIn(0.5f);
-
-            PlayerInput input2 = CreatePlayerInput(PlayerIndex.Two, content);
-            Controls2 = input2.Controls;
-            _player2 = new Player(_pheromoneHandler, input2, _insectHandler, _world, 1, spawnPositions[1]);
-            _player2.LoadContent(content);
             Camera2.LookAt(spawnPositions[1]);
             Camera2.ZoomIn(0.5f);
-
-            CreateBorderTexture(new Color(252, 239, 197), 3);
-        }
-
-        public void UnloadContent(ContentManager content) {
-            _world.UnloadContent(content, _device);
         }
 
         /// <summary>
@@ -169,37 +157,6 @@ namespace TinyShopping.Game {
 #if DEBUG
             _world.DrawDebugInfo(batch);
 #endif
-        }
-
-        /// <summary>
-        /// Creates black rectangles to place around the player views.
-        /// </summary>
-        private void CreateBorderTexture(Color color, int width) {
-            _borderTexture = new Texture2D(_device, Player1Area.Width, Player1Area.Height);
-            Color[] data = new Color[Player1Area.Width * Player1Area.Height];
-            FillTextureRect(data, 0, 0, Player1Area.Width, Player2Area.Height, new Color(0, 0, 0, 0));
-            FillTextureRect(data, 0, 0, Player1Area.Width, width, color);
-            FillTextureRect(data, 0, Player1Area.Height - width, Player1Area.Width, width, color);
-            FillTextureRect(data, 0, 0, width, Player1Area.Height, color);
-            FillTextureRect(data, Player1Area.Width - width, 0, width, Player1Area.Height, color);
-            _borderTexture.SetData(data);
-        }
-
-        /// <summary>
-        /// Fills the given rectangle of a data array with the given color.
-        /// </summary>
-        /// <param name="data">The array to fill.</param>
-        /// <param name="x">The x coordinate of the rectangle.</param>
-        /// <param name="y">The y coordinate of the rectangle.</param>
-        /// <param name="width">The width of the rectangle.</param>
-        /// <param name="height">The height of the rectangle.</param>
-        /// <param name="color">The color to use.</param>
-        private void FillTextureRect(Color[] data, int x, int y, int width, int height, Color color) {
-            for (int j = y; j < y + height; ++j) {
-                for (int i = x; i < x + width; ++i) {
-                    data[i + j * Player1Area.Width] = color;
-                }
-            }
         }
 
         /// <summary>
