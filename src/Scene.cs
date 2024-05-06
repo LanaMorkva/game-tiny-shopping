@@ -8,6 +8,14 @@ namespace TinyShopping {
 
     public abstract class Scene {
 
+        public bool IsStarted {get; set; }
+        public bool IsOver { get; set; }
+
+        public bool IsPaused {get; set; }
+
+        public int Height {  get; private set; }
+        public int Width { get; private set; }
+
         protected ContentManager Content { get; private set; }
 
         protected GraphicsDevice GraphicsDevice { get; private set; }
@@ -30,6 +38,8 @@ namespace TinyShopping {
 
         public virtual void Initialize() {
             SpriteBatch = new SpriteBatch(GraphicsDevice);
+            Width = GraphicsDeviceManager.PreferredBackBufferWidth;
+            Height = GraphicsDeviceManager.PreferredBackBufferHeight;
         }
 
         public virtual void LoadContent() {
@@ -55,6 +65,14 @@ namespace TinyShopping {
 
         public virtual void Draw(GameTime gameTime) {
 
+        }
+
+        public void LoadMainMenu() {
+            Game.ChangeScene(new MainMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
+        }
+
+        public void ResumeGame() {
+            IsPaused = false;
         }
     }
 }

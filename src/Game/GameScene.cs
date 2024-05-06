@@ -6,7 +6,7 @@ using MonoGame.Extended;
 
 namespace TinyShopping.Game {
 
-    public class Scene : TinyShopping.Scene {
+    public class GameScene : TinyShopping.Scene {
 
         private SpriteBatch _spriteBatch;
         
@@ -20,33 +20,20 @@ namespace TinyShopping.Game {
 
         private Rectangle _player2Area;
 
-        public bool IsStarted {get; set; }
-        public bool IsOver { get; set; }
-
-        public bool IsPaused {get; set; }
-
-        public int Height {  get; private set; }
-        public int Width { get; private set; }
-
         private SelectMenu _pauseMenu;
 
-        public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
+        public GameScene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
             base(content, graphics, manager, game, settingsHandler) {
         }
 
         public override void Initialize() {
-            Width = GraphicsDeviceManager.PreferredBackBufferWidth;
-            Height = GraphicsDeviceManager.PreferredBackBufferHeight;
+            base.Initialize();
             _player1Area = new Rectangle(0, 0, Width / 2, Height);
             _player2Area = new Rectangle(Width / 2, 0, Width / 2, Height);
             _splitScreenHandler = new SplitScreenHandler(_player1Area, _player2Area, GraphicsDevice, this);
             _splitScreenHandler.Initialize();
             _ui = new UIController(GraphicsDevice, _splitScreenHandler, this);
             _sound = new SoundController(this);
-
-
-            Height = GraphicsDeviceManager.PreferredBackBufferHeight;
-            Width = GraphicsDeviceManager.PreferredBackBufferWidth;
 
             var menuRegion = new Rectangle(0, 0, Width, Height);
             var menuItemSize = new Vector2((int)(Width / 2.8), Height / 10);
@@ -59,7 +46,6 @@ namespace TinyShopping.Game {
             _pauseMenu = new SelectMenu(menuRegion, menuItemSize, ResumeGame, explanationRegion, explanations);
             _pauseMenu.AddItem(new MenuItem("Resume", ResumeGame));
             _pauseMenu.AddItem(new MenuItem("Exit Game", LoadMainMenu));
-            base.Initialize();
         }
 
         public override void LoadContent() {
@@ -107,14 +93,6 @@ namespace TinyShopping.Game {
             
             _spriteBatch.End();
             base.Draw(gameTime);
-        }
-
-        public void LoadMainMenu() {
-            Game.ChangeScene(new MainMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
-        }
-
-        public void ResumeGame() {
-            IsPaused = false;
         }
     }
 }
