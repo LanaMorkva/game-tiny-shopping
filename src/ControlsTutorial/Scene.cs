@@ -8,8 +8,6 @@ namespace TinyShopping.ControlsTutorial
 
     public class Scene : TinyShopping.Scene
     {
-        private SpriteBatch _spriteBatch;
-
         private SelectMenu _selectMenu;
 
         private Texture2D _gamepadTexture;
@@ -19,9 +17,6 @@ namespace TinyShopping.ControlsTutorial
 
         private Color _backColor = new Color(211, 237, 150);
 
-        public int Height { get; private set; }
-        public int Width { get; private set; }
-
         public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
             base(content, graphics, manager, game, settingsHandler)
         {
@@ -29,9 +24,6 @@ namespace TinyShopping.ControlsTutorial
 
         public override void Initialize()
         {
-            Height = GraphicsDeviceManager.PreferredBackBufferHeight;
-            Width = GraphicsDeviceManager.PreferredBackBufferWidth;
-
             int menuPosY = (int)(Height / 20);
             int menuW = (int)(Width / 2);
             var menuRegion = new Rectangle(-Width/3, -Height/5, Width, Height);
@@ -46,7 +38,6 @@ namespace TinyShopping.ControlsTutorial
 
         public override void LoadContent()
         {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
             _gamepadTexture = Content.Load<Texture2D>("tutorial/controls_gamepad");
             _keyboardTexture = Content.Load<Texture2D>("tutorial/controls_keyboard");
 
@@ -64,14 +55,14 @@ namespace TinyShopping.ControlsTutorial
 
         public override void Draw(GameTime gameTime)
         {
-            _spriteBatch.Begin();
+            SpriteBatch.Begin();
 
             var screenRegion = new Rectangle(0, 0, Width, Height);
-            _spriteBatch.FillRectangle(screenRegion, _backColor);
-            _spriteBatch.Draw(_selectedTexture, screenRegion, Color.White);
-            _selectMenu.Draw(_spriteBatch);
+            SpriteBatch.FillRectangle(screenRegion, _backColor);
+            SpriteBatch.Draw(_selectedTexture, screenRegion, Color.White);
+            _selectMenu.Draw(SpriteBatch);
 
-            _spriteBatch.End();
+            SpriteBatch.End();
             base.Draw(gameTime);
         }
 
@@ -81,10 +72,6 @@ namespace TinyShopping.ControlsTutorial
 
         public void SelectKeyboardTexture() {
             _selectedTexture = _keyboardTexture;
-        }
-
-        public void LoadMainMenu() {
-            Game.ChangeScene(new MainMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
         }
     }
 }

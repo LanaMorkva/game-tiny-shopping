@@ -34,12 +34,13 @@ namespace TinyShopping {
             GraphicsDeviceManager = manager;
             Game = game;
             SettingsHandler = settingsHandler;
+
+            Width = manager.PreferredBackBufferWidth;
+            Height = manager.PreferredBackBufferHeight;
         }
 
         public virtual void Initialize() {
             SpriteBatch = new SpriteBatch(GraphicsDevice);
-            Width = GraphicsDeviceManager.PreferredBackBufferWidth;
-            Height = GraphicsDeviceManager.PreferredBackBufferHeight;
         }
 
         public virtual void LoadContent() {
