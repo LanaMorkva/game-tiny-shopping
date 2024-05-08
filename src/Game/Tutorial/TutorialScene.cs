@@ -61,15 +61,14 @@ namespace TinyShopping.Game {
             };
 
             _pauseMenu = new SelectMenu(new Rectangle(0, 0, Width, Height), menuItemSize, ResumeGame, explanationRegion, explanations);
-            _tutorialMenu = new SelectMenu(new Rectangle(0, Height / 4, Width, Height), menuItemSize, LoadMainMenu, explanationRegion, new List<MenuExplanation> {
-                new("<A>", "Select", Color.Green)});
+            _tutorialMenu = new SelectMenu(new Rectangle(0, (int)(Height / 2.5), Width, Height), menuItemSize, LoadMainMenu, explanationRegion);
         }
 
         public override void Initialize() {
             _splitScreenHandler.Initialize();
             _pauseMenu.AddItem(new MenuItem("Resume", ResumeGame));
             _pauseMenu.AddItem(new MenuItem("Exit Game", LoadMainMenu));
-            _tutorialMenu.AddItem(new MenuItem("Next", TutorialPhaseDone));
+            _tutorialMenu.AddItem(new MenuItem("Next", TutorialPhaseDone, Color.DimGray));
             _runtimeS = 0;
             _lastRecordedRuntimeS = 0;
             base.Initialize();
