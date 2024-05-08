@@ -329,7 +329,43 @@ namespace TinyShopping.Game {
 
             String FruitsNum2 = "x" + _handler.GetNumberOfFruits(1);
             DrawString(batch, FruitsNum2, appleRect2.Center.ToVector2() - new Vector2(-1, -1), _fontScale);
+            DrawControls(batch);
+        }
 
+        private void DrawControls(SpriteBatch batch) {
+            int gap = 7;
+            int borderGap = 20;
+            int bottomOffset = 15;
+            int textOffset = 5;
+            var textureSize = new Vector2(_scene.Height / 35, _scene.Height / 35);
+            
+            for (int i = 0; i < _handler.Controls1.Count; i++){
+                var control = _handler.Controls1[i];
+                var heightOffset = (_handler.Controls1.Count - i) * (textureSize.Y + gap) + bottomOffset;
+                var controlPos = new Vector2(_scene.Width / 2 - borderGap - textureSize.X, _scene.Height - heightOffset);
+                batch.Draw(control.Texture, new RectangleF(controlPos, textureSize).ToRectangle(), 
+                            control.SourceRect, new Color(122, 119, 110, 160));
+                
+                var text = control.Description;
+                Vector2 stringSize = _font.MeasureString(text);
+                Vector2 origin = new Vector2(stringSize.X, stringSize.Y / 2);
+                var textPos = controlPos + new Vector2(-textOffset, textureSize.Y / 2);
+                batch.DrawString(_font, text, textPos, new Color(71, 71, 68, 180), 0, origin, 0.15f, SpriteEffects.None, 0); 
+            }
+
+            for (int i = 0; i < _handler.Controls2.Count; i++){
+                var control = _handler.Controls2[i];
+                var heightOffset = (_handler.Controls2.Count - i) * (textureSize.Y + gap) + bottomOffset;
+                var controlPos = new Vector2(_scene.Width / 2 + borderGap, _scene.Height - heightOffset);
+                batch.Draw(control.Texture, new RectangleF(controlPos, textureSize).ToRectangle(), 
+                            control.SourceRect, new Color(122, 119, 110, 160));
+                
+                var text = control.Description;
+                Vector2 stringSize = _font.MeasureString(text);
+                Vector2 origin = new Vector2(0, stringSize.Y / 2);
+                var textPos = controlPos + new Vector2(textOffset + textureSize.X, textureSize.Y / 2);
+                batch.DrawString(_font, text, textPos, new Color(71, 71, 68, 180), 0, origin, 0.15f, SpriteEffects.None, 0); 
+            }
         }
     }
 }

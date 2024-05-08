@@ -27,6 +27,11 @@ namespace TinyShopping.Game {
         private Player _player1;
 
         private Player _player2;
+        public List<Control> Controls1 {get; private set;}
+        public List<Control> Controls2 {get; private set;}
+        private Scene _scene;
+        private UIController _ui;
+        private SoundController _sound;
 
         private SpriteBatch _batch;
 
@@ -45,11 +50,12 @@ namespace TinyShopping.Game {
         /// <param name="area1">The area where the first screen should be drawn.</param>
         /// <param name="area2">The area where the second screen should be drawn.</param>
         /// <param name="device">The device to render to.</param>
-        public SplitScreenHandler(Rectangle area1, Rectangle area2, GraphicsDevice device) {
+        public SplitScreenHandler(Rectangle area1, Rectangle area2, GraphicsDevice device, Scene scene) {
             Player1Area = area1;
             Player2Area = area2;
             _device = device;
             _batch = new SpriteBatch(device);
+            _scene = scene;
         }
 
         /// <summary>
@@ -68,6 +74,9 @@ namespace TinyShopping.Game {
             
             _renderTarget1 = new RenderTarget2D(_device, Player1Area.Width, Player1Area.Height);
             _renderTarget2 = new RenderTarget2D(_device, Player2Area.Width, Player2Area.Height);
+
+            _ui = new UIController(_device, this, _scene);
+            _sound = new SoundController(_scene);
         }
 
         /// <summary>
@@ -81,19 +90,24 @@ namespace TinyShopping.Game {
             
             var spawnPositions = _world.GetSpawnPositions();
 
-            PlayerInput input1 = CreatePlayerInput(PlayerIndex.One);
+            PlayerInput input1 = CreatePlayerInput(PlayerIndex.One, content);
+            Controls1 = input1.Controls;
             _player1 = new Player(_pheromoneHandler, input1, _insectHandler, _world, 0, spawnPositions[0]);
             _player1.LoadContent(content);
             Camera1.LookAt(spawnPositions[0]);
             Camera1.ZoomIn(0.5f);
 
-            PlayerInput input2 = CreatePlayerInput(PlayerIndex.Two);
+            PlayerInput input2 = CreatePlayerInput(PlayerIndex.Two, content);
+            Controls2 = input2.Controls;
             _player2 = new Player(_pheromoneHandler, input2, _insectHandler, _world, 1, spawnPositions[1]);
             _player2.LoadContent(content);
             Camera2.LookAt(spawnPositions[1]);
             Camera2.ZoomIn(0.5f);
 
             CreateBorderTexture(new Color(252, 239, 197), 3);
+
+            _ui.LoadContent(content);
+            _sound.LoadContent(content);
         }
 
         public void UnloadContent(ContentManager content) {
@@ -105,13 +119,18 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime, Scene scene) {
-            _insectHandler.Update(gameTime);
-            _pheromoneHandler.Update(gameTime);
-            _player1.Update(gameTime, this, scene);
-            _player2.Update(gameTime, this, scene);
+            if (!scene.IsOver && scene.IsStarted && !scene.IsPaused) {
+                _insectHandler.Update(gameTime);
+                _pheromoneHandler.Update(gameTime);
+                _player1.Update(gameTime, this, scene);
+                _player2.Update(gameTime, this, scene);
 
-            Camera1.Update();
-            Camera2.Update();
+                Camera1.Update();
+                Camera2.Update();
+            }
+
+            _ui.Update(gameTime);
+            _sound.Update(gameTime, _ui);
         }
 
         /// <summary>
@@ -138,6 +157,8 @@ namespace TinyShopping.Game {
             _device.SetRenderTarget(null);
             batch.Draw(_renderTarget1, Player1Area, Color.White);
             batch.Draw(_renderTarget2, Player2Area, Color.White);
+
+            _ui.Draw(batch, gameTime);
         }
 
         /// <summary>
@@ -201,12 +222,12 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="playerIndex">The index of the player.</param>
         /// <returns>A PlayerInput instance.</returns>
-        private PlayerInput CreatePlayerInput(PlayerIndex playerIndex) {
+        private PlayerInput CreatePlayerInput(PlayerIndex playerIndex, ContentManager content) {
             GamePadState state = GamePad.GetState(playerIndex);
             if (state.IsConnected) {
-                return new GamePadInput(playerIndex);
+                return new GamePadInput(playerIndex, content);
             }
-            return new KeyboardInput(playerIndex);
+            return new KeyboardInput(playerIndex, content);
         }
 
         /// <summary>

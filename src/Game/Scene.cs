@@ -10,10 +10,6 @@ namespace TinyShopping.Game {
 
         private SpriteBatch _spriteBatch;
 
-        private UIController _ui;
-
-        private SoundController _sound;
-
         private SplitScreenHandler _splitScreenHandler;
 
         private Rectangle _player1Area;
@@ -39,10 +35,8 @@ namespace TinyShopping.Game {
             Height = GraphicsDeviceManager.PreferredBackBufferHeight;
             _player1Area = new Rectangle(0, 0, Width / 2, Height);
             _player2Area = new Rectangle(Width / 2, 0, Width / 2, Height);
-            _splitScreenHandler = new SplitScreenHandler(_player1Area, _player2Area, GraphicsDevice);
+            _splitScreenHandler = new SplitScreenHandler(_player1Area, _player2Area, GraphicsDevice, this);
             _splitScreenHandler.Initialize();
-            _ui = new UIController(GraphicsDevice, _splitScreenHandler, this);
-            _sound = new SoundController(this);
 
             Height = GraphicsDeviceManager.PreferredBackBufferHeight;
             Width = GraphicsDeviceManager.PreferredBackBufferWidth;
@@ -64,8 +58,6 @@ namespace TinyShopping.Game {
         public override void LoadContent() {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             _splitScreenHandler.LoadContent(Content);
-            _ui.LoadContent(Content);
-            _sound.LoadContent(Content);
             _pauseMenu.LoadContent(Content);
             base.LoadContent();
         }
@@ -77,19 +69,11 @@ namespace TinyShopping.Game {
         }
 
         public override void Update(GameTime gameTime) {
-            if (!IsOver && IsStarted) {
-                if (!IsPaused) {
-                    _splitScreenHandler.Update(gameTime, this);
-                    if (IsPaused) {
-                        _pauseMenu.ResetActiveItem();
-                    }
-                } else {
-                    _pauseMenu.Update(gameTime);
-                }
+            _splitScreenHandler.Update(gameTime, this);
+            if (!IsOver && IsStarted && IsPaused) {
+                _pauseMenu.Update(gameTime);
             }
 
-            _ui.Update(gameTime);
-            _sound.Update(gameTime, _ui);
             base.Update(gameTime);
         }
 
@@ -98,7 +82,6 @@ namespace TinyShopping.Game {
             
             Viewport original = GraphicsDevice.Viewport;
             _splitScreenHandler.Draw(_spriteBatch, gameTime);
-            _ui.Draw(_spriteBatch, gameTime);
             GraphicsDevice.Viewport = original;
 
             if (IsPaused) {

@@ -22,7 +22,6 @@ namespace TinyShopping.Game {
 
         public SoundController(Scene scene) {
             _scene = scene;
-            _input = new KeyboardInput(PlayerIndex.One);
             MediaPlayer.IsRepeating = true;
 
             MediaPlayer.Stop();
@@ -37,6 +36,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
+            _input = new KeyboardInput(PlayerIndex.One, content);
             _regularSong = content.Load<Song>("songs/basic_without_intro");
             _regularSongFast = content.Load<Song>("songs/basic_fast");
             _battleSong = content.Load<Song>("songs/drama");
