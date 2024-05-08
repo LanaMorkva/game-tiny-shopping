@@ -46,7 +46,6 @@ namespace TinyShopping.Game {
         /// <param name="contentManager">The content manager of the main game.</param>
         public void LoadContent(ContentManager contentManager, GraphicsDevice device) {
             //_tintEffect = new TiledMapEffect(contentManager.Load<Effect>("shaders/TintMapEffect"));
-            Console.WriteLine("Loading {0} map", _mapName);
             _tiledMap = contentManager.Load<TiledMap>(_mapName);
             _tiledMap.GetLayer("Walls").Offset = new Vector2(0, -96);
             _tiledMap.GetLayer("Walls2").Offset = new Vector2(0, -96);

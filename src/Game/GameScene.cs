@@ -69,6 +69,8 @@ namespace TinyShopping.Game {
 
         public override void Update(GameTime gameTime) {
             if (!IsOver && IsStarted && !IsPaused) {
+                _insectHandler.Update(gameTime);
+                _pheromoneHandler.Update(gameTime);
                 _splitScreenHandler.Update(gameTime, this);
             }
 

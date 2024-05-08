@@ -99,9 +99,6 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime, Scene scene) {
-            _insectHandler.Update(gameTime);
-            _pheromoneHandler.Update(gameTime);
-
             _player1.Update(gameTime, this, scene);
             _player2.Update(gameTime, this, scene);
 
