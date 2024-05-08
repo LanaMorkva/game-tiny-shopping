@@ -208,6 +208,10 @@ namespace TinyShopping.Game {
             return playerId == 0 ? Camera1.Zoom : Camera2.Zoom;
         }
 
+        public Vector2 GetCameraPosition(int playerId) {
+            return playerId == 0 ? Camera1.Position : Camera2.Position;
+        }
+
         /// <summary>
         /// Gets the number of ants in the colony of the given player.
         /// </summary>

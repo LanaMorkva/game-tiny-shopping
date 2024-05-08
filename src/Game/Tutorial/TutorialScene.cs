@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
+using TinyShopping.Game.Tutorial;
 
 namespace TinyShopping.Game {
 
@@ -11,9 +12,9 @@ namespace TinyShopping.Game {
 
         enum TutorialPhase {
             None = -1,
-            Begin = 0, 
-            Phase1,
-            Phase2,
+            Intro, 
+            MoveCamera,
+            MoveCameraWaitingForNext,
             Phase3
         }
 
@@ -21,14 +22,19 @@ namespace TinyShopping.Game {
         private World _world;
         private InsectHandler _insectHandler;
         private PheromoneHandler _pheromoneHandler;
+        private TutorialUIController _ui;
         private SplitScreenHandler _splitScreenHandler;
         private SelectMenu _pauseMenu;
-        private Texture2D _introTexture;
-        private TutorialUIController _ui;
-        private bool _tutorialPause = false;
         private SelectMenu _tutorialMenu;
+        private Texture2D _introTexture;
+        private Texture2D _cameraTexture;
+        private Texture2D _cameraTextureDone;
+        private bool _tutorialPause = false;
         private TutorialPhase _tutorialPhase = TutorialPhase.None;
         private double _runtimeS;
+
+        private CameraTutorialData _cam1Movement;
+        private CameraTutorialData _cam2Movement;
 
 
         public TutorialScene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
@@ -73,6 +79,8 @@ namespace TinyShopping.Game {
             _tutorialMenu.LoadContent(Content);
 
             _introTexture = Content.Load<Texture2D>("tutorial/intro");
+            _cameraTexture = Content.Load<Texture2D>("tutorial/camera");
+            _cameraTextureDone = Content.Load<Texture2D>("tutorial/cameraDone");
             base.LoadContent();
         }
 
@@ -85,9 +93,17 @@ namespace TinyShopping.Game {
 
         public override void Update(GameTime gameTime) {
             _runtimeS += gameTime.ElapsedGameTime.TotalSeconds;
-            if (_runtimeS > 1 && _tutorialPhase == TutorialPhase.None) {
+            if (_runtimeS > 0.2 && _tutorialPhase == TutorialPhase.None) {
                 _tutorialPause = true;
-                _tutorialPhase = TutorialPhase.Begin;
+                _tutorialPhase = TutorialPhase.Intro;
+            }
+
+            if (_tutorialPhase == TutorialPhase.MoveCamera) {
+                _cam1Movement.Update(_splitScreenHandler.GetCameraPosition(0), _splitScreenHandler.GetZoomValue(0));
+                _cam2Movement.Update(_splitScreenHandler.GetCameraPosition(1), _splitScreenHandler.GetZoomValue(1));
+                if (_cam1Movement.Completed() || _cam2Movement.Completed()) {
+                    TutorialPhaseDone();
+                }
             }
 
 
@@ -124,14 +140,7 @@ namespace TinyShopping.Game {
                 _pauseMenu.Draw(SpriteBatch);
             }
 
-            if (_tutorialPause) {
-                SpriteBatch.FillRectangle(new Rectangle(0, 0, Width, Height), pauseColor, 0);
-            }
-            //TODO: fix this conundrum
             DrawCurrentTutorialPhase();
-            if (_tutorialPause) {
-                _tutorialMenu.Draw(SpriteBatch);
-            }
             
             SpriteBatch.End();
             base.Draw(gameTime);
@@ -147,15 +156,26 @@ namespace TinyShopping.Game {
             // 4. Goal (collect more fruits that opponent or kill opponent)
             // 5. Fighting?
 
-            Vector2 screenCenter = new Vector2(GraphicsDevice.Viewport.Bounds.Width / 2, GraphicsDevice.Viewport.Bounds.Height / 2);
-            Vector2 textureCenter = new Vector2(_introTexture.Width / 2, _introTexture.Height / 2);
+            Vector2 screenCenter = new Vector2(Width / 2, Height / 2);
+            Color pauseColor = new Color(122, 119, 110, 120);
 
             switch (_tutorialPhase) {
-                case TutorialPhase.Begin:
+                case TutorialPhase.Intro:
+                    SpriteBatch.FillRectangle(new Rectangle(0, 0, Width, Height), pauseColor, 0);
+                    Vector2 textureCenter = new Vector2(_introTexture.Width / 2, _introTexture.Height / 2);
                     SpriteBatch.Draw(_introTexture, screenCenter, null, Color.White, 0f, textureCenter, 1.2f, SpriteEffects.None, 1f);
+                    _tutorialMenu.Draw(SpriteBatch);
                     break;
-                case TutorialPhase.Phase1: 
-                    SpriteBatch.Draw(_introTexture, screenCenter, null, Color.White, 0f, textureCenter, 0.1f, SpriteEffects.None, 1f);
+                case TutorialPhase.MoveCamera: 
+                    textureCenter = new Vector2(_cameraTexture.Width / 2, _cameraTexture.Height / 2);
+                    var textureLocation = new Vector2(screenCenter.X, _cameraTexture.Height / 4 + 20);
+                    SpriteBatch.Draw(_cameraTexture, textureLocation, null, Color.White, 0f, textureCenter, 0.6f, SpriteEffects.None, 1f);
+                    break;
+                case TutorialPhase.MoveCameraWaitingForNext:
+                    textureCenter = new Vector2(_cameraTextureDone.Width / 2, _cameraTextureDone.Height / 2);
+                    textureLocation = new Vector2(screenCenter.X, _cameraTextureDone.Height / 4 + 20);
+                    SpriteBatch.Draw(_cameraTextureDone, textureLocation, null, Color.White, 0f, textureCenter, 0.6f, SpriteEffects.None, 1f);
+                    _tutorialMenu.Draw(SpriteBatch);
                     break;
                 default:
                     return;

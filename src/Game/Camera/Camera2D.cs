@@ -10,7 +10,7 @@ namespace TinyShopping.Game
     {
         public Vector2 Position { get; set; }  = Vector2.Zero;
         public Vector2 TargetMovement {get; set; } = Vector2.Zero;
-        public Vector2 Origin { get; set; }
+        public Vector2 Origin { get; private set; }
         public float Zoom { get ; private set; } = 1.0f;
 
         private Vector2 _size;
