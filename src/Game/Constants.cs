@@ -98,6 +98,8 @@
         /// </summary>
         public static readonly int PHEROMONE_MAX_RANGE = 400;
 
+        public static readonly int PHEROMONE_MAX_PRIORITY = 500;
+
         /// <summary>
         /// The size of the players' cursors.
         /// </summary>
