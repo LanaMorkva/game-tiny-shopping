@@ -185,16 +185,29 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="batch">The batch to use.</param>
         private void DrawWinMessage(SpriteBatch batch) {
+            DrawDimScreen(batch);
+
+            var partHeight = _scene.Height / 3.5f;
+            var imagePos = new Vector2(_scene.Width / 2, partHeight);
+            var textureSize = new Vector2(_antsCharachterTexture.Width, _antsCharachterTexture.Height) * 1.2f;
+
             string text = "IT'S A DRAW!";
             if (_winner !=  0) {
                 text = "PLAYER " + _winner + " WINS THIS ROUND!";
+                var texture = _winner == 1 ? _antsCharachterTexture : _termiteCharachterTexture;
+                batch.Draw(texture, new RectangleF(imagePos - textureSize / 2, textureSize).ToRectangle(), Color.White);
+            } else {
+                int gap = 75;
+                var antsCharachterPos = new Vector2(imagePos.X - textureSize.X - gap, imagePos.Y - textureSize.Y / 2);
+                var termiteCharachterPos = new Vector2(imagePos.X + gap, imagePos.Y - textureSize.Y / 2);
+                batch.Draw(_antsCharachterTexture, new RectangleF(antsCharachterPos, textureSize).ToRectangle(), Color.White);
+                batch.Draw(_termiteCharachterTexture, new RectangleF(termiteCharachterPos, textureSize).ToRectangle(), Color.White);
             }
-            DrawDimScreen(batch);
 
-            var pos = new Vector2(_scene.Width / 2, _scene.Height / 2);
+            var textPos = imagePos + new Vector2(0, textureSize.Y);
             Vector2 origin = _fontGeneral.MeasureString(text) / 2;
-            batch.DrawString(_fontGeneral, text, pos - new Vector2(3, 3), Color.Black, 0, origin, 1.0f, SpriteEffects.None, 0);
-            batch.DrawString(_fontGeneral, text, pos, _textColor, 0, origin, 1.0f, SpriteEffects.None, 0);
+            batch.DrawString(_fontGeneral, text, textPos - new Vector2(3, 3), Color.Black, 0, origin, 1.0f, SpriteEffects.None, 0);
+            batch.DrawString(_fontGeneral, text, textPos, _textColor, 0, origin, 1.0f, SpriteEffects.None, 0);
         }
 
         private void DrawReturnMessage(SpriteBatch batch) {
@@ -208,7 +221,7 @@ namespace TinyShopping.Game {
 
             Vector2 origin = _fontGeneral.MeasureString(text) / 2;
             var pos = new Vector2(_scene.Width / 2, _scene.Height - origin.Y - 10);
-            batch.DrawString(_fontGeneral, text, pos, _textColor, 0, origin, 0.5f, SpriteEffects.None, 0);
+            batch.DrawString(_fontGeneral, text, pos, _textColor, 0, origin, 0.4f, SpriteEffects.None, 0);
         }
 
         /// <summary>
@@ -259,7 +272,7 @@ namespace TinyShopping.Game {
         }
 
         private void DrawDimScreen(SpriteBatch batch) {
-            batch.FillRectangle(new Rectangle(0, 0, _scene.Width, _scene.Height), new Color(122, 119, 110, 120));
+            batch.FillRectangle(new Rectangle(0, 0, _scene.Width, _scene.Height), new Color(122, 119, 110, 160));
         }
         private void DrawString(SpriteBatch batch, String text, Vector2 position, float scale) {
             Vector2 origin = _font.MeasureString(text) / 2;
