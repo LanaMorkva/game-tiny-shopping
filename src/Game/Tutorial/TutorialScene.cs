@@ -15,7 +15,10 @@ namespace TinyShopping.Game {
             Intro, 
             MoveCamera,
             MoveCameraWaitingForNext,
-            Phase3
+            AntsPause,
+            AntsIntro,
+            AntsTrails,
+            AntsInProgress,
         }
 
         private SoundController _sound;
@@ -28,10 +31,14 @@ namespace TinyShopping.Game {
         private SelectMenu _tutorialMenu;
         private Texture2D _introTexture;
         private Texture2D _cameraTexture;
-        private Texture2D _cameraTextureDone;
+        private Texture2D _cameraWaitingTexture;
+        private Texture2D _antsIntroTexture;
+        private Texture2D _antsTrailsTexture;
+        private Texture2D _antsInProgressTexture;
         private bool _tutorialPause = false;
         private TutorialPhase _tutorialPhase = TutorialPhase.None;
         private double _runtimeS;
+        private double _lastRecordedRuntimeS;
 
         private CameraTutorialData _cam1Movement;
         private CameraTutorialData _cam2Movement;
@@ -64,6 +71,7 @@ namespace TinyShopping.Game {
             _pauseMenu.AddItem(new MenuItem("Exit Game", LoadMainMenu));
             _tutorialMenu.AddItem(new MenuItem("Next", TutorialPhaseDone));
             _runtimeS = 0;
+            _lastRecordedRuntimeS = 0;
             base.Initialize();
         }
 
@@ -78,9 +86,12 @@ namespace TinyShopping.Game {
             _pauseMenu.LoadContent(Content);
             _tutorialMenu.LoadContent(Content);
 
-            _introTexture = Content.Load<Texture2D>("tutorial/intro");
+            _introTexture = Content.Load<Texture2D>("tutorial/game_intro");
             _cameraTexture = Content.Load<Texture2D>("tutorial/camera");
-            _cameraTextureDone = Content.Load<Texture2D>("tutorial/cameraDone");
+            _cameraWaitingTexture = Content.Load<Texture2D>("tutorial/camera_waiting");
+            _antsIntroTexture = Content.Load<Texture2D>("tutorial/ants_intro");
+            _antsInProgressTexture = Content.Load<Texture2D>("tutorial/ants_in_progress");
+            _antsTrailsTexture = Content.Load<Texture2D>("tutorial/ants_trails");
             base.LoadContent();
         }
 
@@ -103,9 +114,28 @@ namespace TinyShopping.Game {
                 _cam2Movement.Update(_splitScreenHandler.GetCameraPosition(1), _splitScreenHandler.GetZoomValue(1));
                 if (_cam1Movement.Completed() || _cam2Movement.Completed()) {
                     TutorialPhaseDone();
+                    _lastRecordedRuntimeS = _runtimeS;
                 }
             }
 
+            if (_tutorialPhase == TutorialPhase.AntsPause && (_runtimeS - _lastRecordedRuntimeS) > 3.0) {
+                _tutorialPause = true;
+                _tutorialPhase = TutorialPhase.AntsIntro;
+
+                _splitScreenHandler.SetPlayerCursorTo(0, _world.GetSpawnPositions()[0]);
+                _splitScreenHandler.SetPlayerCursorTo(1, _world.GetSpawnPositions()[1]);
+                _splitScreenHandler.Camera1.LookAt(_world.GetSpawnPositions()[0]);
+                _splitScreenHandler.Camera2.LookAt(_world.GetSpawnPositions()[1]);
+            }
+
+            if (_tutorialPhase == TutorialPhase.AntsTrails) {
+                _tutorialPause = true;
+            }
+
+            if (_tutorialPhase == TutorialPhase.AntsInProgress) {
+                _insectHandler.Update(gameTime);
+            }
+            
 
             if (!IsOver && IsStarted) {
                 if (!IsPaused && !_tutorialPause) {
@@ -118,8 +148,8 @@ namespace TinyShopping.Game {
                     _pauseMenu.Update(gameTime);
                 }
             }
-            
             _splitScreenHandler.Update(gameTime, this);
+
             _tutorialMenu.Update(gameTime);
             _ui.Update(gameTime);
             _sound.Update(gameTime, _ui);
@@ -127,16 +157,15 @@ namespace TinyShopping.Game {
         }
 
         public override void Draw(GameTime gameTime) {
-            SpriteBatch.Begin();
+            SpriteBatch.Begin(samplerState: SamplerState.AnisotropicClamp);
             
             Viewport original = GraphicsDevice.Viewport;
             _splitScreenHandler.Draw(SpriteBatch, gameTime);
             _ui.Draw(SpriteBatch, gameTime);
             GraphicsDevice.Viewport = original;
 
-            Color pauseColor = new Color(122, 119, 110, 120);
             if (IsPaused) {
-                SpriteBatch.FillRectangle(new Rectangle(0, 0, Width, Height), pauseColor, 0);
+                PauseDrawBackground();
                 _pauseMenu.Draw(SpriteBatch);
             }
 
@@ -149,41 +178,62 @@ namespace TinyShopping.Game {
         private void DrawCurrentTutorialPhase() {
             //TODO:
             // Core ideas: introduce mechanics gradually (first let players move camera, than window with explaining fruits, etc)
-            // 1. Camera movement
-            // 2. Ants (how do they move, why do they move, how they leave small trails)
+            // 1. Camera movement [Done]
+            // 2. Ants (how do they move, why do they move, how they leave small trails) ANTS vs TERMITES
             // 4. Pheromones (how to place(duration, range), types of pheromones, ants with food will react only to blue pheromone)
             // 3. Fruits (how to collect from boxes, where to drop off, how to exchange for ants)
-            // 4. Goal (collect more fruits that opponent or kill opponent)
+            // 4. Goal (collect more fruits that opponent- or kill opponent)
             // 5. Fighting?
-
-            Vector2 screenCenter = new Vector2(Width / 2, Height / 2);
-            Color pauseColor = new Color(122, 119, 110, 120);
 
             switch (_tutorialPhase) {
                 case TutorialPhase.Intro:
-                    SpriteBatch.FillRectangle(new Rectangle(0, 0, Width, Height), pauseColor, 0);
-                    Vector2 textureCenter = new Vector2(_introTexture.Width / 2, _introTexture.Height / 2);
-                    SpriteBatch.Draw(_introTexture, screenCenter, null, Color.White, 0f, textureCenter, 1.2f, SpriteEffects.None, 1f);
-                    _tutorialMenu.Draw(SpriteBatch);
+                    DrawBigTutorialPanel(_introTexture);
                     break;
                 case TutorialPhase.MoveCamera: 
-                    textureCenter = new Vector2(_cameraTexture.Width / 2, _cameraTexture.Height / 2);
-                    var textureLocation = new Vector2(screenCenter.X, _cameraTexture.Height / 4 + 20);
-                    SpriteBatch.Draw(_cameraTexture, textureLocation, null, Color.White, 0f, textureCenter, 0.6f, SpriteEffects.None, 1f);
+                    DrawBigTutorialPanel(_cameraTexture);
                     break;
                 case TutorialPhase.MoveCameraWaitingForNext:
-                    textureCenter = new Vector2(_cameraTextureDone.Width / 2, _cameraTextureDone.Height / 2);
-                    textureLocation = new Vector2(screenCenter.X, _cameraTextureDone.Height / 4 + 20);
-                    SpriteBatch.Draw(_cameraTextureDone, textureLocation, null, Color.White, 0f, textureCenter, 0.6f, SpriteEffects.None, 1f);
-                    _tutorialMenu.Draw(SpriteBatch);
+                    DrawSmallTutorialPanel(_cameraWaitingTexture);
+                    break;
+                case TutorialPhase.AntsIntro:
+                    DrawBigTutorialPanel(_antsIntroTexture);
+                    break;
+                case TutorialPhase.AntsTrails:
+                    DrawBigTutorialPanel(_antsTrailsTexture);
+                    break;
+                case TutorialPhase.AntsInProgress:
+                    DrawSmallTutorialPanel(_antsInProgressTexture);
                     break;
                 default:
                     return;
             }
         }
 
+        private void DrawBigTutorialPanel(Texture2D texture) {
+            Vector2 screenCenter = new Vector2(Width / 2, Height / 2);
+            Vector2 textureCenter = new Vector2(texture.Width / 2, texture.Height / 2);
+
+            PauseDrawBackground();
+            SpriteBatch.Draw(texture, screenCenter, null, Color.White, 0f, textureCenter, 1.0f, SpriteEffects.None, 1f);
+            _tutorialMenu.Draw(SpriteBatch);
+        }
+
+        private void DrawSmallTutorialPanel(Texture2D texture) {
+            Vector2 screenCenter = new Vector2(Width / 2, Height / 2);
+            Vector2 textureCenter = new Vector2(texture.Width / 2, texture.Height / 2);
+            Vector2 textureLocation = new Vector2(screenCenter.X, texture.Height / 4 + 20);
+            SpriteBatch.Draw(texture, textureLocation, null, Color.White, 0f, textureCenter, 0.6f, SpriteEffects.None, 1f);
+            _tutorialMenu.Draw(SpriteBatch);
+        }
+
+        private void PauseDrawBackground() {
+            Color pauseColor = new Color(122, 119, 110, 120);
+            SpriteBatch.FillRectangle(new Rectangle(0, 0, Width, Height), pauseColor, 0);
+        }
+
         private void TutorialPhaseDone() {
             //TODO: both players need to confirm that they read and understood
+            // update: or do they?
             _tutorialPause = false;
             _tutorialPhase += 1;
         }

@@ -212,6 +212,14 @@ namespace TinyShopping.Game {
             return playerId == 0 ? Camera1.Position : Camera2.Position;
         }
 
+        public void SetPlayerCursorTo(int playerId, Vector2 position) {
+            if (playerId == 0) {
+                _player1.SetCursorTo(position);
+            } else {
+                _player2.SetCursorTo(position);
+            }
+        }
+
         /// <summary>
         /// Gets the number of ants in the colony of the given player.
         /// </summary>
