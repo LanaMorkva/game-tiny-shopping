@@ -27,7 +27,6 @@ namespace TinyShopping.Game {
         private Player _player2;
         public List<Control> Controls1 {get; private set;}
         public List<Control> Controls2 {get; private set;}
-        private Scene _scene;
 
         private SpriteBatch _batch;
 
@@ -81,8 +80,11 @@ namespace TinyShopping.Game {
         public void LoadContent(ContentManager content) {
             var spawnPositions = _world.GetSpawnPositions();
             PlayerInput input1 = CreatePlayerInput(PlayerIndex.One, content);
+            Controls1 = input1.Controls;
             _player1 = new Player(_pheromoneHandler, input1, _insectHandler, _world, 0, spawnPositions[0]);
+            
             PlayerInput input2 = CreatePlayerInput(PlayerIndex.Two, content);
+            Controls2 = input2.Controls;
             _player2 = new Player(_pheromoneHandler, input2, _insectHandler, _world, 1, spawnPositions[1]);
             
             _player1.LoadContent(content);
