@@ -30,8 +30,6 @@ namespace TinyShopping.Game {
         public List<Control> Controls1 {get; private set;}
         public List<Control> Controls2 {get; private set;}
         private Scene _scene;
-        private UIController _ui;
-        private SoundController _sound;
 
         private SpriteBatch _batch;
 
@@ -74,9 +72,6 @@ namespace TinyShopping.Game {
             
             _renderTarget1 = new RenderTarget2D(_device, Player1Area.Width, Player1Area.Height);
             _renderTarget2 = new RenderTarget2D(_device, Player2Area.Width, Player2Area.Height);
-
-            _ui = new UIController(_device, this, _scene);
-            _sound = new SoundController(_scene);
         }
 
         /// <summary>
@@ -105,9 +100,6 @@ namespace TinyShopping.Game {
             Camera2.ZoomIn(0.5f);
 
             CreateBorderTexture(new Color(252, 239, 197), 3);
-
-            _ui.LoadContent(content);
-            _sound.LoadContent(content);
         }
 
         public void UnloadContent(ContentManager content) {
@@ -119,18 +111,14 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime, Scene scene) {
-            if (!scene.IsOver && scene.IsStarted && !scene.IsPaused) {
-                _insectHandler.Update(gameTime);
-                _pheromoneHandler.Update(gameTime);
-                _player1.Update(gameTime, this, scene);
-                _player2.Update(gameTime, this, scene);
+            _insectHandler.Update(gameTime);
+            _pheromoneHandler.Update(gameTime);
 
-                Camera1.Update();
-                Camera2.Update();
-            }
+            _player1.Update(gameTime, this, scene);
+            _player2.Update(gameTime, this, scene);
 
-            _ui.Update(gameTime);
-            _sound.Update(gameTime, _ui);
+            Camera1.Update();
+            Camera2.Update();
         }
 
         /// <summary>
@@ -139,7 +127,6 @@ namespace TinyShopping.Game {
         /// <param name="batch">The main sprite batch.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
-
             Matrix viewMatrix = Camera1.GetViewMatrix();
             _device.Viewport = _viewport1;
             _device.SetRenderTarget(_renderTarget1);
@@ -157,8 +144,6 @@ namespace TinyShopping.Game {
             _device.SetRenderTarget(null);
             batch.Draw(_renderTarget1, Player1Area, Color.White);
             batch.Draw(_renderTarget2, Player2Area, Color.White);
-
-            _ui.Draw(batch, gameTime);
         }
 
         /// <summary>
