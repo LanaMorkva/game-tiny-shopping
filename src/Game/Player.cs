@@ -95,6 +95,10 @@ namespace TinyShopping.Game {
             _cursorSize = (int)(Constants.CURSOR_SIZE / handler.GetZoomValue(_id));
         }
 
+        public void SetCursorTo(Vector2 position) {
+            _position = position;
+        }
+
         /// <summary>
         /// Clip the cursor position to the world.
         /// </summary>

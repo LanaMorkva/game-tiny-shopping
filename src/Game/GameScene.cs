@@ -6,47 +6,29 @@ using MonoGame.Extended;
 
 namespace TinyShopping.Game {
 
-    public class Scene : TinyShopping.Scene {
-
-        private SpriteBatch _spriteBatch;
-        
+    public class GameScene : TinyShopping.Scene {
         private UIController _ui;
 
         private SoundController _sound;
 
+        private World _world;
+
+        private InsectHandler _insectHandler;
+
+        private PheromoneHandler _pheromoneHandler;
+
         private SplitScreenHandler _splitScreenHandler;
-
-        private Rectangle _player1Area;
-
-        private Rectangle _player2Area;
-
-        public bool IsStarted {get; set; }
-        public bool IsOver { get; set; }
-
-        public bool IsPaused {get; set; }
-
-        public int Height {  get; private set; }
-        public int Width { get; private set; }
 
         private SelectMenu _pauseMenu;
 
-        public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
+        public GameScene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
             base(content, graphics, manager, game, settingsHandler) {
-        }
-
-        public override void Initialize() {
-            Width = GraphicsDeviceManager.PreferredBackBufferWidth;
-            Height = GraphicsDeviceManager.PreferredBackBufferHeight;
-            _player1Area = new Rectangle(0, 0, Width / 2, Height);
-            _player2Area = new Rectangle(Width / 2, 0, Width / 2, Height);
-            _splitScreenHandler = new SplitScreenHandler(_player1Area, _player2Area, GraphicsDevice, this);
-            _splitScreenHandler.Initialize();
+            _world = new World("map_isometric/map-angled");
+            _pheromoneHandler = new PheromoneHandler(_world);
+            _insectHandler = new InsectHandler(_world, _pheromoneHandler, _world.FruitHandler);
+            _splitScreenHandler = new SplitScreenHandler(this, _world, _insectHandler, _pheromoneHandler);
             _ui = new UIController(GraphicsDevice, _splitScreenHandler, this);
             _sound = new SoundController(this);
-
-
-            Height = GraphicsDeviceManager.PreferredBackBufferHeight;
-            Width = GraphicsDeviceManager.PreferredBackBufferWidth;
 
             var menuRegion = new Rectangle(0, 0, Width, Height);
             var menuItemSize = new Vector2((int)(Width / 2.8), Height / 10);
@@ -57,14 +39,21 @@ namespace TinyShopping.Game {
                 new("<B>", "Resume Game", Color.Red)
             };
             _pauseMenu = new SelectMenu(menuRegion, menuItemSize, ResumeGame, explanationRegion, explanations);
+        }
+
+        public override void Initialize() {
+            _splitScreenHandler.Initialize();
             _pauseMenu.AddItem(new MenuItem("Resume", ResumeGame));
             _pauseMenu.AddItem(new MenuItem("Exit Game", LoadMainMenu));
             base.Initialize();
         }
 
         public override void LoadContent() {
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
+            _world.LoadContent(Content, GraphicsDevice);
+            _insectHandler.LoadContent(Content);
+            _pheromoneHandler.LoadContent(Content);
             _splitScreenHandler.LoadContent(Content);
+
             _ui.LoadContent(Content);
             _sound.LoadContent(Content);
 
@@ -74,12 +63,14 @@ namespace TinyShopping.Game {
 
         public override void UnloadContent()
         {
-            _splitScreenHandler.UnloadContent(Content);
+            _world.UnloadContent(Content);
             base.UnloadContent();
         }
 
         public override void Update(GameTime gameTime) {
             if (!IsOver && IsStarted && !IsPaused) {
+                _insectHandler.Update(gameTime);
+                _pheromoneHandler.Update(gameTime);
                 _splitScreenHandler.Update(gameTime, this);
             }
 
@@ -93,28 +84,20 @@ namespace TinyShopping.Game {
         }
 
         public override void Draw(GameTime gameTime) {
-            _spriteBatch.Begin();
+            SpriteBatch.Begin();
             
             Viewport original = GraphicsDevice.Viewport;
-            _splitScreenHandler.Draw(_spriteBatch, gameTime);
-            _ui.Draw(_spriteBatch, gameTime);
+            _splitScreenHandler.Draw(SpriteBatch, gameTime);
+            _ui.Draw(SpriteBatch, gameTime);
             GraphicsDevice.Viewport = original;
 
             if (IsPaused) {
-                _spriteBatch.FillRectangle(new Rectangle(0, 0, Width, Height), new Color(122, 119, 110, 120), 0);
-                _pauseMenu.Draw(_spriteBatch);
+                SpriteBatch.FillRectangle(new Rectangle(0, 0, Width, Height), new Color(122, 119, 110, 120), 0);
+                _pauseMenu.Draw(SpriteBatch);
             }
             
-            _spriteBatch.End();
+            SpriteBatch.End();
             base.Draw(gameTime);
-        }
-
-        public void LoadMainMenu() {
-            Game.ChangeScene(new MainMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
-        }
-
-        public void ResumeGame() {
-            IsPaused = false;
         }
     }
 }

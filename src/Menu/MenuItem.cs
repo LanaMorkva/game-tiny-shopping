@@ -18,13 +18,16 @@ namespace TinyShopping {
         protected static readonly Color _rectColor = new Color(241, 164, 132);
         protected static readonly Color _textColor = new Color(83, 47, 85);
 
+        private Color _selectColor;
+
         public MenuItem(string name): this(name, NonAction) {}
 
         private static void NonAction() {}
 
-        public MenuItem(string name, Action selectAction) {
+        public MenuItem(string name, Action selectAction, Color? selectColor = null) {
             _name = name;
             _selectAction = selectAction;
+            _selectColor = selectColor ?? Color.White;
         }
         public virtual void LoadContent(ContentManager content) {
             _font = content.Load<SpriteFont>("fonts/General");
@@ -32,7 +35,7 @@ namespace TinyShopping {
 
         public virtual void Draw(SpriteBatch batch, Rectangle itemRect) {
             string text = _name;
-            Color color = isSelected ? Color.White : _rectColor;
+            Color color = isSelected ? _selectColor : _rectColor;
 
             //batch.Draw(_roundRectTexture, itemRect, color);
 

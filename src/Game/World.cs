@@ -7,6 +7,7 @@ using MonoGame.Extended.Tiled.Renderers;
 using MonoGame.Extended;
 using MonoGame.Extended.Shapes;
 using System.Collections.Generic;
+using System;
 
 namespace TinyShopping.Game {
 
@@ -26,13 +27,16 @@ namespace TinyShopping.Game {
         public FruitHandler FruitHandler {get; private set;}
         private TiledMapRenderer _tiledMapRenderer;
         private TiledMap _tiledMap;
+
+        private string _mapName;
         private TiledMapEffect _tintEffect;
 
         public int Width { get; private set; }
 
         public int Height { get; private set; }
 
-        public World() {
+        public World(string mapName) {
+            _mapName = mapName;
             FruitHandler = new FruitHandler(this);
         }
 
@@ -42,7 +46,7 @@ namespace TinyShopping.Game {
         /// <param name="contentManager">The content manager of the main game.</param>
         public void LoadContent(ContentManager contentManager, GraphicsDevice device) {
             //_tintEffect = new TiledMapEffect(contentManager.Load<Effect>("shaders/TintMapEffect"));
-            _tiledMap = contentManager.Load<TiledMap>("map_isometric/map-angled");
+            _tiledMap = contentManager.Load<TiledMap>(_mapName);
             _tiledMap.GetLayer("Walls").Offset = new Vector2(0, -96);
             _tiledMap.GetLayer("Walls2").Offset = new Vector2(0, -96);
             _tiledMap.GetLayer("Posters").Offset = new Vector2(0, -32);
@@ -56,8 +60,8 @@ namespace TinyShopping.Game {
             FruitHandler.LoadContent(contentManager);
         }
 
-        public void UnloadContent(ContentManager contentManager, GraphicsDevice device) {
-            contentManager.UnloadAsset("map_isometric/map-angled");
+        public void UnloadContent(ContentManager contentManager) {
+            contentManager.UnloadAsset(_mapName);
         }
 
         /// <summary>
