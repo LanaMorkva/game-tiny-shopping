@@ -160,6 +160,7 @@ namespace TinyShopping.Game {
             batch.End();
             _batch.Begin(transformMatrix: viewMatrix);
             _world.DrawObjects(batch, viewMatrix, Vector2.Zero);
+            _insectHandler.DrawForeground(batch);
             if (playerId == 0) {
                 _player1.Draw(batch, gameTime);
             } else {
@@ -279,6 +280,15 @@ namespace TinyShopping.Game {
         /// <returns>A list of insects.</returns>
         public IList<Insect> GetAllInsects(int player) {
             return _insectHandler.GetAllInsects(player);
+        }
+
+        /// <summary>
+        /// Returns the healt of the given player's spawn.
+        /// </summary>
+        /// <param name="player">The player to check</param>
+        /// <returns>The spawn health.</returns>
+        public int GetSpawnHealth(int player) {
+            return _insectHandler.GetSpawnHealth(player);
         }
     }
 }

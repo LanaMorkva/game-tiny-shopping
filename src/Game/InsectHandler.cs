@@ -99,6 +99,10 @@ namespace TinyShopping.Game {
                     enemy.TakeDamage(shot.Damage);
                     shot.ShouldRemove = true;
                 }
+                else if (Vector2.DistanceSquared(shot.Position, c.Spawn) < range * range * 2) {
+                    c.TakeDamage(shot.Damage);
+                    shot.ShouldRemove = true;
+                }
             }
             _shots = _shots.Where(obj => !obj.ShouldRemove).ToList();
         }
@@ -116,6 +120,16 @@ namespace TinyShopping.Game {
 
             foreach (var shot in _shots) {
                 shot.Draw(batch);
+            }
+        }
+
+        /// <summary>
+        /// Draws all that needs to be in the foreground.
+        /// </summary>
+        /// <param name="batch">The sprite batch to use.</param>
+        public void DrawForeground(SpriteBatch batch) {
+            for (int i = 0; i < _colonies.Length; i++) {
+                _colonies[i].DrawForeground(batch);
             }
         }
 
@@ -138,6 +152,17 @@ namespace TinyShopping.Game {
             Colony c = _colonies[enemyIndex];
             float range = Constants.ENEMY_VISIBILITY_RANGE;
             return c.GetClosestToInRange(position, range);            
+        }
+
+        /// <summary>
+        /// Returns the position of the enemy spawn point.
+        /// </summary>
+        /// <param name="player">The current player.</param>
+        /// <returns>A position.</returns>
+        public Vector2 GetEnemeySpawnPosition(int player) {
+            int enemyIndex = 1 - player;
+            Colony c = _colonies[enemyIndex];
+            return c.Spawn;
         }
 
         /// <summary>
@@ -182,6 +207,15 @@ namespace TinyShopping.Game {
         /// <returns>A list of insects.</returns>
         public IList<Insect> GetAllInsects(int player) {
             return _colonies[player].Insects;
+        }
+
+        /// <summary>
+        /// Returns the healt of the given player's spawn.
+        /// </summary>
+        /// <param name="player">The player to check</param>
+        /// <returns>The spawn health.</returns>
+        public int GetSpawnHealth(int player) {
+            return _colonies[player].SpawnHealth;
         }
 
         public void AddShot(int owner, int damagePower, Vector2 start, Vector2 end) {

@@ -51,18 +51,29 @@ namespace TinyShopping.Game.AI {
                 return false;
             }
             if (p.Type == PheromoneType.FIGHT) {
+                float fightRange = Constants.FIGHT_RANGE;
                 Insect enemy = _colony.GetClosestEnemy(Insect.Position);
                 if (enemy != null) {
-                    float fightRange = Constants.FIGHT_RANGE;
                     if (Insect.CanGiveDamage && Vector2.DistanceSquared(enemy.Position, Insect.Position) < fightRange * fightRange) {
                         var shotEndPos = Insect.Position + (enemy.Position-Insect.Position).NormalizedCopy() * fightRange;
                         Insect.SendShot();
                         _colony.AddShot(Insect.GetDamagePower, Insect.Position, shotEndPos);
-                    }
-                    
+                    }                    
                     Vector2 target = enemy.Position;
                     Vector2 dirTarget = Vector2.Normalize(target - Insect.Position);
                     Vector2 offsetTarget = dirTarget * fightRange / 1.5f;
+                    AIHandler.WalkTo(target - offsetTarget, p, gameTime, InsectState.Fight);
+                    return true;
+                }
+                else if (Vector2.DistanceSquared(_colony.GetEnemySpawnPosition(), Insect.Position) < Constants.ENEMY_VISIBILITY_RANGE * Constants.ENEMY_VISIBILITY_RANGE) {
+                    if (Insect.CanGiveDamage && Vector2.DistanceSquared(_colony.GetEnemySpawnPosition(), Insect.Position) < fightRange * fightRange * 2) {
+                        var shotEndPos = Insect.Position + (_colony.GetEnemySpawnPosition() - Insect.Position).NormalizedCopy() * fightRange;
+                        Insect.SendShot();
+                        _colony.AddShot(Insect.GetDamagePower, Insect.Position, shotEndPos);
+                    }
+                    Vector2 target = _colony.GetEnemySpawnPosition();
+                    Vector2 dirTarget = Vector2.Normalize(target - Insect.Position);
+                    Vector2 offsetTarget = dirTarget * fightRange;
                     AIHandler.WalkTo(target - offsetTarget, p, gameTime, InsectState.Fight);
                     return true;
                 }

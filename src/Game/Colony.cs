@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
-using System.Linq;
+using MonoGame.Extended;
 
 namespace TinyShopping.Game {
 
@@ -15,7 +15,9 @@ namespace TinyShopping.Game {
 
     internal class Colony {
 
-        private Vector2 _spawn;
+        public Vector2 Spawn { get; private set; }
+
+        public int SpawnHealth { get; private set; } = Constants.SPAWN_MAX_HEALTH;
 
         private int _spawnRotation;
 
@@ -60,7 +62,7 @@ namespace TinyShopping.Game {
         /// <param name="insectHandler">The insect handler.</param>
         /// <param name="type">The insect type of this colony.</param>
         public Colony(Vector2 spawn, int spawnRotation, World world, PheromoneHandler handler, FruitHandler fruits, Vector2 dropOff, int owner, InsectHandler insectHandler, ColonyType type) {
-            _spawn = spawn;
+            Spawn = spawn;
             _spawnRotation = spawnRotation;
             _queue = 6;
             DropOff = dropOff;
@@ -119,7 +121,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <returns>An Ant or Termite.</returns>
         private Insect GetNewInsect() {
-            return new Insect(_services, _spawn, _spawnRotation, _texture, _type);
+            return new Insect(_services, Spawn, _spawnRotation, _texture, _type);
         }
 
         /// <summary>
@@ -130,6 +132,21 @@ namespace TinyShopping.Game {
         public void Draw(SpriteBatch batch, GameTime gameTime, bool playersColony) {
             foreach (Insect insect in Insects) {
                 insect.Draw(batch, gameTime, playersColony);
+            }
+        }
+
+        /// <summary>
+        /// Draws all that needs to be in the foreground.
+        /// </summary>
+        /// <param name="batch">The sprite batch to use.</param>
+        public void DrawForeground(SpriteBatch batch) {
+            if (SpawnHealth < Constants.SPAWN_MAX_HEALTH) {
+                var barPos = Spawn.ToPoint() - new Point(50, 50);
+                var healthBar = new Rectangle(barPos, new Size((100 * SpawnHealth / Constants.SPAWN_MAX_HEALTH), 6));
+                var healthBarBound = new Rectangle(barPos, new Size(100, 6));
+
+                batch.FillRectangle(healthBar, Color.Green);
+                batch.DrawRectangle(healthBarBound, Color.Black);
             }
         }
 
@@ -161,6 +178,14 @@ namespace TinyShopping.Game {
             return _insectHandler.GetClosestEnemy(_owner, position);
         }
 
+        /// <summary>
+        /// Returns the position of the enemy spawn point.
+        /// </summary>
+        /// <returns>A position.</returns>
+        public Vector2 GetEnemySpawnPosition() {
+            return _insectHandler.GetEnemeySpawnPosition(_owner);
+        }
+
         public void AddShot(int damagePower, Vector2 start, Vector2 end) {
             _insectHandler.AddShot(_owner, damagePower, start, end);
         }
@@ -182,6 +207,14 @@ namespace TinyShopping.Game {
                 }
             }
             return closest;
+        }
+
+        /// <summary>
+        /// Reduces the colony spawn's health.
+        /// </summary>
+        /// <param name="damage">The damage to take.</param>
+        public void TakeDamage(int damage) {
+            SpawnHealth -= damage;
         }
     }
 }

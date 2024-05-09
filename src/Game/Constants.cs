@@ -33,6 +33,11 @@
         public static Attributes TERMITE_ATTRIBUTES = new Attributes { speed = 50, rotationSpeed = 200, maxHealth = 25, damage = 4, damageReload = 3000 };
 
         /// <summary>
+        /// The maximum health of a colony's spawn.
+        /// </summary>
+        public static int SPAWN_MAX_HEALTH = 200;
+
+        /// <summary>
         /// Speed of wandering
         /// </summary>
         public static readonly int WANDER_SPEED = 25;
