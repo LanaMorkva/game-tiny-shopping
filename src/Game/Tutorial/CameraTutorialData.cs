@@ -6,37 +6,35 @@ namespace TinyShopping.Game.Tutorial {
     struct CameraTutorialData {
         [Flags]
         private enum CameraMoved {
-            Up  = 1,
-            Down = 2,
-            Left = 4,
-            Right = 8,
-            ZoomIn = 16,
-            ZoomOut = 32,
-            Everywhere = Up | Down | Left | Right | ZoomIn | ZoomOut,
+            Horizonal = 1,
+            Vertical = 2, 
+            Zoomed = 4,
+            Everywhere = Horizonal | Vertical | Zoomed,
         }
         private CameraMoved CameraFlags = 0;
-        private float CameraPreviousRecordedZoom = 0.5f;
+        private float CameraPreviousRecordedZoom = 0;
         private Vector2 CameraPreviousRecordedMovement = Vector2.Zero;
         public CameraTutorialData() {}
 
         public void Update(Vector2 camUpdateMovement, float camUpdateZoom) {
-            if (camUpdateMovement.X > CameraPreviousRecordedMovement.X) {
-                CameraFlags |= CameraMoved.Right;
+            if (CameraPreviousRecordedMovement == Vector2.Zero && CameraPreviousRecordedZoom == 0) {
+                //first recorded movement, record value and skip
+                CameraPreviousRecordedMovement = camUpdateMovement;
+                CameraPreviousRecordedZoom = camUpdateZoom;
+                return;
             }
-            if (camUpdateMovement.X < CameraPreviousRecordedMovement.X) {
-                CameraFlags |= CameraMoved.Left;
+
+            if (Math.Abs(camUpdateMovement.X - CameraPreviousRecordedMovement.X) > 1) {
+                CameraFlags |= CameraMoved.Horizonal;
+                Console.WriteLine("horizontal");
             }
-            if (camUpdateMovement.Y < CameraPreviousRecordedMovement.Y) {
-                CameraFlags |= CameraMoved.Up;
+            if (Math.Abs(camUpdateMovement.Y - CameraPreviousRecordedMovement.Y) > 1) {
+                CameraFlags |= CameraMoved.Vertical;
+                Console.WriteLine("vertical");
             }
-            if (camUpdateMovement.Y > CameraPreviousRecordedMovement.Y) {
-                CameraFlags |= CameraMoved.Down;
-            }
-            if (camUpdateZoom > CameraPreviousRecordedZoom) {
-                CameraFlags |= CameraMoved.ZoomIn;
-            }
-            if (camUpdateZoom < CameraPreviousRecordedZoom) {
-                CameraFlags |= CameraMoved.ZoomOut;
+            if (Math.Abs(camUpdateZoom - CameraPreviousRecordedZoom) > 0f) {
+                CameraFlags |= CameraMoved.Zoomed;
+                Console.WriteLine("zoomed");
             }
 
             CameraPreviousRecordedMovement = camUpdateMovement;

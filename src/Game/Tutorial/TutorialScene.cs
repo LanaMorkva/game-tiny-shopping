@@ -189,7 +189,7 @@ namespace TinyShopping.Game {
                     DrawBigTutorialPanel(_introTexture);
                     break;
                 case TutorialPhase.MoveCamera: 
-                    DrawBigTutorialPanel(_cameraTexture);
+                    DrawSmallTutorialPanel(_cameraTexture);
                     break;
                 case TutorialPhase.MoveCameraWaitingForNext:
                     DrawSmallTutorialPanel(_cameraWaitingTexture);
