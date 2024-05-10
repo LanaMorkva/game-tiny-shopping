@@ -14,11 +14,14 @@ namespace TinyShopping.Game {
             None = -1,
             Intro, 
             MoveCamera,
-            MoveCameraWaitingForNext,
+            MoveCameraWaitingForPlayer,
             AntsPause,
             AntsIntro,
             AntsTrails,
             AntsInProgress,
+            PheromoneIntro,
+            PheromoneInProgress,
+            PheromoneCompleted
         }
 
         private SoundController _sound;
@@ -35,6 +38,9 @@ namespace TinyShopping.Game {
         private Texture2D _antsIntroTexture;
         private Texture2D _antsTrailsTexture;
         private Texture2D _antsInProgressTexture;
+        private Texture2D _pheromonesTexture;
+        private Texture2D _pheromonesInProgressTexture;
+        private Texture2D _pheromonesCompletedTexture;
         private bool _tutorialPause = false;
         private TutorialPhase _tutorialPhase = TutorialPhase.None;
         private double _runtimeS;
@@ -91,6 +97,9 @@ namespace TinyShopping.Game {
             _antsIntroTexture = Content.Load<Texture2D>("tutorial/ants_intro");
             _antsInProgressTexture = Content.Load<Texture2D>("tutorial/ants_in_progress");
             _antsTrailsTexture = Content.Load<Texture2D>("tutorial/ants_trails");
+            _pheromonesTexture = Content.Load<Texture2D>("tutorial/pheromones_intro");
+            _pheromonesInProgressTexture = Content.Load<Texture2D>("tutorial/pheromones_in_progress");
+            _pheromonesCompletedTexture = Content.Load<Texture2D>("tutorial/pheromones_done");
             base.LoadContent();
         }
 
@@ -132,18 +141,27 @@ namespace TinyShopping.Game {
             }
 
             if (_tutorialPhase == TutorialPhase.AntsInProgress) {
+                //TODO: disable user pheromone spawning
+                //TODO: disable fruits
                 _insectHandler.Update(gameTime);
+            }
+            if (_tutorialPhase == TutorialPhase.PheromoneIntro) {
+                _tutorialPause = true;
+                _insectHandler.ResetColonies(Content);
+            }
+
+            if (_tutorialPhase == TutorialPhase.PheromoneInProgress) {
+                _insectHandler.Update(gameTime);
+                _pheromoneHandler.Update(gameTime);
+
+                if (_splitScreenHandler.GetNumberOfFruits(0) > 4 || _splitScreenHandler.GetNumberOfFruits(1) > 4) {
+                    TutorialPhaseDone();
+                }
             }
             
 
             if (!IsOver && IsStarted) {
-                if (!IsPaused && !_tutorialPause) {
-                    _insectHandler.Update(gameTime);
-                    _pheromoneHandler.Update(gameTime);
-                    if (IsPaused) {
-                        _pauseMenu.ResetActiveItem();
-                    }
-                } else {
+                if (IsPaused) {
                     _pauseMenu.Update(gameTime);
                 }
             }
@@ -169,7 +187,9 @@ namespace TinyShopping.Game {
             }
 
             DrawCurrentTutorialPhase();
-            
+#if DEBUG
+            _ui.DrawString(SpriteBatch, "Current tutorial phase: " + _tutorialPhase.ToString(), new Vector2(Width / 4,  Height - 50), 0.3f);
+#endif
             SpriteBatch.End();
             base.Draw(gameTime);
         }
@@ -180,7 +200,7 @@ namespace TinyShopping.Game {
             // 1. Camera movement [Done]
             // 2. Ants (how do they move, why do they move, how they leave small trails) ANTS vs TERMITES
             // 4. Pheromones (how to place(duration, range), types of pheromones, ants with food will react only to blue pheromone)
-            // 3. Fruits (how to collect from boxes, where to drop off, how to exchange for ants)
+            // 3. Fruits (player must collect fruits using pheromones and bring fruits home, he can exchange them for more ants or stash -> victory goal)
             // 4. Goal (collect more fruits that opponent- or kill opponent)
             // 5. Fighting?
 
@@ -191,7 +211,7 @@ namespace TinyShopping.Game {
                 case TutorialPhase.MoveCamera: 
                     DrawSmallTutorialPanel(_cameraTexture);
                     break;
-                case TutorialPhase.MoveCameraWaitingForNext:
+                case TutorialPhase.MoveCameraWaitingForPlayer:
                     DrawSmallTutorialPanel(_cameraWaitingTexture);
                     break;
                 case TutorialPhase.AntsIntro:
@@ -202,6 +222,16 @@ namespace TinyShopping.Game {
                     break;
                 case TutorialPhase.AntsInProgress:
                     DrawSmallTutorialPanel(_antsInProgressTexture);
+                    break;
+                case TutorialPhase.PheromoneIntro:
+                    DrawBigTutorialPanel(_pheromonesTexture);
+                    break;
+                case TutorialPhase.PheromoneInProgress:
+                    //TODO: draw arrows to the food boxes and drop off
+                    DrawSmallTutorialPanel(_pheromonesInProgressTexture);
+                    break;
+                case TutorialPhase.PheromoneCompleted:
+                    DrawSmallTutorialPanel(_pheromonesCompletedTexture);
                     break;
                 default:
                     return;

@@ -91,6 +91,13 @@ namespace TinyShopping.Game {
             _soundEffects.Add(content.Load<SoundEffect>("sounds/insect_dying"));
         }
 
+        public void UnloadContent(ContentManager content) {
+            var texturePath = _type == ColonyType.ANT ? "ants/ant_texture" : "termites/termite_texture";
+            content.UnloadAsset(texturePath);
+            content.UnloadAsset("sounds/cash_register");
+            content.UnloadAsset("sounds/insect_dying");
+        }
+
         /// <summary>
         /// Updates the insects' position.
         /// </summary>

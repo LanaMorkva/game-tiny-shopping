@@ -26,15 +26,12 @@ namespace TinyShopping.Game.Tutorial {
 
             if (Math.Abs(camUpdateMovement.X - CameraPreviousRecordedMovement.X) > 1) {
                 CameraFlags |= CameraMoved.Horizonal;
-                Console.WriteLine("horizontal");
             }
             if (Math.Abs(camUpdateMovement.Y - CameraPreviousRecordedMovement.Y) > 1) {
                 CameraFlags |= CameraMoved.Vertical;
-                Console.WriteLine("vertical");
             }
             if (Math.Abs(camUpdateZoom - CameraPreviousRecordedZoom) > 0f) {
                 CameraFlags |= CameraMoved.Zoomed;
-                Console.WriteLine("zoomed");
             }
 
             CameraPreviousRecordedMovement = camUpdateMovement;
