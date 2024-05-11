@@ -50,6 +50,7 @@ namespace TinyShopping.Game {
 
         public override void LoadContent() {
             _world.LoadContent(Content, GraphicsDevice);
+            _world.InitializeFruitHandler();
             _insectHandler.LoadContent(Content);
             _pheromoneHandler.LoadContent(Content);
             _splitScreenHandler.LoadContent(Content);

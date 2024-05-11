@@ -15,10 +15,10 @@ namespace TinyShopping.Game {
             Intro, 
             MoveCamera,
             MoveCameraWaitingForPlayer,
-            AntsPause,
             AntsIntro,
             AntsTrails,
             AntsInProgress,
+            PheromoneInitialization,
             PheromoneIntro,
             PheromoneInProgress,
             PheromoneCompleted
@@ -43,7 +43,7 @@ namespace TinyShopping.Game {
         private Texture2D _pheromonesCompletedTexture;
         private TutorialPhase _tutorialPhase = TutorialPhase.None;
         private double _runtimeS;
-        private double _lastRecordedRuntimeS;
+        private double _lastPhaseCompletedTimeS;
 
         private CameraTutorialData _cam1Movement;
         private CameraTutorialData _cam2Movement;
@@ -73,9 +73,9 @@ namespace TinyShopping.Game {
             _splitScreenHandler.Initialize();
             _pauseMenu.AddItem(new MenuItem("Resume", ResumeGame));
             _pauseMenu.AddItem(new MenuItem("Exit Game", LoadMainMenu));
-            _tutorialMenu.AddItem(new MenuItem("Next", TutorialPhaseDone, Color.DimGray));
+            _tutorialMenu.AddItem(new MenuItem("Next", NextTutorialPhase, Color.DimGray));
             _runtimeS = 0;
-            _lastRecordedRuntimeS = 0;
+            _lastPhaseCompletedTimeS = 0;
             base.Initialize();
         }
 
@@ -112,20 +112,18 @@ namespace TinyShopping.Game {
         public override void Update(GameTime gameTime) {
             _runtimeS += gameTime.ElapsedGameTime.TotalSeconds;
             if (_tutorialPhase == TutorialPhase.None && TutorialDelayDoneS(0.5f)) {
-                _tutorialPhase = TutorialPhase.Intro;
+                NextTutorialPhase();
             }
 
             if (_tutorialPhase == TutorialPhase.MoveCamera) {
                 _cam1Movement.Update(_splitScreenHandler.GetCameraPosition(0), _splitScreenHandler.GetZoomValue(0));
                 _cam2Movement.Update(_splitScreenHandler.GetCameraPosition(1), _splitScreenHandler.GetZoomValue(1));
                 if (_cam1Movement.Completed() || _cam2Movement.Completed()) {
-                    TutorialPhaseDone();
+                    NextTutorialPhase();
                 }
             }
 
-            if (_tutorialPhase == TutorialPhase.AntsPause && TutorialDelayDoneS(1.0f)) {
-                _tutorialPhase = TutorialPhase.AntsIntro;
-
+            if (_tutorialPhase == TutorialPhase.AntsIntro) {
                 _splitScreenHandler.SetPlayerCursorTo(0, _world.GetSpawnPositions()[0]);
                 _splitScreenHandler.SetPlayerCursorTo(1, _world.GetSpawnPositions()[1]);
                 _splitScreenHandler.Camera1.LookAt(_world.GetSpawnPositions()[0]);
@@ -134,21 +132,21 @@ namespace TinyShopping.Game {
 
             if (_tutorialPhase == TutorialPhase.AntsInProgress && TutorialDelayDoneS(1.0f)) {
                 //TODO: disable user pheromone spawning
-                //TODO: disable fruits
                 _insectHandler.Update(gameTime);
-                
             }
-            if (_tutorialPhase == TutorialPhase.PheromoneIntro && TutorialDelayDoneS(1.0f)) {
+
+            if (_tutorialPhase == TutorialPhase.PheromoneInitialization) {
                 _insectHandler.ResetColonies(Content);
+                _world.InitializeFruitHandler(true);
+                 NextTutorialPhase();
             }
 
             if (_tutorialPhase == TutorialPhase.PheromoneInProgress && TutorialDelayDoneS(1.0f)) {
-                //TODO: disable single fruits, leave only boxes
                 _insectHandler.Update(gameTime);
                 _pheromoneHandler.Update(gameTime);
 
                 if (_splitScreenHandler.GetNumberOfFruits(0) > 4 || _splitScreenHandler.GetNumberOfFruits(1) > 4) {
-                    TutorialPhaseDone();
+                    NextTutorialPhase();
                 }
             }
             
@@ -199,69 +197,75 @@ namespace TinyShopping.Game {
 
             switch (_tutorialPhase) {
                 case TutorialPhase.Intro:
-                    DrawBigTutorialPanel(_introTexture);
+                    DrawBigTutorialPanel(_introTexture, 1f);
                     break;
                 case TutorialPhase.MoveCamera: 
-                    DrawSmallTutorialPanel(_cameraTexture);
+                    DrawSmallTutorialPanel(_cameraTexture, 0.2f);
                     break;
                 case TutorialPhase.MoveCameraWaitingForPlayer:
-                    DrawSmallTutorialPanel(_cameraWaitingTexture);
+                    DrawSmallTutorialPanel(_cameraWaitingTexture, 0.2f);
                     break;
                 case TutorialPhase.AntsIntro:
-                    DrawBigTutorialPanel(_antsIntroTexture);
+                    DrawBigTutorialPanel(_antsIntroTexture, 0.5f);
                     break;
                 case TutorialPhase.AntsTrails:
                     DrawBigTutorialPanel(_antsTrailsTexture);
                     break;
                 case TutorialPhase.AntsInProgress:
-                    DrawSmallTutorialPanel(_antsInProgressTexture);
+                    DrawSmallTutorialPanel(_antsInProgressTexture, 0.2f);
                     break;
                 case TutorialPhase.PheromoneIntro:
-                    DrawBigTutorialPanel(_pheromonesTexture);
+                    DrawBigTutorialPanel(_pheromonesTexture, 1f);
                     break;
                 case TutorialPhase.PheromoneInProgress:
                     //TODO: draw arrows to the food boxes and drop off
-                    DrawSmallTutorialPanel(_pheromonesInProgressTexture);
+                    DrawSmallTutorialPanel(_pheromonesInProgressTexture, 0.2f);
                     break;
                 case TutorialPhase.PheromoneCompleted:
-                    DrawSmallTutorialPanel(_pheromonesCompletedTexture);
+                    DrawSmallTutorialPanel(_pheromonesCompletedTexture, 0.2f);
                     break;
                 default:
                     return;
             }
         }
 
-        private void DrawBigTutorialPanel(Texture2D texture) {
+        private void DrawBigTutorialPanel(Texture2D texture, float fadeIn = 0f) {
+            float timeDelta = (float)(_runtimeS - _lastPhaseCompletedTimeS);
+            float alpha = fadeIn == 0 ? 1f : Math.Clamp(timeDelta / fadeIn, 0, 1);
+
             Vector2 screenCenter = new Vector2(Width / 2, Height / 2);
             Vector2 textureCenter = new Vector2(texture.Width / 2, texture.Height / 2);
 
-            PauseDrawBackground();
-            SpriteBatch.Draw(texture, screenCenter, null, Color.White, 0f, textureCenter, 1.0f, SpriteEffects.None, 1f);
+            PauseDrawBackground(alpha);
+            SpriteBatch.Draw(texture, screenCenter, null, Color.White * alpha, 0f, textureCenter, 1.0f, SpriteEffects.None, 1f);
             _tutorialMenu.Draw(SpriteBatch);
         }
 
-        private void DrawSmallTutorialPanel(Texture2D texture) {
+        private void DrawSmallTutorialPanel(Texture2D texture, float fadeIn = 0f) {
+            float timeDelta = (float)(_runtimeS - _lastPhaseCompletedTimeS);
+            float alpha = fadeIn == 0 ? 1f : Math.Clamp(timeDelta / fadeIn, 0, 1);
+
             Vector2 screenCenter = new Vector2(Width / 2, Height / 2);
             Vector2 textureCenter = new Vector2(texture.Width / 2, texture.Height / 2);
             Vector2 textureLocation = new Vector2(screenCenter.X, texture.Height / 4 + 20);
-            SpriteBatch.Draw(texture, textureLocation, null, Color.White, 0f, textureCenter, 0.6f, SpriteEffects.None, 1f);
+            SpriteBatch.Draw(texture, textureLocation, null, Color.White * alpha, 0f, textureCenter, 0.6f, SpriteEffects.None, 1f);
             _tutorialMenu.Draw(SpriteBatch);
         }
 
-        private void PauseDrawBackground() {
+        private void PauseDrawBackground(float alpha = 1f) {
             Color pauseColor = new Color(122, 119, 110, 120);
-            SpriteBatch.FillRectangle(new Rectangle(0, 0, Width, Height), pauseColor, 0);
+            SpriteBatch.FillRectangle(new Rectangle(0, 0, Width, Height), pauseColor * alpha, 0);
         }
 
-        private void TutorialPhaseDone() {
+        private void NextTutorialPhase() {
             //TODO: both players need to confirm that they read and understood
             // update: or do they?
             _tutorialPhase += 1;
-            _lastRecordedRuntimeS = _runtimeS;
+            _lastPhaseCompletedTimeS = _runtimeS;
         }
 
         private bool TutorialDelayDoneS(float delay) {
-            return (_runtimeS - _lastRecordedRuntimeS) > delay;
+            return (_runtimeS - _lastPhaseCompletedTimeS) > delay;
         }
     }
 }

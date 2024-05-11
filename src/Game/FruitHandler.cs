@@ -32,17 +32,15 @@ namespace TinyShopping.Game {
             _appleTexture = content.Load<Texture2D>("apple");
             _boxAssets = content.Load<Texture2D>("map_isometric/asset-box");
             _boxEmptyAssets = content.Load<Texture2D>("map_isometric/asset-box-empty");
-            GenerateFruitBoxes();
-            GenerateFruits();
         }
 
-        private void GenerateFruitBoxes() {
+        public void GenerateFruitBoxes() {
             foreach (var bottomLeftPos in _world.GetBoxPositions()) {
                 _fruits.Add(new FruitBox(bottomLeftPos, _world, _boxAssets, _boxEmptyAssets));
             }
         }
         
-        private void GenerateFruits() {
+        public void GenerateFruits() {
             float halfFruitSize = Constants.FRUIT_TEXTURE_SIZE / 2;
             for (int i = 0; i < Constants.FRUITS_NUM; ) {
                 int tileX = Random.Shared.Next(_world.Width);
