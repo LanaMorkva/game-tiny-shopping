@@ -136,7 +136,16 @@ namespace TinyShopping.Game {
             }
             
 
-            if (!IsOver && IsStarted) {
+            if (gameState == GameState.Playing) {
+                if (!_tutorialPause) {
+                    _insectHandler.Update(gameTime);
+                    _pheromoneHandler.Update(gameTime);
+                }
+            } else if (gameState == GameState.Paused) {
+                _pauseMenu.Update(gameTime);
+            }
+
+            /*if (!IsOver && IsStarted) {
                 if (!IsPaused && !_tutorialPause) {
                     _insectHandler.Update(gameTime);
                     _pheromoneHandler.Update(gameTime);
@@ -146,7 +155,7 @@ namespace TinyShopping.Game {
                 } else {
                     _pauseMenu.Update(gameTime);
                 }
-            }
+            }*/
             _splitScreenHandler.Update(gameTime, this);
 
             _tutorialMenu.Update(gameTime);
@@ -163,7 +172,7 @@ namespace TinyShopping.Game {
             _ui.Draw(SpriteBatch, gameTime);
             GraphicsDevice.Viewport = original;
 
-            if (IsPaused) {
+            if (gameState == GameState.Paused) {
                 PauseDrawBackground();
                 _pauseMenu.Draw(SpriteBatch);
             }

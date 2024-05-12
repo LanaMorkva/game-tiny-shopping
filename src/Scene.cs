@@ -6,10 +6,21 @@ using Microsoft.Xna.Framework.Media;
 
 namespace TinyShopping {
 
+
+    public enum GameState {
+        Introduction = 0,
+        StartCountdown = 1,
+        Playing = 2, 
+        Paused = 3,
+        Ended = 4
+    }
+
     public abstract class Scene {
 
         public bool IsStarted {get; set; }
         public bool IsOver { get; set; }
+
+        public GameState gameState {get; set; }
 
         public bool IsPaused {get; set; }
 
@@ -73,7 +84,7 @@ namespace TinyShopping {
         }
 
         public void ResumeGame() {
-            IsPaused = false;
+            gameState = GameState.Playing;
         }
     }
 }

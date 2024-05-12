@@ -258,5 +258,34 @@ namespace TinyShopping.Game {
         public int GetSpawnHealth(int player) {
             return _insectHandler.GetSpawnHealth(player);
         }
+
+        public Vector2 GetPlayerPosition(PlayerIndex player) {
+            // Apply camera transformation to render get position on screen
+            if (player == PlayerIndex.One) {
+                Matrix transformMatrix = Camera1.GetViewMatrix();
+                return Vector2.Transform(_player1.GetPosition(), transformMatrix);
+            } else {
+                // Shady code, should be solved more general for a more general splitscreen
+                Matrix transformMatrix = Camera2.GetViewMatrix();
+                return Vector2.Transform(_player2.GetPosition(), transformMatrix) + new Vector2(Player1Area.Width, 0);
+            }
+        }
+
+        public Player GetPlayer(PlayerIndex index) {
+            if (index == PlayerIndex.One) {
+                return _player1;
+            } else {
+                return _player2;
+            }
+        }
+
+        public bool IsPlayerKeyboard(PlayerIndex index) {
+            if (index == PlayerIndex.One) {
+                return _player1.IsPlayerKeyboard();
+            } else {
+                return _player2.IsPlayerKeyboard();
+            }
+        }
+
     }
 }

@@ -64,6 +64,8 @@ namespace TinyShopping.Game {
         public abstract bool IsNewInsectPressed();
 
         public abstract bool IsStartedPressed();
+        
+        public abstract bool IsPlayerKeyboard();
     }
 
     internal class GamePadInput : PlayerInput {
@@ -141,6 +143,11 @@ namespace TinyShopping.Game {
         {
             GamePadState cState = GamePad.GetState(_playerIndex);
             return cState.IsButtonDown(_startButton);
+        }
+
+        public override bool IsPlayerKeyboard()
+        {
+            return false;
         }
     }
 
@@ -265,6 +272,11 @@ namespace TinyShopping.Game {
         {
             KeyboardState kState = Keyboard.GetState();
             return kState.IsKeyDown(_startKey);
+        }
+
+        public override bool IsPlayerKeyboard()
+        {
+            return true;
         }
     }
 }
