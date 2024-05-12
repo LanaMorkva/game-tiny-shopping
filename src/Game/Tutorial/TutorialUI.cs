@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework.Input;
 using MonoGame.Extended;
 using System;
 using System.Collections.Generic;
+using System.Data;
 
 namespace TinyShopping.Game {
 
@@ -68,7 +69,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
-            if (_scene.IsOver && _playerOne.IsSelectPressed()) {
+            if (_scene.gameState == GameState.Ended && _playerOne.IsSelectPressed()) {
                 _selectPressed = true;
             } else if (_selectPressed) {
                 _selectPressed = false;
@@ -93,7 +94,7 @@ namespace TinyShopping.Game {
             DrawBorder(batch);
             DrawStatistics(batch);
             _insectController.Draw(batch, gameTime);
-            if (_scene.IsOver) {
+            if (_scene.gameState == GameState.Ended) {
                 DrawReturnMessage(batch);
             }
 #if DEBUG

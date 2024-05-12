@@ -31,7 +31,7 @@ namespace TinyShopping.Game {
             _sound = new SoundController(this);
 
             var menuRegion = new Rectangle(0, 0, Width, Height);
-            var menuItemSize = new Vector2((int)(Width / 2.8), Height / 10);
+            var menuItemSize = new Vector2((int)(Width / 3.5), Height / 12);
 
             Rectangle explanationRegion = new Rectangle(50, Height - 150, 300, 100);
             List<MenuExplanation> explanations = new List<MenuExplanation> {
