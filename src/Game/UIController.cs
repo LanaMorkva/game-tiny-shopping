@@ -29,6 +29,10 @@ namespace TinyShopping.Game {
 
         private Texture2D _termiteCharachterTexture;
 
+        private Texture2D _gamepadButtons;
+
+        private Texture2D _keyboardButtons;
+
         private SplitScreenHandler _handler;
 
         private List<SoundEffect> _soundEffects;
@@ -76,6 +80,9 @@ namespace TinyShopping.Game {
 
             _soundEffects.Add(content.Load<SoundEffect>("sounds/countdown_3_seconds"));
             _soundEffects.Add(content.Load<SoundEffect>("sounds/final_whistle"));
+
+            _gamepadButtons = content.Load<Texture2D>("stats/controller");
+            _keyboardButtons = content.Load<Texture2D>("stats/numbers");
 
             _insectController.LoadContent(content);
         }
@@ -144,15 +151,19 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="batch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SpriteBatch batch, GameTime gameTime) {
+        public void Draw(SpriteBatch batch, GameTime gameTime, Vector2 player1_pos, Vector2 player2_pos, bool player1_keyboard, bool player2_keyboard) {
             DrawBorder(batch);
             DrawStatistics(batch);
             DrawRemainingTime(batch);
             _insectController.Draw(batch, gameTime);
             if (_scene.gameState == GameState.StartCountdown) {
                 DrawCountdown(batch);
-            }
-            if (_scene.gameState == GameState.Ended) {
+            } else if (_scene.gameState == GameState.Playing) {
+                if (_runtimeMs < 15000) {
+                    DrawCursorExplanations(batch, player1_pos, Color.White, PlayerIndex.One, true, player1_keyboard);
+                    DrawCursorExplanations(batch, player2_pos, Color.White, PlayerIndex.Two, true, player2_keyboard);
+                }
+            } else if (_scene.gameState == GameState.Ended) {
                 DrawWinMessage(batch);
                 if (_afterGameMs <= 0) {
                     DrawReturnMessage(batch);
@@ -371,5 +382,116 @@ namespace TinyShopping.Game {
                 batch.DrawString(_font, text, textPos, new Color(71, 71, 68, 180), 0, origin, 0.15f, SpriteEffects.None, 0); 
             }
         }
+
+        private void DrawCursorExplanations(SpriteBatch batch, Vector2 player_position, Color transparency, PlayerIndex index, bool showText, bool isPlayerOnKeyboard) {
+            string battleText = "Fight";
+            string discoverText = "Discover";
+            string returnText = "Return home";
+            string newAntText = "Buy new insect";
+
+            float distance = 100f;
+
+            float scale = 0.3f;
+            Vector2 battleTextSize = _font.MeasureString(battleText) * scale;
+            battleTextSize = new Vector2(distance, -(battleTextSize.Y/2f));
+            Vector2 discoverTextSize = _font.MeasureString(discoverText) * scale;
+            discoverTextSize = new Vector2(-discoverTextSize.X/2f, (-discoverTextSize.Y/2f)+distance);
+            Vector2 returnTextSize = _font.MeasureString(returnText) * scale;
+            returnTextSize = new Vector2(-returnTextSize.X-distance, -(returnTextSize.Y/2f));
+            Vector2 newAntTextSize = _font.MeasureString(newAntText) * scale;
+            newAntTextSize = new Vector2(-newAntTextSize.X/2f, (-newAntTextSize.Y/2f)-distance);
+
+            if (showText) {
+                batch.DrawString(_font, battleText, player_position + battleTextSize, Color.Black, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+                batch.DrawString(_font, discoverText, player_position + discoverTextSize, Color.Black, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+                batch.DrawString(_font, returnText, player_position + returnTextSize, Color.Black, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+                batch.DrawString(_font, newAntText, player_position + newAntTextSize, Color.Black, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+            }
+
+
+            distance = 60f;
+            PlayerInput input = _handler.GetPlayer(index).GetPlayerInput();
+
+            Color pressedColor = new Color(255, 255, 255, 100);
+
+            int size = 50;
+
+            Func<string, Rectangle> buttonSource;
+            var controlTexture = _gamepadButtons;
+            if (isPlayerOnKeyboard) {
+                controlTexture = _keyboardButtons;
+                if (index == PlayerIndex.One) {
+                    buttonSource = getKeyboardButtonSource1;
+                } else {
+                    buttonSource = getKeyboardButtonSource2;
+                }
+            } else {
+                buttonSource = getGamepadButtonSource;
+            }
+
+            Rectangle newAntRectangle = new Rectangle((int)(player_position.X - size / 2f), (int)(player_position.Y - size / 2f - distance), size, size);
+            batch.Draw(controlTexture, newAntRectangle, buttonSource("y"), input.IsNewInsectPressed() ? pressedColor : transparency );
+            Rectangle discoverRectangle = new Rectangle((int)(player_position.X - size / 2f), (int)(player_position.Y - size / 2f + distance), size, size);
+            batch.Draw(controlTexture, discoverRectangle, buttonSource("a"), input.IsDiscoverPressed() ? pressedColor : transparency);
+            Rectangle returnRectangle = new Rectangle((int)(player_position.X - size / 2f - distance), (int)(player_position.Y - size / 2f), size, size);
+            batch.Draw(controlTexture, returnRectangle, buttonSource("x"), input.IsReturnPressed() ? pressedColor : transparency);
+            Rectangle battleRectangle = new Rectangle((int)(player_position.X - size / 2f + distance), (int)(player_position.Y - size / 2f), size, size);
+            batch.Draw(controlTexture, battleRectangle, buttonSource("b"), input.IsFightPressed() ? pressedColor : transparency);
+        }
+
+        private Rectangle getGamepadButtonSource(string button) {
+            var buttonSize = new Point(_gamepadButtons.Width / 2, _gamepadButtons.Height / 2);
+            switch (button)
+            {
+                case "a":
+                    return new Rectangle(Point.Zero, buttonSize);
+                case "b":
+                    return new Rectangle(new Point(buttonSize.X, 0), buttonSize);
+                case "y":
+                    return new Rectangle(buttonSize, buttonSize);
+                case "x":
+                    return new Rectangle(new Point(0, buttonSize.Y), buttonSize);
+                
+                default:
+                    return new Rectangle(Point.Zero, buttonSize);
+            } 
+        }
+
+        private Rectangle getKeyboardButtonSource2(string button) {
+            var buttonSize = new Point(_keyboardButtons.Width / 4, _keyboardButtons.Height / 2);
+            switch (button)
+            {
+                case "a":
+                    return new Rectangle(new Point(buttonSize.X*2, 0), buttonSize);
+                case "b":
+                    return new Rectangle(new Point(buttonSize.X*2, buttonSize.Y), buttonSize);
+                case "y":
+                    return new Rectangle(new Point(buttonSize.X*3, buttonSize.Y), buttonSize);
+                case "x":
+                    return new Rectangle(new Point(buttonSize.X*3, 0), buttonSize);
+                
+                default:
+                    return new Rectangle(Point.Zero, buttonSize);
+            } 
+        } 
+        
+        private Rectangle getKeyboardButtonSource1(string button) {
+            var buttonSize = new Point(_keyboardButtons.Width / 4, _keyboardButtons.Height / 2);
+
+            switch (button) {
+                case "a":
+                    return new Rectangle(Point.Zero, buttonSize);
+                case "b":
+                    return new Rectangle(new Point(0, buttonSize.Y), buttonSize);
+                case "y":
+                    return new Rectangle(new Point(buttonSize.X, buttonSize.Y), buttonSize);
+                case "x":
+                    return new Rectangle(new Point(buttonSize.X, 0), buttonSize);
+                default:
+                    return new Rectangle(Point.Zero, buttonSize);
+
+            }
+        }
+
     }
 }

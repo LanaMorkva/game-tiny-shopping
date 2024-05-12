@@ -87,7 +87,7 @@ namespace TinyShopping.Game {
             
             Viewport original = GraphicsDevice.Viewport;
             _splitScreenHandler.Draw(SpriteBatch, gameTime);
-            _ui.Draw(SpriteBatch, gameTime);
+            _ui.Draw(SpriteBatch, gameTime, _splitScreenHandler.GetPlayerPosition(PlayerIndex.One), _splitScreenHandler.GetPlayerPosition(PlayerIndex.Two), _splitScreenHandler.IsPlayerKeyboard(PlayerIndex.One), _splitScreenHandler. IsPlayerKeyboard(PlayerIndex.Two));
             GraphicsDevice.Viewport = original;
 
             if (gameState == GameState.Paused) {
