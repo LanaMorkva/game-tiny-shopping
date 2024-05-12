@@ -37,6 +37,10 @@ namespace TinyShopping.Game {
 
         private double _runtimeMs;
 
+        private double _countdownMs;
+
+        private double _afterGameMs;
+
         private int _winner;
 
         private MenuInput _playerOne;
@@ -52,6 +56,7 @@ namespace TinyShopping.Game {
             _soundEffects = new List<SoundEffect>();
             _playerOne = CreateMenuInput(PlayerIndex.One);
             _insectController = new UIInsectController(handler);
+            _afterGameMs = 3000;
         }
 
         /// <summary>
@@ -80,23 +85,20 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
-            bool isOverBefore = _scene.IsOver;
-            if (!_scene.IsStarted) {
-                if (_runtimeMs == 0) {
+            if (_scene.gameState == GameState.StartCountdown) {
+                if (_countdownMs == 0) {
                     _soundEffects[0].Play();
                 }
+                _countdownMs += gameTime.ElapsedGameTime.TotalMilliseconds;
+                if (_countdownMs >= 4000) {
+                    _countdownMs = 0.0;
+                    _scene.gameState = GameState.Playing;
+                }
+            } else if (_scene.gameState == GameState.Playing) {
                 _runtimeMs += gameTime.ElapsedGameTime.TotalMilliseconds;
-                if (_runtimeMs >= 4000) {
-                    _runtimeMs = 0.0;
-                    _scene.IsStarted = true;
-                }
-            } else {
-                if (!_scene.IsOver && !_scene.IsPaused) {
-                    _runtimeMs += gameTime.ElapsedGameTime.TotalMilliseconds;
-                }
 
                 if (_runtimeMs > Constants.TIME_LIMIT_S * 1000) {
-                    _scene.IsOver = true;
+                    _scene.gameState = GameState.Ended;
                     if (_handler.GetNumberOfFruits(0) > _handler.GetNumberOfFruits(1)) {
                         _winner = 1;
                     }
@@ -105,28 +107,28 @@ namespace TinyShopping.Game {
                     }
                 }
                 if (_handler.GetNumberOfAnts(0) == 0 || _handler.GetSpawnHealth(0) <= 0) {
-                    _scene.IsOver = true;
+                    _scene.gameState = GameState.Ended;
                     _winner = 2;
                 }
                 if (_handler.GetNumberOfAnts(1) == 0 || _handler.GetSpawnHealth(1) <= 0) {
-                    _scene.IsOver = true;
+                    _scene.gameState = GameState.Ended;
                     _winner = 1;
                 }
 
-            }
+                // Play end of game sound
+                if (_scene.gameState == GameState.Ended) {
+                    _soundEffects[1].Play();
+                }
 
-            if (!isOverBefore && _scene.IsOver) {
-                _soundEffects[1].Play();
+            } else if (_scene.gameState == GameState.Ended) {
+                _afterGameMs -= gameTime.ElapsedGameTime.TotalMilliseconds;
+                if (_afterGameMs <= 0 && _playerOne.IsSelectPressed()) {
+                    _selectPressed = true;
+                } else if (_selectPressed) {
+                    _selectPressed = false;
+                    _scene.LoadMainMenu();
+                }
             }
-
-            if (_scene.IsOver && _playerOne.IsSelectPressed()) {
-                _selectPressed = true;
-            }
-            else if (_selectPressed) {
-                _selectPressed = false;
-                _scene.LoadMainMenu();
-            }
-
         }
 
         private MenuInput CreateMenuInput(PlayerIndex playerIndex) {
@@ -147,12 +149,14 @@ namespace TinyShopping.Game {
             DrawStatistics(batch);
             DrawRemainingTime(batch);
             _insectController.Draw(batch, gameTime);
-            if (!_scene.IsStarted) {
+            if (_scene.gameState == GameState.StartCountdown) {
                 DrawCountdown(batch);
             }
-            if (_scene.IsOver) {
+            if (_scene.gameState == GameState.Ended) {
                 DrawWinMessage(batch);
-                DrawReturnMessage(batch);
+                if (_afterGameMs <= 0) {
+                    DrawReturnMessage(batch);
+                }
             }
 #if DEBUG
             int fps = (int) Math.Round((1000 / gameTime.ElapsedGameTime.TotalMilliseconds));
@@ -231,7 +235,7 @@ namespace TinyShopping.Game {
         private void DrawRemainingTime(SpriteBatch batch) {
             int offsetTop = 20;
             int secs;
-            if (_scene.IsStarted) {
+            if (_scene.gameState == GameState.Playing || _scene.gameState == GameState.Paused) {
                 secs = Constants.TIME_LIMIT_S - (int) (_runtimeMs / 1000);
             } else {
                 secs = Constants.TIME_LIMIT_S;
@@ -248,9 +252,9 @@ namespace TinyShopping.Game {
         }
 
         public float GetRemainingTime() {
-            if (!_scene.IsStarted) {
+            if (_scene.gameState == GameState.StartCountdown) {
                 return Constants.TIME_LIMIT_S;
-            } else if (_scene.IsOver) {
+            } else if (_scene.gameState == GameState.Ended) {
                 return 0f;
             } else {
                 return (float) (Constants.TIME_LIMIT_S - (_runtimeMs / 1000f));
@@ -262,7 +266,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="batch">The sprite batch to write to.</param>
         private void DrawCountdown(SpriteBatch batch) {
-            int secs = 3 - (int) (_runtimeMs / 1000);
+            int secs = 3 - (int) (_countdownMs / 1000);
             string secStr = "" + secs;
             if (secs == 0) {
                 secStr = "Go!";

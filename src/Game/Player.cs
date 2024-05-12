@@ -85,7 +85,7 @@ namespace TinyShopping.Game {
         public void Update(GameTime gameTime, SplitScreenHandler handler, Scene scene) {
             int speed = (int)(gameTime.ElapsedGameTime.TotalSeconds * Constants.CURSOR_SPEED / handler.GetZoomValue(_id));
             if (_input.IsStartedPressed()) {
-                scene.IsPaused = true;
+                scene.gameState = GameState.Paused;
             }
             PlacePheromones(gameTime);
             UpdatePosition(speed);
