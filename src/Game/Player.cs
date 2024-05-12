@@ -59,8 +59,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager to use.</param>
         public void LoadContent(ContentManager content) {
-            // TODO: change to cursor
-            _texture = content.Load<Texture2D>("crosshair");
+            _texture = content.Load<Texture2D>("ui/cursor");
         }
 
         /// <summary>

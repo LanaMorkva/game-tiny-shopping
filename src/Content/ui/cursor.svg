@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="100"
+   height="100"
+   viewBox="0 0 26.458333 26.458333"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="cursor.svg"
+   inkscape:export-filename="/home/claudio/Documents/coding/GameLab/gamelab2024-hyrule-team2/src/Content/ui/cursor.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="true"
+     units="px"
+     width="100px"
+     objecttolerance="29.4"
+     inkscape:zoom="6.4029785"
+     inkscape:cx="40.293748"
+     inkscape:cy="56.145745"
+     inkscape:window-width="1920"
+     inkscape:window-height="1136"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid9" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path500"
+       style="fill:#000000;stroke-width:0.999999"
+       d="M 89.193359 57.990234 A 39.999999 39.999999 0 0 1 58.453125 89.09375 L 60.566406 98.871094 A 49.999998 49.999998 0 0 0 98.992188 59.988281 L 89.193359 57.990234 z "
+       transform="scale(0.26458333)" />
+    <path
+       id="path500-8"
+       style="fill:#000000;stroke-width:0.999999"
+       d="M 60.169922 1.0449219 L 58.130859 10.863281 A 39.999999 39.999999 0 0 1 89.136719 41.876953 L 98.957031 39.839844 A 49.999998 49.999998 0 0 0 60.169922 1.0449219 z "
+       transform="scale(0.26458333)" />
+    <path
+       id="path500-8-5"
+       style="fill:#000000;stroke-width:0.999999"
+       d="M 40.138672 0.98242188 A 49.999998 49.999998 0 0 0 1.0488281 39.814453 L 10.857422 41.855469 A 39.999999 39.999999 0 0 1 42.111328 10.785156 L 40.138672 0.98242188 z "
+       transform="scale(0.26458333)" />
+    <path
+       id="path500-1"
+       style="fill:#000000;stroke-width:0.999999"
+       d="M 10.78125 57.724609 L 0.94335938 59.662109 A 49.999998 49.999998 0 0 0 39.933594 98.976562 L 41.953125 89.15625 A 39.999999 39.999999 0 0 1 10.78125 57.724609 z "
+       transform="scale(0.26458333)" />
+  </g>
+</svg>
