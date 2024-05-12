@@ -15,6 +15,8 @@ namespace TinyShopping {
         public abstract bool IsPreviousPressed();
 
         public abstract bool IsBackPressed();
+
+        public abstract bool IsStartedPressed();
     }
 
     internal class GamePadMenuInput : MenuInput {
@@ -23,6 +25,8 @@ namespace TinyShopping {
         private Buttons _nextButton = Buttons.DPadDown;
         private Buttons _previousButton = Buttons.DPadUp;
         private Buttons _backButton = Buttons.B;
+
+        private Buttons _startButton = Buttons.Start;
 
         public GamePadMenuInput(PlayerIndex playerIndex) {
             _playerIndex = playerIndex;
@@ -49,6 +53,12 @@ namespace TinyShopping {
             return cState.IsButtonDown(button);
         }
 
+        public override bool IsStartedPressed()
+        {
+            GamePadState cState = GamePad.GetState(_playerIndex);
+            return cState.IsButtonDown(_startButton);
+        }
+
     }
 
     internal class KeyboardMenuInput : MenuInput {
@@ -60,6 +70,8 @@ namespace TinyShopping {
         private Keys _selectKey = Keys.Enter;
 
         private Keys _backKey = Keys.Escape;
+
+        private Keys _startKey = Keys.Escape;
 
 
         public KeyboardMenuInput(PlayerIndex playerIndex) {
@@ -86,6 +98,12 @@ namespace TinyShopping {
         public override bool IsBackPressed()
         {
             return IsButtonPressed(_backKey);
+        }
+
+        public override bool IsStartedPressed()
+        {
+            KeyboardState kState = Keyboard.GetState();
+            return kState.IsKeyDown(_startKey);
         }
 
         private bool IsButtonPressed(Keys key) {
