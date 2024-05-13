@@ -69,18 +69,14 @@ namespace TinyShopping.Game {
 
             var menuItemSize = new Vector2((int)(Width / 3), Height / 12);
             Rectangle explanationRegion = new Rectangle(50, Height - 100, 300, 100);
-            List<MenuExplanation> explanations = new List<MenuExplanation> {
-                new("<A>", "Select", Color.Green),
-                new("<B>", "Resume Game", Color.Red)
-            };
+            _pauseMenu = new SelectMenu(new Rectangle(0, 0, Width, Height), menuItemSize, ResumeGame, explanationRegion);
 
+
+            menuItemSize = new Vector2((int)(Width / 7), Height / 15);
+            var tutorialMenuRect = new Rectangle((int)(Width / 2.5), (int)(Height / 2.5), Width, Height);
             List<MenuExplanation> tutorialExplanations = new List<MenuExplanation> {
                 new("<Start>", "Next", Color.Green),
             };
-
-            _pauseMenu = new SelectMenu(new Rectangle(0, 0, Width, Height), menuItemSize, ResumeGame, explanationRegion, explanations);
-            menuItemSize = new Vector2((int)(Width / 7), Height / 15);
-            var tutorialMenuRect = new Rectangle((int)(Width / 2.5), (int)(Height / 2.5), Width, Height);
             _tutorialMenu = new TutorialMenu(tutorialMenuRect, Vector2.Zero, menuItemSize, LoadMainMenu, explanationRegion, tutorialExplanations);
         }
 
