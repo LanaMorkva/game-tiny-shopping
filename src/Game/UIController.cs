@@ -156,13 +156,17 @@ namespace TinyShopping.Game {
             DrawStatistics(batch);
             DrawRemainingTime(batch);
             _insectController.Draw(batch, gameTime);
+            if (_runtimeMs > 10000) {
+                DrawControls(batch);
+            } 
             if (_scene.gameState == GameState.StartCountdown) {
                 DrawCountdown(batch);
             } else if (_scene.gameState == GameState.Playing) {
-                if (_runtimeMs < 15000) {
-                    DrawCursorExplanations(batch, player1_pos, Color.White, PlayerIndex.One, true, player1_keyboard);
-                    DrawCursorExplanations(batch, player2_pos, Color.White, PlayerIndex.Two, true, player2_keyboard);
-                }
+                if (_runtimeMs < 10000) {
+                    var buttonColor = new Color(122, 119, 110, 200);
+                    DrawCursorExplanations(batch, player1_pos, buttonColor, PlayerIndex.One, true, player1_keyboard);
+                    DrawCursorExplanations(batch, player2_pos, buttonColor, PlayerIndex.Two, true, player2_keyboard);
+                } 
             } else if (_scene.gameState == GameState.Ended) {
                 DrawWinMessage(batch);
                 if (_afterGameMs <= 0) {
@@ -344,7 +348,6 @@ namespace TinyShopping.Game {
 
             String FruitsNum2 = "x" + _handler.GetNumberOfFruits(1);
             DrawString(batch, FruitsNum2, appleRect2.Center.ToVector2() - new Vector2(-1, -1), _fontScale);
-            DrawControls(batch);
         }
 
         private void DrawControls(SpriteBatch batch) {
@@ -365,7 +368,7 @@ namespace TinyShopping.Game {
                 Vector2 stringSize = _font.MeasureString(text);
                 Vector2 origin = new Vector2(stringSize.X, stringSize.Y / 2);
                 var textPos = controlPos + new Vector2(-textOffset, textureSize.Y / 2);
-                batch.DrawString(_font, text, textPos, new Color(71, 71, 68, 180), 0, origin, 0.15f, SpriteEffects.None, 0); 
+                batch.DrawString(_font, text, textPos, new Color(71, 71, 68, 200), 0, origin, 0.15f, SpriteEffects.None, 0); 
             }
 
             for (int i = 0; i < _handler.Controls2.Count; i++){
@@ -379,7 +382,7 @@ namespace TinyShopping.Game {
                 Vector2 stringSize = _font.MeasureString(text);
                 Vector2 origin = new Vector2(0, stringSize.Y / 2);
                 var textPos = controlPos + new Vector2(textOffset + textureSize.X, textureSize.Y / 2);
-                batch.DrawString(_font, text, textPos, new Color(71, 71, 68, 180), 0, origin, 0.15f, SpriteEffects.None, 0); 
+                batch.DrawString(_font, text, textPos, new Color(71, 71, 68, 200), 0, origin, 0.15f, SpriteEffects.None, 0); 
             }
         }
 
@@ -389,9 +392,9 @@ namespace TinyShopping.Game {
             string returnText = "Return home";
             string newAntText = "Buy new insect";
 
-            float distance = 100f;
+            float distance = _scene.Height / 10;
 
-            float scale = 0.3f;
+            float scale = 0.18f;
             Vector2 battleTextSize = _font.MeasureString(battleText) * scale;
             battleTextSize = new Vector2(distance, -(battleTextSize.Y/2f));
             Vector2 discoverTextSize = _font.MeasureString(discoverText) * scale;
@@ -402,19 +405,20 @@ namespace TinyShopping.Game {
             newAntTextSize = new Vector2(-newAntTextSize.X/2f, (-newAntTextSize.Y/2f)-distance);
 
             if (showText) {
-                batch.DrawString(_font, battleText, player_position + battleTextSize, Color.Black, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
-                batch.DrawString(_font, discoverText, player_position + discoverTextSize, Color.Black, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
-                batch.DrawString(_font, returnText, player_position + returnTextSize, Color.Black, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
-                batch.DrawString(_font, newAntText, player_position + newAntTextSize, Color.Black, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+                var textColor = new Color(40, 40, 40, 210);
+                batch.DrawString(_font, battleText, player_position + battleTextSize, textColor, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+                batch.DrawString(_font, discoverText, player_position + discoverTextSize, textColor, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+                batch.DrawString(_font, returnText, player_position + returnTextSize, textColor, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+                batch.DrawString(_font, newAntText, player_position + newAntTextSize, textColor, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
             }
 
 
-            distance = 60f;
+            distance = _scene.Height / 15;
             PlayerInput input = _handler.GetPlayer(index).GetPlayerInput();
 
             Color pressedColor = new Color(255, 255, 255, 100);
 
-            int size = 50;
+            int size = _scene.Height / 20;
 
             Func<string, Rectangle> buttonSource;
             var controlTexture = _gamepadButtons;

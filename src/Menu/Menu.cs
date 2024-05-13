@@ -104,7 +104,6 @@ namespace TinyShopping {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public virtual void Update(GameTime gameTime) {
-            Console.WriteLine("Update menu");
             if (_menuInput.IsNextPressed()) {
                 _nextPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
             } else if (_nextPressed > 0) {
