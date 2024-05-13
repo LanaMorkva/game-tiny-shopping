@@ -24,6 +24,7 @@ namespace TinyShopping.Game {
             ExchangeFood, 
             ExchangeFoodDone,
             Goal,
+            FinalMessage,
             TutorialEnded
         }
 
@@ -45,6 +46,8 @@ namespace TinyShopping.Game {
         private Texture2D _collectFoodTexture;
         private Texture2D _exchangeFoodTexture;
         private Texture2D _exchangeFoodDoneTexture;
+        private Texture2D _goalTexture;
+        private Texture2D _finalMessageTexture;
         private TutorialPhase _tutorialPhase = TutorialPhase.None;
         private double _runtimeS;
         private double _lastPhaseCompletedTimeS;
@@ -76,6 +79,7 @@ namespace TinyShopping.Game {
             };
 
             _pauseMenu = new SelectMenu(new Rectangle(0, 0, Width, Height), menuItemSize, ResumeGame, explanationRegion, explanations);
+            menuItemSize = new Vector2((int)(Width / 7), Height / 15);
             _tutorialMenu = new TutorialMenu(new Rectangle(0, (int)(Height / 2.5), Width, Height), new Vector2(0,0), menuItemSize, LoadMainMenu, explanationRegion, tutorialExplanations);
         }
 
@@ -83,7 +87,7 @@ namespace TinyShopping.Game {
             _splitScreenHandler.Initialize();
             _pauseMenu.AddItem(new MenuItem("Resume", ResumeGame));
             _pauseMenu.AddItem(new MenuItem("Exit Game", LoadMainMenu));
-            _tutorialMenu.AddItem(new MenuItem("Next", NextTutorialPhase, Color.DimGray));
+            _tutorialMenu.AddItem(new MenuItem("Next", NextTutorialPhase));
             _runtimeS = 0;
             _lastPhaseCompletedTimeS = 0;
             base.Initialize();
@@ -110,6 +114,8 @@ namespace TinyShopping.Game {
             _collectFoodTexture = Content.Load<Texture2D>("tutorial/collect_food");
             _exchangeFoodTexture = Content.Load<Texture2D>("tutorial/exchange_food");
             _exchangeFoodDoneTexture = Content.Load<Texture2D>("tutorial/exchange_food_done");
+            _goalTexture = Content.Load<Texture2D>("tutorial/goal");
+            _finalMessageTexture = Content.Load<Texture2D>("tutorial/final_message");
             base.LoadContent();
         }
 
@@ -172,7 +178,7 @@ namespace TinyShopping.Game {
                 }
             }
 
-            if (_tutorialPhase >= TutorialPhase.ExchangeFoodDone) {
+            if (_tutorialPhase == TutorialPhase.ExchangeFoodDone) {
                 _insectHandler.Update(gameTime);
                 _pheromoneHandler.Update(gameTime);
             }
@@ -257,6 +263,12 @@ namespace TinyShopping.Game {
                     break;
                 case TutorialPhase.ExchangeFoodDone:
                     DrawSmallTutorialPanel(_exchangeFoodDoneTexture, 1.0f);
+                    break;
+                case TutorialPhase.Goal:
+                    DrawBigTutorialPanel(_goalTexture, 1.0f);
+                    break;
+                case TutorialPhase.FinalMessage:
+                    DrawBigTutorialPanel(_finalMessageTexture, 1.0f);
                     break;
                 default:
                     return;
