@@ -186,10 +186,6 @@ namespace TinyShopping.Game {
                 }
             } else {
                 _tutorialMenu.Update(gameTime);
-                if (!_tutorialPause) {
-                    _insectHandler.Update(gameTime);
-                    _pheromoneHandler.Update(gameTime);
-                }
             }
 
             _splitScreenHandler.Update(gameTime, this);
@@ -211,13 +207,8 @@ namespace TinyShopping.Game {
                 if (gameState == GameState.Paused) {
                     _pauseMenu.Draw(SpriteBatch);
                 }
-            } else {
-                if (_tutorialPause) {
-                    PauseDrawBackground();
-                }
-                DrawCurrentTutorialPhase();
             }
-
+            DrawCurrentTutorialPhase();
 #if DEBUG
             _ui.DrawString(SpriteBatch, "Current tutorial phase: " + _tutorialPhase.ToString(), new Vector2(Width / 4,  Height - 50), 0.3f);
 #endif
