@@ -79,9 +79,12 @@ namespace TinyShopping {
         }
 
         private static List<MenuExplanation> CreateDefaultExplanations() {
-            return new List<MenuExplanation> {
-                new("<A>", "Select", Color.Green)
-            };
+            GamePadState state = GamePad.GetState(PlayerIndex.One);
+            if (state.IsConnected) {
+                return new List<MenuExplanation> {new("<A>", "Select", Color.Green)};
+            } else {
+                return new List<MenuExplanation> {new("<Enter>", "Select", Color.Green)};
+            }
         }
 
 

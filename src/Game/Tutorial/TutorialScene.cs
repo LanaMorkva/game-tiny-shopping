@@ -74,10 +74,8 @@ namespace TinyShopping.Game {
 
             menuItemSize = new Vector2((int)(Width / 7), Height / 15);
             var tutorialMenuRect = new Rectangle((int)(Width / 2.5), (int)(Height / 2.5), Width, Height);
-            List<MenuExplanation> tutorialExplanations = new List<MenuExplanation> {
-                new("<Start>", "Next", Color.Green),
-            };
-            _tutorialMenu = new TutorialMenu(tutorialMenuRect, Vector2.Zero, menuItemSize, LoadMainMenu, explanationRegion, tutorialExplanations);
+            
+            _tutorialMenu = new TutorialMenu(tutorialMenuRect, Vector2.Zero, menuItemSize, LoadMainMenu, explanationRegion);
         }
 
         public override void Initialize() {
@@ -180,16 +178,17 @@ namespace TinyShopping.Game {
                 _pheromoneHandler.Update(gameTime);
             }
 
-            if (_tutorialPhase == TutorialPhase.TutorialEnded) {
-                if (gameState == GameState.Playing) { 
+            if (gameState == GameState.Playing) {
+                if (_tutorialPhase == TutorialPhase.TutorialEnded) {
                     _insectHandler.Update(gameTime);
                     _pheromoneHandler.Update(gameTime);
-                } else if (gameState == GameState.Paused) {
-                    _pauseMenu.Update(gameTime);
+                } else {
+                    _tutorialMenu.Update(gameTime);
                 }
             } else {
-                _tutorialMenu.Update(gameTime);
+                _pauseMenu.Update(gameTime);
             }
+
 
             _splitScreenHandler.Update(gameTime, this);
 
@@ -206,13 +205,11 @@ namespace TinyShopping.Game {
             _ui.Draw(SpriteBatch, gameTime);
             GraphicsDevice.Viewport = original;
 
-            if (_tutorialPhase == TutorialPhase.TutorialEnded) {
-                if (gameState == GameState.Paused) {
-                    PauseDrawBackground();
-                    _pauseMenu.Draw(SpriteBatch);
-                }
-            }
             DrawCurrentTutorialPhase();
+            if (gameState == GameState.Paused) {
+                PauseDrawBackground();
+                _pauseMenu.Draw(SpriteBatch);
+            }
 #if DEBUG
             _ui.DrawString(SpriteBatch, "Current tutorial phase: " + _tutorialPhase.ToString(), new Vector2(Width / 4,  Height - 50), 0.3f);
 #endif

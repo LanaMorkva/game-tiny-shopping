@@ -25,8 +25,7 @@ namespace TinyShopping {
         private Buttons _nextButton = Buttons.DPadDown;
         private Buttons _previousButton = Buttons.DPadUp;
         private Buttons _backButton = Buttons.B;
-
-        private Buttons _startButton = Buttons.Start;
+        private Buttons _startButton = Buttons.DPadRight;
 
         public GamePadMenuInput(PlayerIndex playerIndex) {
             _playerIndex = playerIndex;
@@ -71,7 +70,7 @@ namespace TinyShopping {
 
         private Keys _backKey = Keys.Escape;
 
-        private Keys _startKey = Keys.Escape;
+        private Keys _startKey = Keys.Enter;
 
 
         public KeyboardMenuInput(PlayerIndex playerIndex) {
