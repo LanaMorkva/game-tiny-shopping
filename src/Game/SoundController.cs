@@ -26,7 +26,7 @@ namespace TinyShopping.Game {
 
             MediaPlayer.Stop();
             if (_scene.SettingsHandler.settings.music) {
-                MediaPlayer.Volume = 1;
+                MediaPlayer.Volume = 0.5f;
             }
 
         }
