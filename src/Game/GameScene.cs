@@ -92,7 +92,7 @@ namespace TinyShopping.Game {
             GraphicsDevice.Viewport = original;
 
             if (gameState == GameState.Paused) {
-                SpriteBatch.FillRectangle(new Rectangle(0, 0, Width, Height), new Color(122, 119, 110, 120), 0);
+                SpriteBatch.FillRectangle(new Rectangle(0, 0, Width, Height), new Color(122, 119, 110, 160), 0);
                 _pauseMenu.Draw(SpriteBatch);
             }
             

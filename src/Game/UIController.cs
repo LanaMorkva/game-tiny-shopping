@@ -212,7 +212,7 @@ namespace TinyShopping.Game {
 
             string text = "IT'S A DRAW!";
             if (_winner !=  0) {
-                text = "PLAYER " + _winner + " WINS THIS ROUND!";
+                text = _winner == 1 ? "ANTS WIN THIS ROUND!" : "TERMITES WIN THIS ROUND!";
                 var texture = _winner == 1 ? _antsCharachterTexture : _termiteCharachterTexture;
                 batch.Draw(texture, new RectangleF(imagePos - textureSize / 2, textureSize).ToRectangle(), Color.White);
             } else {
