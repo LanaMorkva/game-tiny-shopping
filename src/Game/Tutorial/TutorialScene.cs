@@ -20,8 +20,11 @@ namespace TinyShopping.Game {
             AntsInProgress,
             PheromoneInitialization,
             PheromoneIntro,
-            PheromoneInProgress,
-            PheromoneCompleted
+            CollectFood,
+            ExchangeFood, 
+            ExchangeFoodDone,
+            Goal,
+            Freetime
         }
 
         private SoundController _sound;
@@ -39,14 +42,17 @@ namespace TinyShopping.Game {
         private Texture2D _antsTrailsTexture;
         private Texture2D _antsInProgressTexture;
         private Texture2D _pheromonesTexture;
-        private Texture2D _pheromonesInProgressTexture;
-        private Texture2D _pheromonesCompletedTexture;
+        private Texture2D _collectFoodTexture;
+        private Texture2D _exchangeFoodTexture;
+        private Texture2D _exchangeFoodDoneTexture;
         private TutorialPhase _tutorialPhase = TutorialPhase.None;
         private double _runtimeS;
         private double _lastPhaseCompletedTimeS;
 
         private CameraTutorialData _cam1Movement;
         private CameraTutorialData _cam2Movement;
+        private int _player1AntCount = 0;
+        private int _player2AntCount = 0;
 
 
         public TutorialScene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
@@ -97,8 +103,9 @@ namespace TinyShopping.Game {
             _antsInProgressTexture = Content.Load<Texture2D>("tutorial/ants_in_progress");
             _antsTrailsTexture = Content.Load<Texture2D>("tutorial/ants_trails");
             _pheromonesTexture = Content.Load<Texture2D>("tutorial/pheromones_intro");
-            _pheromonesInProgressTexture = Content.Load<Texture2D>("tutorial/pheromones_in_progress");
-            _pheromonesCompletedTexture = Content.Load<Texture2D>("tutorial/pheromones_done");
+            _collectFoodTexture = Content.Load<Texture2D>("tutorial/collect_food");
+            _exchangeFoodTexture = Content.Load<Texture2D>("tutorial/exchange_food");
+            _exchangeFoodDoneTexture = Content.Load<Texture2D>("tutorial/exchange_food_done");
             base.LoadContent();
         }
 
@@ -141,15 +148,30 @@ namespace TinyShopping.Game {
                  NextTutorialPhase();
             }
 
-            if (_tutorialPhase == TutorialPhase.PheromoneInProgress && TutorialDelayDoneS(1.0f)) {
+            if (_tutorialPhase == TutorialPhase.CollectFood && TutorialDelayDoneS(1.0f)) {
                 _insectHandler.Update(gameTime);
                 _pheromoneHandler.Update(gameTime);
 
                 if (_splitScreenHandler.GetNumberOfFruits(0) > 4 || _splitScreenHandler.GetNumberOfFruits(1) > 4) {
                     NextTutorialPhase();
+                    _player1AntCount = _splitScreenHandler.GetNumberOfAnts(0);
+                    _player2AntCount = _splitScreenHandler.GetNumberOfAnts(1);
                 }
             }
-            
+
+            if (_tutorialPhase == TutorialPhase.ExchangeFood) {
+                _insectHandler.Update(gameTime);
+                _pheromoneHandler.Update(gameTime);
+
+                if (_splitScreenHandler.GetNumberOfAnts(0) > _player1AntCount ||_splitScreenHandler.GetNumberOfAnts(1) > _player2AntCount) {
+                    NextTutorialPhase();
+                }
+            }
+
+            if (_tutorialPhase >= TutorialPhase.ExchangeFoodDone) {
+                _insectHandler.Update(gameTime);
+                _pheromoneHandler.Update(gameTime);
+            }
 
             if (!IsOver && IsStarted) {
                 if (IsPaused) {
@@ -217,12 +239,15 @@ namespace TinyShopping.Game {
                 case TutorialPhase.PheromoneIntro:
                     DrawBigTutorialPanel(_pheromonesTexture, 1f);
                     break;
-                case TutorialPhase.PheromoneInProgress:
+                case TutorialPhase.CollectFood:
                     //TODO: draw arrows to the food boxes and drop off
-                    DrawSmallTutorialPanel(_pheromonesInProgressTexture, 0.2f);
+                    DrawSmallTutorialPanel(_collectFoodTexture, 0.2f);
                     break;
-                case TutorialPhase.PheromoneCompleted:
-                    DrawSmallTutorialPanel(_pheromonesCompletedTexture, 0.2f);
+                case TutorialPhase.ExchangeFood:
+                    DrawSmallTutorialPanel(_exchangeFoodTexture, 0.2f);
+                    break;
+                case TutorialPhase.ExchangeFoodDone:
+                    DrawSmallTutorialPanel(_exchangeFoodDoneTexture, 1.0f);
                     break;
                 default:
                     return;
