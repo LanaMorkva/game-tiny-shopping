@@ -10,7 +10,7 @@ namespace TinyShopping.Game {
 
     public class TutorialScene : TinyShopping.Scene {
 
-        enum TutorialPhase {
+        public enum TutorialPhase {
             None = -1,
             Intro, 
             MoveCamera,
@@ -67,7 +67,7 @@ namespace TinyShopping.Game {
             _ui = new TutorialUIController(GraphicsDevice, _splitScreenHandler, this);
             _sound = new SoundController(this);
 
-            var menuItemSize = new Vector2((int)(Width / 3.5), Height / 12);
+            var menuItemSize = new Vector2((int)(Width / 3), Height / 12);
             Rectangle explanationRegion = new Rectangle(50, Height - 100, 300, 100);
             List<MenuExplanation> explanations = new List<MenuExplanation> {
                 new("<A>", "Select", Color.Green),
@@ -80,13 +80,14 @@ namespace TinyShopping.Game {
 
             _pauseMenu = new SelectMenu(new Rectangle(0, 0, Width, Height), menuItemSize, ResumeGame, explanationRegion, explanations);
             menuItemSize = new Vector2((int)(Width / 7), Height / 15);
-            _tutorialMenu = new TutorialMenu(new Rectangle(0, (int)(Height / 2.5), Width, Height), new Vector2(0,0), menuItemSize, LoadMainMenu, explanationRegion, tutorialExplanations);
+            var tutorialMenuRect = new Rectangle((int)(Width / 2.5), (int)(Height / 2.5), Width, Height);
+            _tutorialMenu = new TutorialMenu(tutorialMenuRect, Vector2.Zero, menuItemSize, LoadMainMenu, explanationRegion, tutorialExplanations);
         }
 
         public override void Initialize() {
             _splitScreenHandler.Initialize();
             _pauseMenu.AddItem(new MenuItem("Resume", ResumeGame));
-            _pauseMenu.AddItem(new MenuItem("Exit Game", LoadMainMenu));
+            _pauseMenu.AddItem(new MenuItem("Quit Tutorial", LoadMainMenu));
             _tutorialMenu.AddItem(new MenuItem("Next", NextTutorialPhase));
             _runtimeS = 0;
             _lastPhaseCompletedTimeS = 0;
@@ -211,6 +212,7 @@ namespace TinyShopping.Game {
 
             if (_tutorialPhase == TutorialPhase.TutorialEnded) {
                 if (gameState == GameState.Paused) {
+                    PauseDrawBackground();
                     _pauseMenu.Draw(SpriteBatch);
                 }
             }
@@ -241,6 +243,7 @@ namespace TinyShopping.Game {
                     break;
                 case TutorialPhase.MoveCameraWaitingForPlayer:
                     DrawSmallTutorialPanel(_cameraWaitingTexture, 0.2f);
+                    _tutorialMenu.Draw(SpriteBatch);
                     break;
                 case TutorialPhase.AntsIntro:
                     DrawBigTutorialPanel(_antsIntroTexture, 0.5f);
@@ -250,6 +253,7 @@ namespace TinyShopping.Game {
                     break;
                 case TutorialPhase.AntsInProgress:
                     DrawSmallTutorialPanel(_antsInProgressTexture, 0.2f);
+                    _tutorialMenu.Draw(SpriteBatch);
                     break;
                 case TutorialPhase.PheromoneIntro:
                     DrawBigTutorialPanel(_pheromonesTexture, 1f);
@@ -263,6 +267,7 @@ namespace TinyShopping.Game {
                     break;
                 case TutorialPhase.ExchangeFoodDone:
                     DrawSmallTutorialPanel(_exchangeFoodDoneTexture, 1.0f);
+                    _tutorialMenu.Draw(SpriteBatch);
                     break;
                 case TutorialPhase.Goal:
                     DrawBigTutorialPanel(_goalTexture, 1.0f);
@@ -295,7 +300,6 @@ namespace TinyShopping.Game {
             Vector2 textureCenter = new Vector2(texture.Width / 2, texture.Height / 2);
             Vector2 textureLocation = new Vector2(screenCenter.X, texture.Height / 4 + 20);
             SpriteBatch.Draw(texture, textureLocation, null, Color.White * alpha, 0f, textureCenter, 0.6f, SpriteEffects.None, 1f);
-            _tutorialMenu.Draw(SpriteBatch);
         }
 
         private void PauseDrawBackground(float alpha = 1f) {
@@ -308,6 +312,7 @@ namespace TinyShopping.Game {
             // update: or do they?
             gameState = GameState.Playing;
             _tutorialPhase += 1;
+            _ui.SetTutorialPhase(_tutorialPhase, _runtimeS);
             _lastPhaseCompletedTimeS = _runtimeS;
         }
 

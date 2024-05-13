@@ -11,13 +11,13 @@ namespace TinyShopping.Game {
 
     internal class UIController {
 
-        private static readonly Color _borderColor = new Color(255, 157, 118);
-        private static readonly Color _textColor = new Color(83, 47, 85);
-        private static readonly float _fontScale = 0.4f;
+        protected static readonly Color _borderColor = new Color(255, 157, 118);
+        protected static readonly Color _textColor = new Color(83, 47, 85);
+        protected static readonly float _fontScale = 0.4f;
 
-        private SpriteFont _font;
-        private SpriteFont _fontBig;
-        private SpriteFont _fontGeneral;
+        protected SpriteFont _font;
+        protected SpriteFont _fontBig;
+        protected SpriteFont _fontGeneral;
 
         private Texture2D _appleTexture;
 
@@ -33,11 +33,11 @@ namespace TinyShopping.Game {
 
         private Texture2D _keyboardButtons;
 
-        private SplitScreenHandler _handler;
+        protected SplitScreenHandler _handler;
 
         private List<SoundEffect> _soundEffects;
 
-        private Scene _scene;
+        protected Scene _scene;
 
         private double _runtimeMs;
 
@@ -47,11 +47,11 @@ namespace TinyShopping.Game {
 
         private int _winner;
 
-        private MenuInput _playerOne;
+        protected MenuInput _playerOne;
 
-        private bool _selectPressed;
+        protected bool _selectPressed;
 
-        private UIInsectController _insectController;
+        protected UIInsectController _insectController;
 
         public UIController(GraphicsDevice device, SplitScreenHandler handler, Scene scene) {
             _handler = handler;
@@ -91,7 +91,7 @@ namespace TinyShopping.Game {
         /// Updates the UI.
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
-        public void Update(GameTime gameTime) {
+        public virtual void Update(GameTime gameTime) {
             if (_scene.gameState == GameState.StartCountdown) {
                 if (_countdownMs == 0) {
                     _soundEffects[0].Play();
@@ -138,7 +138,7 @@ namespace TinyShopping.Game {
             }
         }
 
-        private MenuInput CreateMenuInput(PlayerIndex playerIndex) {
+        protected MenuInput CreateMenuInput(PlayerIndex playerIndex) {
             GamePadState state = GamePad.GetState(playerIndex);
             if (state.IsConnected) {
                 return new GamePadMenuInput(playerIndex);
@@ -183,7 +183,7 @@ namespace TinyShopping.Game {
         /// Draws screen separation
         /// </summary>
         /// <param name="batch">The batch to use.</param>
-        private void DrawBorder(SpriteBatch batch) {
+        protected void DrawBorder(SpriteBatch batch) {
             var splitBorder = new Rectangle(_scene.Width / 2 - 5, 0, 10, _scene.Height);
             var timeBorder = new Rectangle(_scene.Width / 2 - 90, 0, 180, 40);
 
@@ -203,7 +203,7 @@ namespace TinyShopping.Game {
         /// Writes the game over and win text to the screen.
         /// </summary>
         /// <param name="batch">The batch to use.</param>
-        private void DrawWinMessage(SpriteBatch batch) {
+        protected void DrawWinMessage(SpriteBatch batch) {
             DrawDimScreen(batch);
 
             var partHeight = _scene.Height / 3.5f;
@@ -229,7 +229,7 @@ namespace TinyShopping.Game {
             batch.DrawString(_fontGeneral, text, textPos, _textColor, 0, origin, 1.0f, SpriteEffects.None, 0);
         }
 
-        private void DrawReturnMessage(SpriteBatch batch) {
+        protected void DrawReturnMessage(SpriteBatch batch) {
             string text = "Press ";
             if (GamePad.GetState(PlayerIndex.One).IsConnected) {
                 text += "<A> ";
@@ -247,7 +247,7 @@ namespace TinyShopping.Game {
         /// Draws the time countdown.
         /// </summary>
         /// <param name="batch"></param>
-        private void DrawRemainingTime(SpriteBatch batch) {
+        protected void DrawRemainingTime(SpriteBatch batch) {
             int offsetTop = 20;
             int secs;
             if (_scene.gameState == GameState.Playing || _scene.gameState == GameState.Paused) {
@@ -304,7 +304,7 @@ namespace TinyShopping.Game {
             batch.DrawString(_fontBig, text, position, _textColor, 0, origin, scale, SpriteEffects.None, 0);
         }
 
-        private void DrawOutlinedTexture(SpriteBatch batch, Texture2D texture, Rectangle rect, Color color, int border = 5, bool flipped = false) {
+        protected void DrawOutlinedTexture(SpriteBatch batch, Texture2D texture, Rectangle rect, Color color, int border = 5, bool flipped = false) {
             var rectBig = rect;
             rectBig.Inflate(border, border);
 
@@ -321,7 +321,7 @@ namespace TinyShopping.Game {
         /// Draws the two players fruit and insect statistics.
         /// </summary>
         /// <param name="batch">The sprite batch to write to.</param>
-        private void DrawStatistics(SpriteBatch batch) {
+        protected void DrawStatistics(SpriteBatch batch) {
             DrawOutlinedTexture(batch, _antsCharachterTexture, new Rectangle(30, 30, 160, 160), Color.White);
             DrawOutlinedTexture(batch, _termiteCharachterTexture, new Rectangle(_scene.Width - 180, 30, 160, 160), Color.White);
 
@@ -350,7 +350,7 @@ namespace TinyShopping.Game {
             DrawString(batch, FruitsNum2, appleRect2.Center.ToVector2() - new Vector2(-1, -1), _fontScale);
         }
 
-        private void DrawControls(SpriteBatch batch) {
+        protected void DrawControls(SpriteBatch batch) {
             int gap = 7;
             int borderGap = 20;
             int bottomOffset = 15;
@@ -386,7 +386,7 @@ namespace TinyShopping.Game {
             }
         }
 
-        private void DrawCursorExplanations(SpriteBatch batch, Vector2 player_position, Color transparency, PlayerIndex index, bool showText, bool isPlayerOnKeyboard) {
+        protected void DrawCursorExplanations(SpriteBatch batch, Vector2 player_position, Color transparency, PlayerIndex index, bool showText, bool isPlayerOnKeyboard) {
             string battleText = "Fight";
             string discoverText = "Discover";
             string returnText = "Return home";
