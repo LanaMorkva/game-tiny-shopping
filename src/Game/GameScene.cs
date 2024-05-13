@@ -31,7 +31,7 @@ namespace TinyShopping.Game {
             _sound = new SoundController(this);
 
             var menuRegion = new Rectangle(0, 0, Width, Height);
-            var menuItemSize = new Vector2((int)(Width / 2.8), Height / 10);
+            var menuItemSize = new Vector2((int)(Width / 3.5), Height / 12);
 
             Rectangle explanationRegion = new Rectangle(50, Height - 150, 300, 100);
             List<MenuExplanation> explanations = new List<MenuExplanation> {
@@ -39,6 +39,7 @@ namespace TinyShopping.Game {
                 new("<B>", "Resume Game", Color.Red)
             };
             _pauseMenu = new SelectMenu(menuRegion, menuItemSize, ResumeGame, explanationRegion, explanations);
+            gameState = GameState.StartCountdown;
         }
 
         public override void Initialize() {
@@ -69,13 +70,11 @@ namespace TinyShopping.Game {
         }
 
         public override void Update(GameTime gameTime) {
-            if (!IsOver && IsStarted && !IsPaused) {
+            if (gameState == GameState.Playing) {
                 _insectHandler.Update(gameTime);
                 _pheromoneHandler.Update(gameTime);
                 _splitScreenHandler.Update(gameTime, this);
-            }
-
-            if (!IsOver && IsStarted && IsPaused) {
+            } else if (gameState == GameState.Paused) {
                 _pauseMenu.Update(gameTime);
             }
 
@@ -89,10 +88,10 @@ namespace TinyShopping.Game {
             
             Viewport original = GraphicsDevice.Viewport;
             _splitScreenHandler.Draw(SpriteBatch, gameTime);
-            _ui.Draw(SpriteBatch, gameTime);
+            _ui.Draw(SpriteBatch, gameTime, _splitScreenHandler.GetPlayerPosition(PlayerIndex.One), _splitScreenHandler.GetPlayerPosition(PlayerIndex.Two), _splitScreenHandler.IsPlayerKeyboard(PlayerIndex.One), _splitScreenHandler. IsPlayerKeyboard(PlayerIndex.Two));
             GraphicsDevice.Viewport = original;
 
-            if (IsPaused) {
+            if (gameState == GameState.Paused) {
                 SpriteBatch.FillRectangle(new Rectangle(0, 0, Width, Height), new Color(122, 119, 110, 120), 0);
                 _pauseMenu.Draw(SpriteBatch);
             }

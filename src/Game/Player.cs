@@ -25,6 +25,8 @@ namespace TinyShopping.Game {
 
         private bool _newInsectPressed;
 
+        private bool _startedPressed;
+
         private PheromoneHandler _handler;
 
         private PlayerInput _input;
@@ -57,7 +59,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager to use.</param>
         public void LoadContent(ContentManager content) {
-            _texture = content.Load<Texture2D>("crosshair");
+            _texture = content.Load<Texture2D>("ui/cursor");
         }
 
         /// <summary>
@@ -85,7 +87,10 @@ namespace TinyShopping.Game {
         public void Update(GameTime gameTime, SplitScreenHandler handler, Scene scene) {
             int speed = (int)(gameTime.ElapsedGameTime.TotalSeconds * Constants.CURSOR_SPEED / handler.GetZoomValue(_id));
             if (_input.IsStartedPressed()) {
-                scene.IsPaused = true;
+                _startedPressed = true;
+            } else if (_startedPressed) {
+                _startedPressed = false;
+                scene.gameState = GameState.Paused;
             }
             PlacePheromones(gameTime);
             UpdatePosition(speed);
@@ -174,5 +179,18 @@ namespace TinyShopping.Game {
                 _insectHandler.BuyNewInsect(_id);
             }
         }
+
+        public Vector2 GetPosition() {
+            return _position;
+        }
+
+        public PlayerInput GetPlayerInput() {
+            return _input;
+        }
+
+        public bool IsPlayerKeyboard() {
+            return _input.IsPlayerKeyboard();
+        }
+
     }
 }

@@ -29,6 +29,10 @@ namespace TinyShopping.Game {
 
         private Texture2D _termiteCharachterTexture;
 
+        private Texture2D _gamepadButtons;
+
+        private Texture2D _keyboardButtons;
+
         private SplitScreenHandler _handler;
 
         private List<SoundEffect> _soundEffects;
@@ -36,6 +40,10 @@ namespace TinyShopping.Game {
         private Scene _scene;
 
         private double _runtimeMs;
+
+        private double _countdownMs;
+
+        private double _afterGameMs;
 
         private int _winner;
 
@@ -52,6 +60,7 @@ namespace TinyShopping.Game {
             _soundEffects = new List<SoundEffect>();
             _playerOne = CreateMenuInput(PlayerIndex.One);
             _insectController = new UIInsectController(handler);
+            _afterGameMs = 3000;
         }
 
         /// <summary>
@@ -72,6 +81,9 @@ namespace TinyShopping.Game {
             _soundEffects.Add(content.Load<SoundEffect>("sounds/countdown_3_seconds"));
             _soundEffects.Add(content.Load<SoundEffect>("sounds/final_whistle"));
 
+            _gamepadButtons = content.Load<Texture2D>("stats/controller");
+            _keyboardButtons = content.Load<Texture2D>("stats/numbers");
+
             _insectController.LoadContent(content);
         }
 
@@ -80,23 +92,20 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
-            bool isOverBefore = _scene.IsOver;
-            if (!_scene.IsStarted) {
-                if (_runtimeMs == 0) {
+            if (_scene.gameState == GameState.StartCountdown) {
+                if (_countdownMs == 0) {
                     _soundEffects[0].Play();
                 }
+                _countdownMs += gameTime.ElapsedGameTime.TotalMilliseconds;
+                if (_countdownMs >= 4000) {
+                    _countdownMs = 0.0;
+                    _scene.gameState = GameState.Playing;
+                }
+            } else if (_scene.gameState == GameState.Playing) {
                 _runtimeMs += gameTime.ElapsedGameTime.TotalMilliseconds;
-                if (_runtimeMs >= 4000) {
-                    _runtimeMs = 0.0;
-                    _scene.IsStarted = true;
-                }
-            } else {
-                if (!_scene.IsOver && !_scene.IsPaused) {
-                    _runtimeMs += gameTime.ElapsedGameTime.TotalMilliseconds;
-                }
 
                 if (_runtimeMs > Constants.TIME_LIMIT_S * 1000) {
-                    _scene.IsOver = true;
+                    _scene.gameState = GameState.Ended;
                     if (_handler.GetNumberOfFruits(0) > _handler.GetNumberOfFruits(1)) {
                         _winner = 1;
                     }
@@ -105,28 +114,28 @@ namespace TinyShopping.Game {
                     }
                 }
                 if (_handler.GetNumberOfAnts(0) == 0 || _handler.GetSpawnHealth(0) <= 0) {
-                    _scene.IsOver = true;
+                    _scene.gameState = GameState.Ended;
                     _winner = 2;
                 }
                 if (_handler.GetNumberOfAnts(1) == 0 || _handler.GetSpawnHealth(1) <= 0) {
-                    _scene.IsOver = true;
+                    _scene.gameState = GameState.Ended;
                     _winner = 1;
                 }
 
-            }
+                // Play end of game sound
+                if (_scene.gameState == GameState.Ended) {
+                    _soundEffects[1].Play();
+                }
 
-            if (!isOverBefore && _scene.IsOver) {
-                _soundEffects[1].Play();
+            } else if (_scene.gameState == GameState.Ended) {
+                _afterGameMs -= gameTime.ElapsedGameTime.TotalMilliseconds;
+                if (_afterGameMs <= 0 && _playerOne.IsSelectPressed()) {
+                    _selectPressed = true;
+                } else if (_selectPressed) {
+                    _selectPressed = false;
+                    _scene.LoadMainMenu();
+                }
             }
-
-            if (_scene.IsOver && _playerOne.IsSelectPressed()) {
-                _selectPressed = true;
-            }
-            else if (_selectPressed) {
-                _selectPressed = false;
-                _scene.LoadMainMenu();
-            }
-
         }
 
         private MenuInput CreateMenuInput(PlayerIndex playerIndex) {
@@ -142,17 +151,23 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="batch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
-        public void Draw(SpriteBatch batch, GameTime gameTime) {
+        public void Draw(SpriteBatch batch, GameTime gameTime, Vector2 player1_pos, Vector2 player2_pos, bool player1_keyboard, bool player2_keyboard) {
             DrawBorder(batch);
             DrawStatistics(batch);
             DrawRemainingTime(batch);
             _insectController.Draw(batch, gameTime);
-            if (!_scene.IsStarted) {
+            if (_scene.gameState == GameState.StartCountdown) {
                 DrawCountdown(batch);
-            }
-            if (_scene.IsOver) {
+            } else if (_scene.gameState == GameState.Playing) {
+                if (_runtimeMs < 15000) {
+                    DrawCursorExplanations(batch, player1_pos, Color.White, PlayerIndex.One, true, player1_keyboard);
+                    DrawCursorExplanations(batch, player2_pos, Color.White, PlayerIndex.Two, true, player2_keyboard);
+                }
+            } else if (_scene.gameState == GameState.Ended) {
                 DrawWinMessage(batch);
-                DrawReturnMessage(batch);
+                if (_afterGameMs <= 0) {
+                    DrawReturnMessage(batch);
+                }
             }
 #if DEBUG
             int fps = (int) Math.Round((1000 / gameTime.ElapsedGameTime.TotalMilliseconds));
@@ -231,7 +246,7 @@ namespace TinyShopping.Game {
         private void DrawRemainingTime(SpriteBatch batch) {
             int offsetTop = 20;
             int secs;
-            if (_scene.IsStarted) {
+            if (_scene.gameState == GameState.Playing || _scene.gameState == GameState.Paused) {
                 secs = Constants.TIME_LIMIT_S - (int) (_runtimeMs / 1000);
             } else {
                 secs = Constants.TIME_LIMIT_S;
@@ -248,9 +263,9 @@ namespace TinyShopping.Game {
         }
 
         public float GetRemainingTime() {
-            if (!_scene.IsStarted) {
+            if (_scene.gameState == GameState.StartCountdown) {
                 return Constants.TIME_LIMIT_S;
-            } else if (_scene.IsOver) {
+            } else if (_scene.gameState == GameState.Ended) {
                 return 0f;
             } else {
                 return (float) (Constants.TIME_LIMIT_S - (_runtimeMs / 1000f));
@@ -262,7 +277,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="batch">The sprite batch to write to.</param>
         private void DrawCountdown(SpriteBatch batch) {
-            int secs = 3 - (int) (_runtimeMs / 1000);
+            int secs = 3 - (int) (_countdownMs / 1000);
             string secStr = "" + secs;
             if (secs == 0) {
                 secStr = "Go!";
@@ -367,5 +382,116 @@ namespace TinyShopping.Game {
                 batch.DrawString(_font, text, textPos, new Color(71, 71, 68, 180), 0, origin, 0.15f, SpriteEffects.None, 0); 
             }
         }
+
+        private void DrawCursorExplanations(SpriteBatch batch, Vector2 player_position, Color transparency, PlayerIndex index, bool showText, bool isPlayerOnKeyboard) {
+            string battleText = "Fight";
+            string discoverText = "Discover";
+            string returnText = "Return home";
+            string newAntText = "Buy new insect";
+
+            float distance = 100f;
+
+            float scale = 0.3f;
+            Vector2 battleTextSize = _font.MeasureString(battleText) * scale;
+            battleTextSize = new Vector2(distance, -(battleTextSize.Y/2f));
+            Vector2 discoverTextSize = _font.MeasureString(discoverText) * scale;
+            discoverTextSize = new Vector2(-discoverTextSize.X/2f, (-discoverTextSize.Y/2f)+distance);
+            Vector2 returnTextSize = _font.MeasureString(returnText) * scale;
+            returnTextSize = new Vector2(-returnTextSize.X-distance, -(returnTextSize.Y/2f));
+            Vector2 newAntTextSize = _font.MeasureString(newAntText) * scale;
+            newAntTextSize = new Vector2(-newAntTextSize.X/2f, (-newAntTextSize.Y/2f)-distance);
+
+            if (showText) {
+                batch.DrawString(_font, battleText, player_position + battleTextSize, Color.Black, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+                batch.DrawString(_font, discoverText, player_position + discoverTextSize, Color.Black, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+                batch.DrawString(_font, returnText, player_position + returnTextSize, Color.Black, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+                batch.DrawString(_font, newAntText, player_position + newAntTextSize, Color.Black, 0, Vector2.Zero, scale, SpriteEffects.None, 0);
+            }
+
+
+            distance = 60f;
+            PlayerInput input = _handler.GetPlayer(index).GetPlayerInput();
+
+            Color pressedColor = new Color(255, 255, 255, 100);
+
+            int size = 50;
+
+            Func<string, Rectangle> buttonSource;
+            var controlTexture = _gamepadButtons;
+            if (isPlayerOnKeyboard) {
+                controlTexture = _keyboardButtons;
+                if (index == PlayerIndex.One) {
+                    buttonSource = getKeyboardButtonSource1;
+                } else {
+                    buttonSource = getKeyboardButtonSource2;
+                }
+            } else {
+                buttonSource = getGamepadButtonSource;
+            }
+
+            Rectangle newAntRectangle = new Rectangle((int)(player_position.X - size / 2f), (int)(player_position.Y - size / 2f - distance), size, size);
+            batch.Draw(controlTexture, newAntRectangle, buttonSource("y"), input.IsNewInsectPressed() ? pressedColor : transparency );
+            Rectangle discoverRectangle = new Rectangle((int)(player_position.X - size / 2f), (int)(player_position.Y - size / 2f + distance), size, size);
+            batch.Draw(controlTexture, discoverRectangle, buttonSource("a"), input.IsDiscoverPressed() ? pressedColor : transparency);
+            Rectangle returnRectangle = new Rectangle((int)(player_position.X - size / 2f - distance), (int)(player_position.Y - size / 2f), size, size);
+            batch.Draw(controlTexture, returnRectangle, buttonSource("x"), input.IsReturnPressed() ? pressedColor : transparency);
+            Rectangle battleRectangle = new Rectangle((int)(player_position.X - size / 2f + distance), (int)(player_position.Y - size / 2f), size, size);
+            batch.Draw(controlTexture, battleRectangle, buttonSource("b"), input.IsFightPressed() ? pressedColor : transparency);
+        }
+
+        private Rectangle getGamepadButtonSource(string button) {
+            var buttonSize = new Point(_gamepadButtons.Width / 2, _gamepadButtons.Height / 2);
+            switch (button)
+            {
+                case "a":
+                    return new Rectangle(Point.Zero, buttonSize);
+                case "b":
+                    return new Rectangle(new Point(buttonSize.X, 0), buttonSize);
+                case "y":
+                    return new Rectangle(buttonSize, buttonSize);
+                case "x":
+                    return new Rectangle(new Point(0, buttonSize.Y), buttonSize);
+                
+                default:
+                    return new Rectangle(Point.Zero, buttonSize);
+            } 
+        }
+
+        private Rectangle getKeyboardButtonSource2(string button) {
+            var buttonSize = new Point(_keyboardButtons.Width / 4, _keyboardButtons.Height / 2);
+            switch (button)
+            {
+                case "a":
+                    return new Rectangle(new Point(buttonSize.X*2, 0), buttonSize);
+                case "b":
+                    return new Rectangle(new Point(buttonSize.X*2, buttonSize.Y), buttonSize);
+                case "y":
+                    return new Rectangle(new Point(buttonSize.X*3, buttonSize.Y), buttonSize);
+                case "x":
+                    return new Rectangle(new Point(buttonSize.X*3, 0), buttonSize);
+                
+                default:
+                    return new Rectangle(Point.Zero, buttonSize);
+            } 
+        } 
+        
+        private Rectangle getKeyboardButtonSource1(string button) {
+            var buttonSize = new Point(_keyboardButtons.Width / 4, _keyboardButtons.Height / 2);
+
+            switch (button) {
+                case "a":
+                    return new Rectangle(Point.Zero, buttonSize);
+                case "b":
+                    return new Rectangle(new Point(0, buttonSize.Y), buttonSize);
+                case "y":
+                    return new Rectangle(new Point(buttonSize.X, buttonSize.Y), buttonSize);
+                case "x":
+                    return new Rectangle(new Point(buttonSize.X, 0), buttonSize);
+                default:
+                    return new Rectangle(Point.Zero, buttonSize);
+
+            }
+        }
+
     }
 }

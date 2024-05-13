@@ -24,7 +24,7 @@ namespace TinyShopping.Game {
             ExchangeFood, 
             ExchangeFoodDone,
             Goal,
-            Freetime
+            TutorialEnded
         }
 
         private SoundController _sound;
@@ -34,7 +34,7 @@ namespace TinyShopping.Game {
         private TutorialUIController _ui;
         private SplitScreenHandler _splitScreenHandler;
         private SelectMenu _pauseMenu;
-        private SelectMenu _tutorialMenu;
+        private TutorialMenu _tutorialMenu;
         private Texture2D _introTexture;
         private Texture2D _cameraTexture;
         private Texture2D _cameraWaitingTexture;
@@ -64,15 +64,19 @@ namespace TinyShopping.Game {
             _ui = new TutorialUIController(GraphicsDevice, _splitScreenHandler, this);
             _sound = new SoundController(this);
 
-            var menuItemSize = new Vector2((int)(Width / 2.8), Height / 10);
+            var menuItemSize = new Vector2((int)(Width / 3.5), Height / 12);
             Rectangle explanationRegion = new Rectangle(50, Height - 100, 300, 100);
             List<MenuExplanation> explanations = new List<MenuExplanation> {
                 new("<A>", "Select", Color.Green),
                 new("<B>", "Resume Game", Color.Red)
             };
 
+            List<MenuExplanation> tutorialExplanations = new List<MenuExplanation> {
+                new("<Start>", "Next", Color.Green),
+            };
+
             _pauseMenu = new SelectMenu(new Rectangle(0, 0, Width, Height), menuItemSize, ResumeGame, explanationRegion, explanations);
-            _tutorialMenu = new SelectMenu(new Rectangle(0, (int)(Height / 2.5), Width, Height), menuItemSize, LoadMainMenu, explanationRegion);
+            _tutorialMenu = new TutorialMenu(new Rectangle(0, (int)(Height / 2.5), Width, Height), new Vector2(0,0), menuItemSize, LoadMainMenu, explanationRegion, tutorialExplanations);
         }
 
         public override void Initialize() {
@@ -173,14 +177,23 @@ namespace TinyShopping.Game {
                 _pheromoneHandler.Update(gameTime);
             }
 
-            if (!IsOver && IsStarted) {
-                if (IsPaused) {
+            if (_tutorialPhase == TutorialPhase.TutorialEnded) {
+                if (gameState == GameState.Playing) { 
+                    _insectHandler.Update(gameTime);
+                    _pheromoneHandler.Update(gameTime);
+                } else if (gameState == GameState.Paused) {
                     _pauseMenu.Update(gameTime);
                 }
+            } else {
+                _tutorialMenu.Update(gameTime);
+                if (!_tutorialPause) {
+                    _insectHandler.Update(gameTime);
+                    _pheromoneHandler.Update(gameTime);
+                }
             }
+
             _splitScreenHandler.Update(gameTime, this);
 
-            _tutorialMenu.Update(gameTime);
             _ui.Update(gameTime);
             _sound.Update(gameTime, _ui);
             base.Update(gameTime);
@@ -194,12 +207,17 @@ namespace TinyShopping.Game {
             _ui.Draw(SpriteBatch, gameTime);
             GraphicsDevice.Viewport = original;
 
-            if (IsPaused) {
-                PauseDrawBackground();
-                _pauseMenu.Draw(SpriteBatch);
+            if (_tutorialPhase == TutorialPhase.TutorialEnded) {
+                if (gameState == GameState.Paused) {
+                    _pauseMenu.Draw(SpriteBatch);
+                }
+            } else {
+                if (_tutorialPause) {
+                    PauseDrawBackground();
+                }
+                DrawCurrentTutorialPhase();
             }
 
-            DrawCurrentTutorialPhase();
 #if DEBUG
             _ui.DrawString(SpriteBatch, "Current tutorial phase: " + _tutorialPhase.ToString(), new Vector2(Width / 4,  Height - 50), 0.3f);
 #endif
@@ -285,6 +303,7 @@ namespace TinyShopping.Game {
         private void NextTutorialPhase() {
             //TODO: both players need to confirm that they read and understood
             // update: or do they?
+            gameState = GameState.Playing;
             _tutorialPhase += 1;
             _lastPhaseCompletedTimeS = _runtimeS;
         }

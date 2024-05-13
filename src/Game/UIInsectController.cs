@@ -34,7 +34,7 @@ namespace TinyShopping.Game {
             _iconBorderV = content.Load<Texture2D>("icon_border_v");
             _iconBorderH = content.Load<Texture2D>("icon_border_h");
             _sleepIcon = content.Load<Texture2D>("sleep_indicator");
-            _borderPadding = 24;
+            _borderPadding = 10;
             _borderSize = Constants.INSECT_ICON_SIZE + _borderPadding * 2;
         }
 
@@ -86,28 +86,44 @@ namespace TinyShopping.Game {
             if (borderR.Right > viewArea.Right) {
                 needBorder = true;
                 borderR.X = viewArea.Right - _borderSize;
+                batch.Draw(border, borderR, null, Color.White, 0, new Vector2(), effect, 0);
+                Rectangle r = new Rectangle(borderR.Center.X - size / 2 - 8, borderR.Center.Y - size / 2, size, size);
+                batch.Draw(_sleepIcon, r, Color.White);
+                return;
             }
             if (borderR.Left < viewArea.Left) {
                 needBorder = true;
                 effect = SpriteEffects.FlipHorizontally;
                 borderR.X = viewArea.Left;
+                batch.Draw(border, borderR, null, Color.White, 0, new Vector2(), effect, 0);
+                Rectangle r = new Rectangle(borderR.Center.X - size / 2 + 8, borderR.Center.Y - size / 2, size, size);
+                batch.Draw(_sleepIcon, r, Color.White);
+                return;
             }
             if (borderR.Top < viewArea.Top) {
                 needBorder = true;
                 borderR.Y = viewArea.Top;
                 border = _iconBorderV;
+                batch.Draw(border, borderR, null, Color.White, 0, new Vector2(), effect, 0);
+                Rectangle r = new Rectangle(borderR.Center.X - size / 2, borderR.Center.Y - size / 2 + 8, size, size);
+                batch.Draw(_sleepIcon, r, Color.White);
+                return;
             }
             if (borderR.Bottom > viewArea.Bottom) {
                 needBorder = true;
                 borderR.Y = viewArea.Bottom - _borderSize - 32;
                 effect = SpriteEffects.FlipVertically;
                 border = _iconBorderV;
-            }
-            if (needBorder) {
                 batch.Draw(border, borderR, null, Color.White, 0, new Vector2(), effect, 0);
+                Rectangle r = new Rectangle(borderR.Center.X - size / 2, borderR.Center.Y - size / 2 - 8, size, size);
+                batch.Draw(_sleepIcon, r, Color.White);
+                return;
             }
-            Rectangle r = new Rectangle(borderR.Center.X - size / 2, borderR.Center.Y - size / 2, size, size);
-            batch.Draw(_sleepIcon, r, Color.White);
+            //if (needBorder) {
+            //    batch.Draw(border, borderR, null, Color.White, 0, new Vector2(), effect, 0);
+            //}
+            Rectangle r_ = new Rectangle(borderR.Center.X - size / 2, borderR.Center.Y - size / 2, size, size);
+            batch.Draw(_sleepIcon, r_, Color.White);
         }
 
         /// <summary>

@@ -20,6 +20,8 @@ namespace TinyShopping {
 
         private Color _selectColor;
 
+        protected Texture2D _roundRectTexture;
+
         public MenuItem(string name): this(name, NonAction) {}
 
         private static void NonAction() {}
@@ -31,13 +33,14 @@ namespace TinyShopping {
         }
         public virtual void LoadContent(ContentManager content) {
             _font = content.Load<SpriteFont>("fonts/General");
+            _roundRectTexture = content.Load<Texture2D>("main_menu/rounded_rect");
         }
 
         public virtual void Draw(SpriteBatch batch, Rectangle itemRect) {
             string text = _name;
             Color color = isSelected ? _selectColor : _rectColor;
 
-            //batch.Draw(_roundRectTexture, itemRect, color);
+            batch.Draw(_roundRectTexture, itemRect, color);
 
             Vector2 origin = _font.MeasureString(text) / 2;
             batch.DrawString(_font, text, itemRect.Center.ToVector2(), color, 0, origin, 0.7f, 

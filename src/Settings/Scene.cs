@@ -11,8 +11,11 @@ namespace TinyShopping.SettingsMenu
     {
         private SelectMenu _selectMenu;
 
-        private Texture2D _titleTexture;
         private Texture2D _imageTexture;
+
+        private SpriteFont _font;
+
+        private Vector2 _titleLocation;
 
         private Rectangle _imageRegion;
         private Rectangle _titleRegion;
@@ -29,7 +32,9 @@ namespace TinyShopping.SettingsMenu
             int menuPosY = (int)(Height / 10);
             int menuW = (int)(Width / 2.3);
             var menuRegion = new Rectangle(menuW / 10, menuPosY, menuW, Height - menuPosY);
-            var menuItemSize = new Vector2((int)(Width / 2.8), Height / 10);
+            var menuItemSize = new Vector2((int)(Width / 3), Height / 12);
+
+            _titleLocation = new Vector2(menuW / 8, (int)(menuPosY / 3));
 
             _titleRegion = new Rectangle(menuW / 8, (int)(menuPosY / 1.5), menuW, menuPosY);
             _imageRegion = new Rectangle((int)(menuW / 1.5), menuPosY / 3, (int)(Width - menuW / 1.5),
@@ -50,7 +55,7 @@ namespace TinyShopping.SettingsMenu
         public override void LoadContent()
         {
             _imageTexture = Content.Load<Texture2D>("main_menu/teaser");
-            _titleTexture = Content.Load<Texture2D>("main_menu/game_title");
+            _font = Content.Load<SpriteFont>("fonts/General");
             _selectMenu.LoadContent(Content);
             base.LoadContent();
         }
@@ -69,8 +74,9 @@ namespace TinyShopping.SettingsMenu
             SpriteBatch.FillRectangle(backRegion, _backColor);
             // Draw menu texture
             SpriteBatch.Draw(_imageTexture, _imageRegion, new Rectangle(40, 70, 535, 390), Color.White);
-            SpriteBatch.Draw(_titleTexture, _titleRegion, Color.White);
             _selectMenu.Draw(SpriteBatch);
+
+            SpriteBatch.DrawString(_font, "Settings", _titleLocation, Color.Coral, 0, Vector2.Zero, 1.5f, SpriteEffects.None, 0);
 
             SpriteBatch.End();
             base.Draw(gameTime);
