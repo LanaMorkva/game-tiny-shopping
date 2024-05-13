@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
-using System.Linq;
+using MonoGame.Extended;
 
 namespace TinyShopping.Game {
 
@@ -15,7 +15,9 @@ namespace TinyShopping.Game {
 
     internal class Colony {
 
-        private Vector2 _spawn;
+        public Vector2 Spawn { get; private set; }
+
+        public int SpawnHealth { get; private set; } = Constants.SPAWN_MAX_HEALTH;
 
         private int _spawnRotation;
 
@@ -44,6 +46,7 @@ namespace TinyShopping.Game {
         public int AntsNum => Insects.Count;
 
         List<SoundEffect> _soundEffects;
+        public List<Vector2> TargetPositions {get; set;}
 
 
         /// <summary>
@@ -59,7 +62,7 @@ namespace TinyShopping.Game {
         /// <param name="insectHandler">The insect handler.</param>
         /// <param name="type">The insect type of this colony.</param>
         public Colony(Vector2 spawn, int spawnRotation, World world, PheromoneHandler handler, FruitHandler fruits, Vector2 dropOff, int owner, InsectHandler insectHandler, ColonyType type) {
-            _spawn = spawn;
+            Spawn = spawn;
             _spawnRotation = spawnRotation;
             _queue = 6;
             DropOff = dropOff;
@@ -68,6 +71,7 @@ namespace TinyShopping.Game {
             _soundEffects = new List<SoundEffect>();
             _services = new Services { colony = this, fruits = fruits, handler = handler, world = world, coloniesHandler = insectHandler };
             _type = type;
+            TargetPositions = new List<Vector2>();
         }
 
         /// <summary>
@@ -87,11 +91,19 @@ namespace TinyShopping.Game {
             _soundEffects.Add(content.Load<SoundEffect>("sounds/insect_dying"));
         }
 
+        public void UnloadContent(ContentManager content) {
+            var texturePath = _type == ColonyType.ANT ? "ants/ant_texture" : "termites/termite_texture";
+            content.UnloadAsset(texturePath);
+            content.UnloadAsset("sounds/cash_register");
+            content.UnloadAsset("sounds/insect_dying");
+        }
+
         /// <summary>
         /// Updates the insects' position.
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
+            TargetPositions.Clear();
             _spawnCooldown -= (int) Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
             if (_spawnCooldown < 0 && _queue > 0) {
                 _spawnCooldown = 1000;
@@ -116,7 +128,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <returns>An Ant or Termite.</returns>
         private Insect GetNewInsect() {
-            return new Insect(_services, _spawn, _spawnRotation, _texture, _type);
+            return new Insect(_services, Spawn, _spawnRotation, _texture, _type);
         }
 
         /// <summary>
@@ -127,6 +139,21 @@ namespace TinyShopping.Game {
         public void Draw(SpriteBatch batch, GameTime gameTime, bool playersColony) {
             foreach (Insect insect in Insects) {
                 insect.Draw(batch, gameTime, playersColony);
+            }
+        }
+
+        /// <summary>
+        /// Draws all that needs to be in the foreground.
+        /// </summary>
+        /// <param name="batch">The sprite batch to use.</param>
+        public void DrawForeground(SpriteBatch batch) {
+            if (SpawnHealth < Constants.SPAWN_MAX_HEALTH) {
+                var barPos = Spawn.ToPoint() - new Point(50, 50);
+                var healthBar = new Rectangle(barPos, new Size((100 * SpawnHealth / Constants.SPAWN_MAX_HEALTH), 6));
+                var healthBarBound = new Rectangle(barPos, new Size(100, 6));
+
+                batch.FillRectangle(healthBar, Color.Green);
+                batch.DrawRectangle(healthBarBound, Color.Black);
             }
         }
 
@@ -158,8 +185,16 @@ namespace TinyShopping.Game {
             return _insectHandler.GetClosestEnemy(_owner, position);
         }
 
-        public List<Rectangle> GetOtherInsectBoxes(Insect insect) {
-            return Insects.Where(i => i != insect).Select(i => i.BoundingBox).ToList();
+        /// <summary>
+        /// Returns the position of the enemy spawn point.
+        /// </summary>
+        /// <returns>A position.</returns>
+        public Vector2 GetEnemySpawnPosition() {
+            return _insectHandler.GetEnemeySpawnPosition(_owner);
+        }
+
+        public void AddShot(int damagePower, Vector2 start, Vector2 end) {
+            _insectHandler.AddShot(_owner, damagePower, start, end);
         }
 
         /// <summary>
@@ -179,6 +214,14 @@ namespace TinyShopping.Game {
                 }
             }
             return closest;
+        }
+
+        /// <summary>
+        /// Reduces the colony spawn's health.
+        /// </summary>
+        /// <param name="damage">The damage to take.</param>
+        public void TakeDamage(int damage) {
+            SpawnHealth -= damage;
         }
     }
 }

@@ -39,8 +39,7 @@ namespace TinyShopping.Game.AI {
                 return true;
             }
             if (dir != null) {
-                int maxOffset = closestFruit.Size / 3;
-                AIHandler.WalkTo(closestFruit.Center, AIHandler.ActivePheromone, gameTime, InsectState.Run, maxOffset);
+                AIHandler.WalkTo(closestFruit.Center, AIHandler.ActivePheromone, gameTime, InsectState.Run);
                 return true;
             }
             return false;

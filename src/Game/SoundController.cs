@@ -22,12 +22,11 @@ namespace TinyShopping.Game {
 
         public SoundController(Scene scene) {
             _scene = scene;
-            _input = new KeyboardInput(PlayerIndex.One);
             MediaPlayer.IsRepeating = true;
 
             MediaPlayer.Stop();
             if (_scene.SettingsHandler.settings.music) {
-                MediaPlayer.Volume = 1;
+                MediaPlayer.Volume = 0.5f;
             }
 
         }
@@ -37,6 +36,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
+            _input = new KeyboardInput(PlayerIndex.One, content);
             _regularSong = content.Load<Song>("songs/basic_without_intro");
             _regularSongFast = content.Load<Song>("songs/basic_fast");
             _battleSong = content.Load<Song>("songs/drama");
@@ -49,12 +49,12 @@ namespace TinyShopping.Game {
         /// <param name="gameTime">The current game time.</param>
         /// <param name="controller">The UI controller of the game</param>
         public void Update(GameTime gameTime, UIController controller) {
-            if (_scene.IsStarted && !_isPlaying && _scene.SettingsHandler.settings.music) {
+            if (_scene.gameState == GameState.Playing && !_isPlaying && _scene.SettingsHandler.settings.music) {
                 MediaPlayer.Play(_regularSong);
                 _isPlaying = true;
             }
 
-            if (_scene.IsStarted && !_finalMinuteStarted && controller.GetRemainingTime() <= 60 && _scene.SettingsHandler.settings.music) {
+            if (_scene.gameState == GameState.Playing && !_finalMinuteStarted && controller.GetRemainingTime() <= 60 && _scene.SettingsHandler.settings.music) {
                 _finalMinuteStarted = true;
                 TimeSpan songPosition = MediaPlayer.PlayPosition * (10f/12f);
                 if ((int) songPosition.TotalSeconds >= (int) _regularSongFast.Duration.TotalSeconds) {
@@ -66,7 +66,7 @@ namespace TinyShopping.Game {
             // TODO: Swap song if battle is currently playing
             // Need a function to get if any ants are in battle
 
-            if (_scene.IsOver) {
+            if (_scene.gameState == GameState.Ended) {
                 MediaPlayer.Stop();
             }
 

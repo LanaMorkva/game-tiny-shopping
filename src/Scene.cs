@@ -6,11 +6,30 @@ using Microsoft.Xna.Framework.Media;
 
 namespace TinyShopping {
 
+
+    public enum GameState {
+        Introduction = 0,
+        StartCountdown = 1,
+        Playing = 2, 
+        Paused = 3,
+        Ended = 4
+    }
+
     public abstract class Scene {
+
+        public bool IsStarted {get; set; }
+        public bool IsOver { get; set; }
+
+        public GameState gameState {get; set; }
+
+        public bool IsPaused {get; set; }
+
+        public int Height {  get; private set; }
+        public int Width { get; private set; }
 
         protected ContentManager Content { get; private set; }
 
-        protected GraphicsDevice GraphicsDevice { get; private set; }
+        public GraphicsDevice GraphicsDevice { get; private set; }
 
         protected GraphicsDeviceManager GraphicsDeviceManager { get; private set; }
 
@@ -26,6 +45,9 @@ namespace TinyShopping {
             GraphicsDeviceManager = manager;
             Game = game;
             SettingsHandler = settingsHandler;
+
+            Width = manager.PreferredBackBufferWidth;
+            Height = manager.PreferredBackBufferHeight;
         }
 
         public virtual void Initialize() {
@@ -55,6 +77,14 @@ namespace TinyShopping {
 
         public virtual void Draw(GameTime gameTime) {
 
+        }
+
+        public void LoadMainMenu() {
+            Game.ChangeScene(new MainMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
+        }
+
+        public void ResumeGame() {
+            gameState = GameState.Playing;
         }
     }
 }

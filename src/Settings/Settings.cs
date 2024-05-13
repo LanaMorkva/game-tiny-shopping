@@ -54,7 +54,7 @@ namespace TinyShopping {
 
         private void ApplyMusic() {
             if (settings.music) {
-                MediaPlayer.Volume = 1;
+                MediaPlayer.Volume = 0.5f;
             } else {
                 MediaPlayer.Volume = 0;
             }

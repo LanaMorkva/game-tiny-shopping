@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 
 using MonoGame.Extended;
@@ -24,6 +25,7 @@ namespace TinyShopping.Game {
         private ParticleEffect _particleEffect;
         private ParticleEffect _trailEffect;
         private Color _color;
+        private float _maxDuration;
 
         private Dictionary<int, List<PFPoint>> _antPaths = new  Dictionary<int, List<PFPoint>>();
 
@@ -62,6 +64,7 @@ namespace TinyShopping.Game {
             Duration = duration;
             IsPlayer = isPlayer;
             ReachedInsects = new List<Insect>();
+            _maxDuration = duration;
             switch (type) {
                 case PheromoneType.RETURN:
                     _color = Color.Blue;
@@ -89,13 +92,12 @@ namespace TinyShopping.Game {
             _particleEffect = new ParticleEffect() {
                 Position = position,
                 Emitters = new List<ParticleEmitter> {
-                    new ParticleEmitter(textureRegion, 100, System.TimeSpan.FromMilliseconds(duration),
-                        Profile.Circle(10, Profile.CircleRadiation.None)) {
+                    new ParticleEmitter(textureRegion, 250, System.TimeSpan.FromSeconds(1),
+                        Profile.Circle(25, Profile.CircleRadiation.None)) {
                         Parameters = new ParticleReleaseParameters {
                             Speed = new Range<float>(0f, 10f),
-                            Quantity = 3,
+                            Quantity = 7,
                             Scale = new Range<float>(0.1f, 0.5f),
-                            Opacity = new Range<float>(0.5f, 0.5f),
                         },
                         Modifiers = { new AgeModifier { Interpolators = {
                             new ColorInterpolator {StartValue = _color.ToHsl(), EndValue = _color.ToHsl()} } },
@@ -103,15 +105,15 @@ namespace TinyShopping.Game {
                             new CircleContainerModifier {Radius = 10, Inside = true},
                         }
                     },
-                    new ParticleEmitter(textureRegion, 500, System.TimeSpan.FromSeconds(1),
+                    new ParticleEmitter(textureRegion, 300, System.TimeSpan.FromSeconds(1),
                         Profile.Ring(range, Profile.CircleRadiation.None)) {
                         Parameters = new ParticleReleaseParameters {
                             Speed = new Range<float>(0f, 5f),
                             Quantity = 10,
-                            Scale = new Range<float>(0.1f, 0.4f)
+                            Scale = new Range<float>(0.1f, 0.3f),
                         },
                         Modifiers = {new AgeModifier { Interpolators = {
-                            new ColorInterpolator {StartValue = Color.DarkGray.ToHsl(), EndValue = Color.DarkGray.ToHsl()} } },
+                            new ColorInterpolator {StartValue = _color.ToHsl(), EndValue = _color.ToHsl()} } },
                             new RotationModifier {RotationRate = -2.1f}}
                     }
                 }
@@ -196,11 +198,22 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime) {
+            Duration -= (int) Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
+
             if (IsPlayer) {
+                float opacity = Duration / _maxDuration * 0.5f;
+                _particleEffect.Emitters = _particleEffect.Emitters.Select(e => { 
+                    e.Parameters.Opacity = opacity;
+                    return e; 
+                }).ToList();
+                _trailEffect.Emitters = _trailEffect.Emitters.Select(e => { 
+                    e.Parameters.Opacity = opacity;
+                    return e; 
+                }).ToList();
+
                 _particleEffect.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
                 _trailEffect.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             }
-            Duration -= (int) Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
         }
     }
 }

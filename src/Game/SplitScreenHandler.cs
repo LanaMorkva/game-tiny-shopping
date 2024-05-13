@@ -16,8 +16,6 @@ namespace TinyShopping.Game {
 
         private GraphicsDevice _device;
 
-        private Texture2D _borderTexture;
-
         private World _world;
 
         private InsectHandler _insectHandler;
@@ -27,6 +25,8 @@ namespace TinyShopping.Game {
         private Player _player1;
 
         private Player _player2;
+        public List<Control> Controls1 {get; private set;}
+        public List<Control> Controls2 {get; private set;}
 
         private SpriteBatch _batch;
 
@@ -45,20 +45,17 @@ namespace TinyShopping.Game {
         /// <param name="area1">The area where the first screen should be drawn.</param>
         /// <param name="area2">The area where the second screen should be drawn.</param>
         /// <param name="device">The device to render to.</param>
-        public SplitScreenHandler(Rectangle area1, Rectangle area2, GraphicsDevice device) {
-            Player1Area = area1;
-            Player2Area = area2;
-            _device = device;
-            _batch = new SpriteBatch(device);
-        }
+        public SplitScreenHandler(Scene scene, World world, InsectHandler insectHandler, PheromoneHandler pheromoneHandler) {
 
-        /// <summary>
-        /// Initializes the necessary data.
-        /// </summary>
-        public void Initialize() {
-            _world = new World();
-            _pheromoneHandler = new PheromoneHandler(_world);
-            _insectHandler = new InsectHandler(_world, _pheromoneHandler, _world.FruitHandler);
+            Player1Area = new Rectangle(0, 0, scene.Width / 2, scene.Height);
+            Player2Area = new Rectangle(scene.Width / 2, 0, scene.Width / 2, scene.Height);
+
+            _world = world;
+            _insectHandler = insectHandler;
+            _pheromoneHandler = pheromoneHandler;
+
+            _device = scene.GraphicsDevice;
+            _batch = new SpriteBatch(_device);
             
             Camera1 = new Camera2D(Player1Area.Width, Player1Area.Height);
             Camera2 = new Camera2D(Player2Area.Width, Player2Area.Height);
@@ -71,33 +68,32 @@ namespace TinyShopping.Game {
         }
 
         /// <summary>
+        /// Initializes the necessary data.
+        /// </summary>
+        public void Initialize() {
+        }
+
+        /// <summary>
         /// Loads the necessary content from disk.
         /// </summary>
         /// <param name="content">The content manager to use.</param>
         public void LoadContent(ContentManager content) {
-            _world.LoadContent(content, _device);
-            _insectHandler.LoadContent(content);
-            _pheromoneHandler.LoadContent(content);
-            
             var spawnPositions = _world.GetSpawnPositions();
-
-            PlayerInput input1 = CreatePlayerInput(PlayerIndex.One);
+            PlayerInput input1 = CreatePlayerInput(PlayerIndex.One, content);
+            Controls1 = input1.Controls;
             _player1 = new Player(_pheromoneHandler, input1, _insectHandler, _world, 0, spawnPositions[0]);
+            
+            PlayerInput input2 = CreatePlayerInput(PlayerIndex.Two, content);
+            Controls2 = input2.Controls;
+            _player2 = new Player(_pheromoneHandler, input2, _insectHandler, _world, 1, spawnPositions[1]);
+            
             _player1.LoadContent(content);
+            _player2.LoadContent(content);
+
             Camera1.LookAt(spawnPositions[0]);
             Camera1.ZoomIn(0.5f);
-
-            PlayerInput input2 = CreatePlayerInput(PlayerIndex.Two);
-            _player2 = new Player(_pheromoneHandler, input2, _insectHandler, _world, 1, spawnPositions[1]);
-            _player2.LoadContent(content);
             Camera2.LookAt(spawnPositions[1]);
             Camera2.ZoomIn(0.5f);
-
-            CreateBorderTexture(new Color(252, 239, 197), 3);
-        }
-
-        public void UnloadContent(ContentManager content) {
-            _world.UnloadContent(content, _device);
         }
 
         /// <summary>
@@ -105,8 +101,6 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
         public void Update(GameTime gameTime, Scene scene) {
-            _insectHandler.Update(gameTime);
-            _pheromoneHandler.Update(gameTime);
             _player1.Update(gameTime, this, scene);
             _player2.Update(gameTime, this, scene);
 
@@ -120,7 +114,6 @@ namespace TinyShopping.Game {
         /// <param name="batch">The main sprite batch.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime) {
-
             Matrix viewMatrix = Camera1.GetViewMatrix();
             _device.Viewport = _viewport1;
             _device.SetRenderTarget(_renderTarget1);
@@ -154,6 +147,7 @@ namespace TinyShopping.Game {
             batch.End();
             _batch.Begin(transformMatrix: viewMatrix);
             _world.DrawObjects(batch, viewMatrix, Vector2.Zero);
+            _insectHandler.DrawForeground(batch);
             if (playerId == 0) {
                 _player1.Draw(batch, gameTime);
             } else {
@@ -166,47 +160,16 @@ namespace TinyShopping.Game {
         }
 
         /// <summary>
-        /// Creates black rectangles to place around the player views.
-        /// </summary>
-        private void CreateBorderTexture(Color color, int width) {
-            _borderTexture = new Texture2D(_device, Player1Area.Width, Player1Area.Height);
-            Color[] data = new Color[Player1Area.Width * Player1Area.Height];
-            FillTextureRect(data, 0, 0, Player1Area.Width, Player2Area.Height, new Color(0, 0, 0, 0));
-            FillTextureRect(data, 0, 0, Player1Area.Width, width, color);
-            FillTextureRect(data, 0, Player1Area.Height - width, Player1Area.Width, width, color);
-            FillTextureRect(data, 0, 0, width, Player1Area.Height, color);
-            FillTextureRect(data, Player1Area.Width - width, 0, width, Player1Area.Height, color);
-            _borderTexture.SetData(data);
-        }
-
-        /// <summary>
-        /// Fills the given rectangle of a data array with the given color.
-        /// </summary>
-        /// <param name="data">The array to fill.</param>
-        /// <param name="x">The x coordinate of the rectangle.</param>
-        /// <param name="y">The y coordinate of the rectangle.</param>
-        /// <param name="width">The width of the rectangle.</param>
-        /// <param name="height">The height of the rectangle.</param>
-        /// <param name="color">The color to use.</param>
-        private void FillTextureRect(Color[] data, int x, int y, int width, int height, Color color) {
-            for (int j = y; j < y + height; ++j) {
-                for (int i = x; i < x + width; ++i) {
-                    data[i + j * Player1Area.Width] = color;
-                }
-            }
-        }
-
-        /// <summary>
         /// Creates a fitting player input method for the given player.
         /// </summary>
         /// <param name="playerIndex">The index of the player.</param>
         /// <returns>A PlayerInput instance.</returns>
-        private PlayerInput CreatePlayerInput(PlayerIndex playerIndex) {
+        private PlayerInput CreatePlayerInput(PlayerIndex playerIndex, ContentManager content) {
             GamePadState state = GamePad.GetState(playerIndex);
             if (state.IsConnected) {
-                return new GamePadInput(playerIndex);
+                return new GamePadInput(playerIndex, content);
             }
-            return new KeyboardInput(playerIndex);
+            return new KeyboardInput(playerIndex, content);
         }
 
         /// <summary>
@@ -248,6 +211,18 @@ namespace TinyShopping.Game {
             return playerId == 0 ? Camera1.Zoom : Camera2.Zoom;
         }
 
+        public Vector2 GetCameraPosition(int playerId) {
+            return playerId == 0 ? Camera1.Position : Camera2.Position;
+        }
+
+        public void SetPlayerCursorTo(int playerId, Vector2 position) {
+            if (playerId == 0) {
+                _player1.SetCursorTo(position);
+            } else {
+                _player2.SetCursorTo(position);
+            }
+        }
+
         /// <summary>
         /// Gets the number of ants in the colony of the given player.
         /// </summary>
@@ -274,5 +249,43 @@ namespace TinyShopping.Game {
         public IList<Insect> GetAllInsects(int player) {
             return _insectHandler.GetAllInsects(player);
         }
+
+        /// <summary>
+        /// Returns the healt of the given player's spawn.
+        /// </summary>
+        /// <param name="player">The player to check</param>
+        /// <returns>The spawn health.</returns>
+        public int GetSpawnHealth(int player) {
+            return _insectHandler.GetSpawnHealth(player);
+        }
+
+        public Vector2 GetPlayerPosition(PlayerIndex player) {
+            // Apply camera transformation to render get position on screen
+            if (player == PlayerIndex.One) {
+                Matrix transformMatrix = Camera1.GetViewMatrix();
+                return Vector2.Transform(_player1.GetPosition(), transformMatrix);
+            } else {
+                // Shady code, should be solved more general for a more general splitscreen
+                Matrix transformMatrix = Camera2.GetViewMatrix();
+                return Vector2.Transform(_player2.GetPosition(), transformMatrix) + new Vector2(Player1Area.Width, 0);
+            }
+        }
+
+        public Player GetPlayer(PlayerIndex index) {
+            if (index == PlayerIndex.One) {
+                return _player1;
+            } else {
+                return _player2;
+            }
+        }
+
+        public bool IsPlayerKeyboard(PlayerIndex index) {
+            if (index == PlayerIndex.One) {
+                return _player1.IsPlayerKeyboard();
+            } else {
+                return _player2.IsPlayerKeyboard();
+            }
+        }
+
     }
 }

@@ -79,9 +79,12 @@ namespace TinyShopping {
         }
 
         private static List<MenuExplanation> CreateDefaultExplanations() {
-            return new List<MenuExplanation> {
-                new("<A>", "Select", Color.Green)
-            };
+            GamePadState state = GamePad.GetState(PlayerIndex.One);
+            if (state.IsConnected) {
+                return new List<MenuExplanation> {new("<A>", "Select", Color.Green)};
+            } else {
+                return new List<MenuExplanation> {new("<Enter>", "Select", Color.Green)};
+            }
         }
 
 
@@ -103,7 +106,7 @@ namespace TinyShopping {
         /// Updates the UI.
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
-        public void Update(GameTime gameTime) {
+        public virtual void Update(GameTime gameTime) {
             if (_menuInput.IsNextPressed()) {
                 _nextPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
             } else if (_nextPressed > 0) {

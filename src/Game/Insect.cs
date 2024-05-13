@@ -67,9 +67,6 @@ namespace TinyShopping.Game {
             }
         }
 
-        // This is bounding box of main part of the insect - it is smaller than a whole texture
-        public Rectangle BoundingBox => new(Position.ToPoint() - new Point(TextureSize/2, 0), new(TextureSize, TextureSize/2));
-
         public int TargetRotation {
             get {
                 return _position.TargetRotation;
@@ -108,11 +105,14 @@ namespace TinyShopping.Game {
             }
         }
 
-        public int GiveDamage { 
+        public int GetDamagePower { 
             get {
-                _damageCooldown = _attributes.damageReload;
                 return _attributes.damage;
             } 
+        }
+
+        public void SendShot() {
+            _damageCooldown = _attributes.damageReload;
         }
 
         private float _pheromoneCooldown;
@@ -250,11 +250,6 @@ namespace TinyShopping.Game {
                 }
             }
             _position.Move((float)gameTime.ElapsedGameTime.TotalSeconds * speed);
-        }
-
-        private void UpdateToAvailablePos(Vector2 prevPos) {
-            var insectBoxes = _coloniesHandler.GetOtherInsectBoxes(this);
-            bool notAvailable = insectBoxes.Any(box => box.Intersects(BoundingBox));
         }
 
         /// <summary>

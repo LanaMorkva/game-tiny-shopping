@@ -18,8 +18,11 @@ namespace TinyShopping {
             text += ": " + (_state ? "On" : "Off");
 
             Vector2 origin = _font.MeasureString(text) / 2;
+
+            batch.Draw(_roundRectTexture, itemRect, color);
             batch.DrawString(_font, text, itemRect.Center.ToVector2(), color, 0, origin, 0.7f, 
                 SpriteEffects.None, 0);
+
         }
 
         public override void ApplyAction() {

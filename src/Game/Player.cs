@@ -25,6 +25,8 @@ namespace TinyShopping.Game {
 
         private bool _newInsectPressed;
 
+        private bool _startedPressed;
+
         private PheromoneHandler _handler;
 
         private PlayerInput _input;
@@ -57,7 +59,7 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager to use.</param>
         public void LoadContent(ContentManager content) {
-            _texture = content.Load<Texture2D>("crosshair");
+            _texture = content.Load<Texture2D>("ui/cursor");
         }
 
         /// <summary>
@@ -85,7 +87,10 @@ namespace TinyShopping.Game {
         public void Update(GameTime gameTime, SplitScreenHandler handler, Scene scene) {
             int speed = (int)(gameTime.ElapsedGameTime.TotalSeconds * Constants.CURSOR_SPEED / handler.GetZoomValue(_id));
             if (_input.IsStartedPressed()) {
-                scene.IsPaused = true;
+                _startedPressed = true;
+            } else if (_startedPressed) {
+                _startedPressed = false;
+                scene.gameState = GameState.Paused;
             }
             PlacePheromones(gameTime);
             UpdatePosition(speed);
@@ -93,6 +98,10 @@ namespace TinyShopping.Game {
             handler.UpdateCameraState(_id, _position, speed, _input.GetZoom(), _input.GetCameraMotion());
 
             _cursorSize = (int)(Constants.CURSOR_SIZE / handler.GetZoomValue(_id));
+        }
+
+        public void SetCursorTo(Vector2 position) {
+            _position = position;
         }
 
         /// <summary>
@@ -140,7 +149,8 @@ namespace TinyShopping.Game {
             }
             else if (_discoverPressed > 0) {
                 float range = Constants.PHEROMONE_RANGE + Constants.PHEROMONE_RANGE_COEFFICIENT * _discoverPressed / 1000f;
-                _handler.AddPheromone(_position, gameTime, PheromoneType.DISCOVER, _id, 500, Constants.PHEROMONE_DURATION, MathHelper.Min((int) range, Constants.PHEROMONE_MAX_RANGE), true);
+                _handler.AddPheromone(_position, gameTime, PheromoneType.DISCOVER, _id, Constants.PHEROMONE_MAX_PRIORITY, 
+                                    Constants.PHEROMONE_DURATION, MathHelper.Min((int) range, Constants.PHEROMONE_MAX_RANGE), true);
                 _discoverPressed = 0;
             }
             if (_input.IsReturnPressed()) {
@@ -148,7 +158,8 @@ namespace TinyShopping.Game {
             }
             else if (_returnPressed > 0) {
                 float range = Constants.PHEROMONE_RANGE + Constants.PHEROMONE_RANGE_COEFFICIENT * _returnPressed / 1000f;
-                _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN, _id, 500, Constants.PHEROMONE_DURATION, MathHelper.Min((int)range, Constants.PHEROMONE_MAX_RANGE), true);
+                _handler.AddPheromone(_position, gameTime, PheromoneType.RETURN, _id, Constants.PHEROMONE_MAX_PRIORITY,
+                                    Constants.PHEROMONE_DURATION, MathHelper.Min((int)range, Constants.PHEROMONE_MAX_RANGE), true);
                 _returnPressed = 0;
             }
             if (_input.IsFightPressed()) {
@@ -156,7 +167,8 @@ namespace TinyShopping.Game {
             }
             else if (_fightPressed > 0) {
                 float range = Constants.PHEROMONE_RANGE + Constants.PHEROMONE_RANGE_COEFFICIENT * _fightPressed / 1000f;
-                _handler.AddPheromone(_position, gameTime, PheromoneType.FIGHT, _id, 500, Constants.PHEROMONE_DURATION, MathHelper.Min((int)range, Constants.PHEROMONE_MAX_RANGE), true);
+                _handler.AddPheromone(_position, gameTime, PheromoneType.FIGHT, _id, Constants.PHEROMONE_MAX_PRIORITY,
+                                    Constants.PHEROMONE_DURATION, MathHelper.Min((int)range, Constants.PHEROMONE_MAX_RANGE), true);
                 _fightPressed = 0;
             }
             if (_input.IsNewInsectPressed()) {
@@ -167,5 +179,18 @@ namespace TinyShopping.Game {
                 _insectHandler.BuyNewInsect(_id);
             }
         }
+
+        public Vector2 GetPosition() {
+            return _position;
+        }
+
+        public PlayerInput GetPlayerInput() {
+            return _input;
+        }
+
+        public bool IsPlayerKeyboard() {
+            return _input.IsPlayerKeyboard();
+        }
+
     }
 }

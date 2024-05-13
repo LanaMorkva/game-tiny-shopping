@@ -1,12 +1,27 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Content;
 using System;
+using System.Collections.Generic;
 
 namespace TinyShopping.Game {
+    internal class Control {
+        public Texture2D Texture { get; }
+        public String Description { get; }
+        public Rectangle SourceRect { get; }
+
+        public Control(Texture2D texture, Rectangle source, String description) {
+            Texture = texture;
+            SourceRect = source;
+            Description = description;
+        }
+    }
 
     internal abstract class PlayerInput {
 
         protected PlayerIndex _playerIndex;
+        public List<Control> Controls { get; protected set; }
 
         /// <summary>
         /// Reads the desired player motion from the input.
@@ -49,6 +64,8 @@ namespace TinyShopping.Game {
         public abstract bool IsNewInsectPressed();
 
         public abstract bool IsStartedPressed();
+        
+        public abstract bool IsPlayerKeyboard();
     }
 
     internal class GamePadInput : PlayerInput {
@@ -63,16 +80,25 @@ namespace TinyShopping.Game {
 
         private Buttons _startButton = Buttons.Start;
 
-        public GamePadInput(PlayerIndex playerIndex) {
+        public GamePadInput(PlayerIndex playerIndex, ContentManager content) {
             _playerIndex = playerIndex;
+            var gamePadButtons = content.Load<Texture2D>("stats/controller");
+            var buttonSize = new Point(gamePadButtons.Width / 2, gamePadButtons.Height / 2);
+            Controls = new List<Control>{
+                new (gamePadButtons, new Rectangle(Point.Zero, buttonSize), "Discover"), 
+                new (gamePadButtons, new Rectangle(new Point(0, buttonSize.Y), buttonSize), "Return home"), 
+                new (gamePadButtons, new Rectangle(new Point(buttonSize.X, 0), buttonSize), "Fight"),  
+                new (gamePadButtons, new Rectangle(new Point(buttonSize.X, buttonSize.Y), buttonSize), "Buy new insect"), 
+            };
         }
 
         public override Vector2 GetMotion() {
             GamePadState state = GamePad.GetState(_playerIndex);
-            if (!state.IsConnected) {
-                throw new Exception("Unable to read player input, no available input methods left!");
+            Vector2 motion = Vector2.Zero;
+            if (state.IsConnected) {
+                motion = state.ThumbSticks.Left;
             }
-            Vector2 motion = state.ThumbSticks.Left;
+             
             motion.Y *= -1;
             return motion;
         }
@@ -85,10 +111,10 @@ namespace TinyShopping.Game {
 
         public override Vector2 GetCameraMotion() {
             GamePadState state = GamePad.GetState(_playerIndex);
-            if (!state.IsConnected) {
-                throw new Exception("Unable to read player input, no available input methods left!");
+            Vector2 motion = Vector2.Zero;
+            if (state.IsConnected) {
+                motion = state.ThumbSticks.Right;
             }
-            Vector2 motion = state.ThumbSticks.Right;
             motion.Y *= -1;
             return motion;
         }
@@ -119,6 +145,11 @@ namespace TinyShopping.Game {
             GamePadState cState = GamePad.GetState(_playerIndex);
             return cState.IsButtonDown(_startButton);
         }
+
+        public override bool IsPlayerKeyboard()
+        {
+            return false;
+        }
     }
 
     internal class KeyboardInput : PlayerInput {
@@ -144,10 +175,12 @@ namespace TinyShopping.Game {
         private Keys _zoomIn = Keys.Q;
         private Keys _zoomOut = Keys.E;
 
-        public KeyboardInput(PlayerIndex playerIndex) {
+        public KeyboardInput(PlayerIndex playerIndex, ContentManager content) {
             if (playerIndex < 0 || playerIndex > PlayerIndex.Two) {
                 throw new Exception("Invalid player index, maximum 2 players are allowed");
             }
+            var keyboardButtons = content.Load<Texture2D>("stats/numbers");
+            var buttonSize = new Point(keyboardButtons.Width / 4, keyboardButtons.Height / 2);
             if (playerIndex == PlayerIndex.Two) {
                 _up = Keys.I;
                 _down = Keys.K;
@@ -160,6 +193,19 @@ namespace TinyShopping.Game {
                 _returnKey = Keys.D8;
                 _fightKey = Keys.D9;
                 _newInsectKey = Keys.D0;
+                Controls = new List<Control>{
+                    new (keyboardButtons, new Rectangle(new Point(buttonSize.X*2, 0), buttonSize), "Discover"), 
+                    new (keyboardButtons, new Rectangle(new Point(buttonSize.X*3, 0), buttonSize), "Return home"), 
+                    new (keyboardButtons, new Rectangle(new Point(buttonSize.X*2, buttonSize.Y), buttonSize), "Fight"),  
+                    new (keyboardButtons, new Rectangle(new Point(buttonSize.X*3, buttonSize.Y), buttonSize), "Buy new insect"), 
+                };
+            } else {
+                Controls = new List<Control>{
+                    new (keyboardButtons, new Rectangle(Point.Zero, buttonSize), "Discover"), 
+                    new (keyboardButtons, new Rectangle(new Point(buttonSize.X, 0), buttonSize), "Return home"), 
+                    new (keyboardButtons, new Rectangle(new Point(0, buttonSize.Y), buttonSize), "Fight"),  
+                    new (keyboardButtons, new Rectangle(new Point(buttonSize.X, buttonSize.Y), buttonSize), "Buy new insect"), 
+                };
             }
             _playerIndex = playerIndex;
         }
@@ -227,6 +273,11 @@ namespace TinyShopping.Game {
         {
             KeyboardState kState = Keyboard.GetState();
             return kState.IsKeyDown(_startKey);
+        }
+
+        public override bool IsPlayerKeyboard()
+        {
+            return true;
         }
     }
 }
