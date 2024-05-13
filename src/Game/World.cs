@@ -60,6 +60,13 @@ namespace TinyShopping.Game {
             FruitHandler.LoadContent(contentManager);
         }
 
+        public void InitializeFruitHandler(bool disableSingleFruits = false) {
+            FruitHandler.GenerateFruitBoxes();
+            if (!disableSingleFruits) {
+                FruitHandler.GenerateFruits();
+            }
+        }
+
         public void UnloadContent(ContentManager contentManager) {
             contentManager.UnloadAsset(_mapName);
         }
