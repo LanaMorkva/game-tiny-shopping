@@ -94,10 +94,11 @@ namespace TinyShopping.Game {
 
         public override Vector2 GetMotion() {
             GamePadState state = GamePad.GetState(_playerIndex);
-            if (!state.IsConnected) {
-                throw new Exception("Unable to read player input, no available input methods left!");
+            Vector2 motion = Vector2.Zero;
+            if (state.IsConnected) {
+                motion = state.ThumbSticks.Left;
             }
-            Vector2 motion = state.ThumbSticks.Left;
+             
             motion.Y *= -1;
             return motion;
         }
@@ -110,10 +111,10 @@ namespace TinyShopping.Game {
 
         public override Vector2 GetCameraMotion() {
             GamePadState state = GamePad.GetState(_playerIndex);
-            if (!state.IsConnected) {
-                throw new Exception("Unable to read player input, no available input methods left!");
+            Vector2 motion = Vector2.Zero;
+            if (state.IsConnected) {
+                motion = state.ThumbSticks.Right;
             }
-            Vector2 motion = state.ThumbSticks.Right;
             motion.Y *= -1;
             return motion;
         }
