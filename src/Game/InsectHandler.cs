@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace TinyShopping.Game {
@@ -28,9 +27,6 @@ namespace TinyShopping.Game {
         public void Update(GameTime gameTime) {
             Position += (float)gameTime.ElapsedGameTime.TotalSeconds * 160 * _dir;
             ShouldRemove = Vector2.Dot(_end - Position, _dir) < 0;
-            if (ShouldRemove) {
-                Debug.WriteLine("Removing shot without hit");
-            }
         }
 
         public void Draw(SpriteBatch batch) {

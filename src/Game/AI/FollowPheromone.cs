@@ -67,7 +67,7 @@ namespace TinyShopping.Game.AI {
                 }
                 else if (Vector2.DistanceSquared(_colony.GetEnemySpawnPosition(), Insect.Position) < Constants.ENEMY_VISIBILITY_RANGE * Constants.ENEMY_VISIBILITY_RANGE) {
                     if (Insect.CanGiveDamage && Vector2.DistanceSquared(_colony.GetEnemySpawnPosition(), Insect.Position) < fightRange * fightRange * 2) {
-                        var shotEndPos = Insect.Position + (_colony.GetEnemySpawnPosition() - Insect.Position).NormalizedCopy() * fightRange;
+                        var shotEndPos = _colony.GetEnemySpawnPosition();
                         Insect.SendShot();
                         _colony.AddShot(Insect.GetDamagePower, Insect.Position, shotEndPos);
                     }
