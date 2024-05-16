@@ -43,10 +43,6 @@ namespace TinyShopping.Game {
             RightFull
         }
 
-        private readonly World _world;
-
-        private InsectHandler _coloniesHandler;
-
         private Texture2D _texture;
 
         public int TextureSize { get; private set; } // equal to Constants.ANT_TEXTURE_SIZE, can be removed
@@ -128,9 +124,7 @@ namespace TinyShopping.Game {
         private AIHandler _aiHandler;
 
         public Insect(Services services, Vector2 spawn, int spawnRotation, Texture2D texture, ColonyType insectType) {
-            _world = services.world;
             _pheromoneHandler = services.handler;
-            _coloniesHandler = services.coloniesHandler;
             _position = new InsectPos((int)spawn.X, (int)spawn.Y, spawnRotation);
             _texture = texture;
             _insectType = insectType;
