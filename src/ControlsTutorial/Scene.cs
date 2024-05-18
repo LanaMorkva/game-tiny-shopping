@@ -30,7 +30,7 @@ namespace TinyShopping.ControlsTutorial
             var menuItemSize = new Vector2((int)(Width / 4.5), Height / 10);
 
             Rectangle explanationRegion = new Rectangle(50, Height - 150, 300, 100);
-            _selectMenu = new SelectMenu(menuRegion, menuItemSize, LoadMainMenu, explanationRegion);
+            _selectMenu = new SelectMenu(menuRegion, menuItemSize, GoBack, explanationRegion);
             _selectMenu.AddItem(new MainMenu.MainMenuItem("GamePad", SelectGamepadTexture));
             _selectMenu.AddItem(new MainMenu.MainMenuItem("Keyboard", SelectKeyboardTexture));
             base.Initialize();

@@ -45,6 +45,8 @@ namespace TinyShopping.Game {
         public override void Initialize() {
             _splitScreenHandler.Initialize();
             _pauseMenu.AddItem(new MenuItem("Resume", ResumeGame));
+            _pauseMenu.AddItem(new MenuItem("Settings", SettingsMenu));
+            _pauseMenu.AddItem(new MenuItem("Controls", ControlsTutorial));
             _pauseMenu.AddItem(new MenuItem("Exit Game", LoadMainMenu));
             base.Initialize();
         }

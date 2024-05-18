@@ -106,22 +106,12 @@ namespace TinyShopping.MainMenu
 
         public void StartGame()
         {
-            Game.ChangeScene(new Game.GameScene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
+            Game.ChangeSceneUnload(new Game.GameScene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
         }
 
         public void StartTutorial() 
         {
-            Game.ChangeScene(new Game.TutorialScene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
-        }
-
-        public void SettingsMenu()
-        {
-            Game.ChangeScene(new SettingsMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
-        }
-
-        public void ControlsTutorial()
-        {
-            Game.ChangeScene(new ControlsTutorial.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
+            Game.ChangeSceneUnload(new Game.TutorialScene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
         }
 
         public void ExitGame()

@@ -16,7 +16,6 @@ namespace TinyShopping {
     }
 
     public abstract class Scene {
-
         public bool IsStarted {get; set; }
         public bool IsOver { get; set; }
 
@@ -79,8 +78,22 @@ namespace TinyShopping {
 
         }
 
+        public void GoBack() {
+            Game.GoBack();
+        }
+
         public void LoadMainMenu() {
-            Game.ChangeScene(new MainMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
+            Game.ChangeSceneUnload(new MainMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
+        }
+
+        public void SettingsMenu()
+        {
+            Game.ChangeScene(new SettingsMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
+        }
+
+        public void ControlsTutorial()
+        {
+            Game.ChangeScene(new ControlsTutorial.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
         }
 
         public void ResumeGame() {

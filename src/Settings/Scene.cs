@@ -22,7 +22,8 @@ namespace TinyShopping.SettingsMenu
 
         private Color _backColor = new Color(211, 237, 150);
 
-        public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
+        public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game,     
+                    SettingsHandler settingsHandler) :
             base(content, graphics, manager, game, settingsHandler)
         {
         }
@@ -45,7 +46,7 @@ namespace TinyShopping.SettingsMenu
                 new("<A>", "Change Setting", Color.Green),
                 new("<B>", "Back", Color.Red)
             };
-            _selectMenu = new SelectMenu(menuRegion, menuItemSize, LoadMainMenu, explanationRegion, explanations);
+            _selectMenu = new SelectMenu(menuRegion, menuItemSize, GoBack, explanationRegion, explanations);
             _selectMenu.AddItem(new MenuItemBool("Music", ChangeMusicSettings, SettingsHandler.settings.music));
             _selectMenu.AddItem(new MenuItemBool("Sound Effects", ChangeSoundEffectsSettings, SettingsHandler.settings.soundEffects));
             _selectMenu.AddItem(new MenuItemBool("Fullscreen", ChangeFullScreenSettings, SettingsHandler.settings.fullScreen));

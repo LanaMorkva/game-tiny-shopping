@@ -7,6 +7,7 @@ namespace TinyShopping {
 
         private GraphicsDeviceManager _graphics;
         private Scene _scene;
+        private Scene _prevScene;
 
         private SettingsHandler _settingsHandler;
 
@@ -26,6 +27,7 @@ namespace TinyShopping {
 
             _scene = new MainMenu.Scene(Content, GraphicsDevice, _graphics, this, _settingsHandler);
             _scene.Initialize();
+            _prevScene = null;
 
             base.Initialize();
         }
@@ -52,12 +54,30 @@ namespace TinyShopping {
             base.Draw(gameTime);
         }
 
-        public void ChangeScene(Scene newScene) {
+        public void ChangeSceneUnload(Scene newScene) {
+            _prevScene = null;
             _scene.Terminate();
             _scene.UnloadContent();
             newScene.Initialize();
             newScene.LoadContent();
             _scene = newScene;
+        }
+
+        public void ChangeScene(Scene newScene) {
+            _scene.Terminate();
+            newScene.Initialize();
+            newScene.LoadContent();
+            _prevScene = _scene;
+            _scene = newScene;
+        }
+
+        public void GoBack() {
+            if (_prevScene != null) {
+                _scene.Terminate();
+                _scene.UnloadContent();
+                _scene = _prevScene;
+                _prevScene = null;
+            }
         }
     }
 }
