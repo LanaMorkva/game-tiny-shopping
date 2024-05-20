@@ -61,6 +61,14 @@ namespace TinyShopping.SettingsMenu
             base.LoadContent();
         }
 
+        public override void UnloadContent()
+        {
+            Content.UnloadAsset("main_menu/teaser");
+            Content.UnloadAsset("fonts/General");
+            _selectMenu.UnloadContent(Content);
+            base.UnloadContent();
+        }
+
         public override void Update(GameTime gameTime)
         {
             _selectMenu.Update(gameTime);
