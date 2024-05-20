@@ -12,9 +12,12 @@ namespace TinyShopping.MainMenu
     public class Scene : TinyShopping.Scene
     {
         private SelectMenu _selectMenu;
+        private SelectMenu _firstTimeTutorialMenu;
 
         private Texture2D _titleTexture;
         private Texture2D _imageTexture;
+
+        private Texture2D _tutorialPropmtTexture;
 
         private Rectangle _imageRegion;
         private Vector2 _titleLocation;
@@ -51,6 +54,11 @@ namespace TinyShopping.MainMenu
             _selectMenu.AddItem(new MainMenuItem("Settings", SettingsMenu));
             _selectMenu.AddItem(new MainMenuItem("Quit", ExitGame));
 
+            menuRegion = new Rectangle(0, Height/4, Width, Height);
+            _firstTimeTutorialMenu = new SelectMenu(menuRegion, menuItemSize, MainSelectMenu.NoAction, explanationRegion);
+            _firstTimeTutorialMenu.AddItem(new MainMenuItem("Yes", AcceptTutorialPrompt));
+            _firstTimeTutorialMenu.AddItem(new MainMenuItem("No", DeclineTutorialPrompt));
+
             base.Initialize();
         }
 
@@ -60,8 +68,10 @@ namespace TinyShopping.MainMenu
             _titleTexture = Content.Load<Texture2D>("main_menu/game_title");
             _font = Content.Load<SpriteFont>("fonts/General");
             _selectMenu.LoadContent(Content);
+            _firstTimeTutorialMenu.LoadContent(Content);
             _backgroundSong = Content.Load<Song>("songs/basic_supermarket");
             SoundEffect supermarketNoise = Content.Load<SoundEffect>("sounds/supermarket_atmosphere");
+            _tutorialPropmtTexture = Content.Load<Texture2D>("tutorial/tutorial_prompt");
             base.LoadContent();
             MediaPlayer.Play(_backgroundSong);
             MediaPlayer.IsRepeating = true;
@@ -76,13 +86,20 @@ namespace TinyShopping.MainMenu
             Content.UnloadAsset("fonts/General");
             Content.UnloadAsset("songs/basic_supermarket");
             Content.UnloadAsset("sounds/supermarket_atmosphere");
+            Content.UnloadAsset("tutorial/tutorial_prompt");
             _selectMenu.UnloadContent(Content);
+            _firstTimeTutorialMenu.UnloadContent(Content);
             base.UnloadContent();
         }
 
         public override void Update(GameTime gameTime)
         {
-            _selectMenu.Update(gameTime);
+            if (SettingsHandler.settings.firstLaunch) {
+                _firstTimeTutorialMenu.Update(gameTime);
+            } else {
+                _selectMenu.Update(gameTime);
+            }
+
             base.Update(gameTime);
         }
 
@@ -97,7 +114,19 @@ namespace TinyShopping.MainMenu
             SpriteBatch.Draw(_imageTexture, _imageRegion, new Rectangle(40, 70, 535, 390), Color.White);
             // Draw title
             SpriteBatch.DrawString(_font, "Tiny Shopping", _titleLocation, Color.Coral, 0, Vector2.Zero, 1.5f, SpriteEffects.None, 0);
-            _selectMenu.Draw(SpriteBatch);
+
+            if (SettingsHandler.settings.firstLaunch) {
+                Color pauseColor = new Color(122, 119, 110, 120);
+                SpriteBatch.FillRectangle(new Rectangle(0, 0, Width, Height), pauseColor);
+
+                Vector2 textureCenter = new Vector2(_tutorialPropmtTexture.Width / 2, _tutorialPropmtTexture.Height / 2);
+                Vector2 textureLocation = new Vector2(Width / 2, Height / 3);
+                SpriteBatch.Draw(_tutorialPropmtTexture, textureLocation, null, Color.White, 0f, textureCenter, 0.9f, SpriteEffects.None, 1f);
+                _firstTimeTutorialMenu.Draw(SpriteBatch);
+            } else {
+                _selectMenu.Draw(SpriteBatch);
+            }
+
 
             SpriteBatch.End();
             base.Draw(gameTime);
@@ -109,6 +138,15 @@ namespace TinyShopping.MainMenu
             // If loop is not falsified for some reason this has a side effect for the MediaPlayer
             _supermarketNoiseInstance.IsLooped = false;
             _supermarketNoiseInstance.Stop(true);
+        }
+
+        private void AcceptTutorialPrompt() {
+            SettingsHandler.SetFirstLaunch(false);
+            StartTutorial();
+        }
+
+        private void DeclineTutorialPrompt() {
+            SettingsHandler.SetFirstLaunch(false);
         }
 
         public void StartGame()

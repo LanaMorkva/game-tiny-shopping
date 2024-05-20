@@ -11,7 +11,8 @@ namespace TinyShopping {
         public int musicVolume { get; set; } = 20;
         public bool soundEffects { get; set; } = true;
         public bool fullScreen { get; set; } = false;
-        public string version { get; set; } = "1.1";
+		public bool firstLaunch {get; set; } = true;
+        public string version { get; set; } = "1.2";
     }
 
     public class SettingsHandler {
@@ -74,6 +75,11 @@ namespace TinyShopping {
         public void ChangeMusicVolumeSettings(int volume) {
             settings.musicVolume = volume;
             ApplyMusic();
+            SaveSettings();
+        }
+
+        public void SetFirstLaunch(bool value) {
+            settings.firstLaunch = value;
             SaveSettings();
         }
 
