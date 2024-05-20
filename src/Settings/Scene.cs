@@ -4,11 +4,9 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 
-namespace TinyShopping.SettingsMenu
-{
+namespace TinyShopping.SettingsMenu {
 
-    public class Scene : TinyShopping.Scene
-    {
+    public class Scene : TinyShopping.Scene {
         private SelectMenu _selectMenu;
 
         private Texture2D _imageTexture;
@@ -22,14 +20,12 @@ namespace TinyShopping.SettingsMenu
 
         private Color _backColor = new Color(211, 237, 150);
 
-        public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game,     
+        public Scene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game,
                     SettingsHandler settingsHandler) :
-            base(content, graphics, manager, game, settingsHandler)
-        {
+            base(content, graphics, manager, game, settingsHandler) {
         }
 
-        public override void Initialize()
-        {
+        public override void Initialize() {
             int menuPosY = (int)(Height / 10);
             int menuW = (int)(Width / 2.3);
             var menuRegion = new Rectangle(menuW / 10, menuPosY, menuW, Height - menuPosY);
@@ -48,27 +44,25 @@ namespace TinyShopping.SettingsMenu
             };
             _selectMenu = new SelectMenu(menuRegion, menuItemSize, GoBack, explanationRegion, explanations);
             _selectMenu.AddItem(new MenuItemBool("Music", ChangeMusicSettings, SettingsHandler.settings.music));
+            _selectMenu.AddItem(new MenuItemInt("Music Volume", DecreaseMusicVolumeSettings, IncreaseMusicVolumeSettings, SettingsHandler.settings.musicVolume, 0, 100));
             _selectMenu.AddItem(new MenuItemBool("Sound Effects", ChangeSoundEffectsSettings, SettingsHandler.settings.soundEffects));
             _selectMenu.AddItem(new MenuItemBool("Fullscreen", ChangeFullScreenSettings, SettingsHandler.settings.fullScreen));
             base.Initialize();
         }
 
-        public override void LoadContent()
-        {
+        public override void LoadContent() {
             _imageTexture = Content.Load<Texture2D>("main_menu/teaser");
             _font = Content.Load<SpriteFont>("fonts/General");
             _selectMenu.LoadContent(Content);
             base.LoadContent();
         }
 
-        public override void Update(GameTime gameTime)
-        {
+        public override void Update(GameTime gameTime) {
             _selectMenu.Update(gameTime);
             base.Update(gameTime);
         }
 
-        public override void Draw(GameTime gameTime)
-        {
+        public override void Draw(GameTime gameTime) {
             SpriteBatch.Begin();
 
             var backRegion = new RectangleF(0, 0, Width, Height);
@@ -83,8 +77,7 @@ namespace TinyShopping.SettingsMenu
             base.Draw(gameTime);
         }
 
-        public void NotImplementedScene()
-        {
+        public void NotImplementedScene() {
             // empty
         }
 
@@ -98,6 +91,14 @@ namespace TinyShopping.SettingsMenu
 
         public void ChangeFullScreenSettings() {
             SettingsHandler.ToggleFullScreen(GraphicsDeviceManager);
+        }
+
+        public void IncreaseMusicVolumeSettings() {
+            SettingsHandler.ChangeMusicVolumeSettings(SettingsHandler.GetMusicVolume() + 1);
+        }
+
+        public void DecreaseMusicVolumeSettings() {
+            SettingsHandler.ChangeMusicVolumeSettings(SettingsHandler.GetMusicVolume() - 1);
         }
     }
 }

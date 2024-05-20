@@ -32,12 +32,18 @@ namespace TinyShopping {
         protected List<MenuItem> _menuItems;
 
         protected int _nextPressed;
+        protected int _lastNext;
 
         protected int _previousPressed;
+        protected int _lastPrevious;
 
         protected int _submitPressed;
 
         protected int _backPressed;
+        protected int _leftPressed;
+        protected int _lastLeft;
+        protected int _rightPressed;
+        protected int _lastRight;
 
         protected float _itemPadding = 25;
         protected Vector2 _itemSize;
@@ -54,13 +60,13 @@ namespace TinyShopping {
 
         protected List<MenuExplanation> _explanations;
 
-        public SelectMenu(Rectangle menuRegion, Vector2 itemSize, Action backAction, Rectangle explanationRegion): this(menuRegion, new Vector2(0, 0), itemSize, backAction, explanationRegion, CreateDefaultExplanations()) {
+        public SelectMenu(Rectangle menuRegion, Vector2 itemSize, Action backAction, Rectangle explanationRegion) : this(menuRegion, new Vector2(0, 0), itemSize, backAction, explanationRegion, CreateDefaultExplanations()) {
         }
 
-        public SelectMenu(Rectangle menuRegion, Vector2 itemSize, Action backAction, Rectangle explanationRegion, List<MenuExplanation> explanations): this(menuRegion, new Vector2(0, 0), itemSize, backAction, explanationRegion, explanations) {
+        public SelectMenu(Rectangle menuRegion, Vector2 itemSize, Action backAction, Rectangle explanationRegion, List<MenuExplanation> explanations) : this(menuRegion, new Vector2(0, 0), itemSize, backAction, explanationRegion, explanations) {
         }
 
-        public SelectMenu(Rectangle menuRegion, Vector2 centerOffset, Vector2 itemSize, Action backAction, Rectangle explanationRegion): this(menuRegion, centerOffset, itemSize, backAction, explanationRegion, CreateDefaultExplanations()) {
+        public SelectMenu(Rectangle menuRegion, Vector2 centerOffset, Vector2 itemSize, Action backAction, Rectangle explanationRegion) : this(menuRegion, centerOffset, itemSize, backAction, explanationRegion, CreateDefaultExplanations()) {
         }
 
         public SelectMenu(Rectangle menuRegion, Vector2 centerOffset, Vector2 itemSize, Action backAction, Rectangle explanationRegion, List<MenuExplanation> explanations) {
@@ -81,9 +87,9 @@ namespace TinyShopping {
         private static List<MenuExplanation> CreateDefaultExplanations() {
             GamePadState state = GamePad.GetState(PlayerIndex.One);
             if (state.IsConnected) {
-                return new List<MenuExplanation> {new("<A>", "Select", Color.Green)};
+                return new List<MenuExplanation> { new("<A>", "Select", Color.Green) };
             } else {
-                return new List<MenuExplanation> {new("<Enter>", "Select", Color.Green)};
+                return new List<MenuExplanation> { new("<Enter>", "Select", Color.Green) };
             }
         }
 
@@ -119,14 +125,34 @@ namespace TinyShopping {
         public virtual void Update(GameTime gameTime) {
             if (_menuInput.IsNextPressed()) {
                 _nextPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
+                if (_lastNext < _nextPressed) {
+                    _soundEffects[2].Play();
+                    nextItem();
+                    if (_lastNext == 0) {
+                        _lastNext += 500;
+                    } else {
+                        _lastNext += 100;
+                    }
+                }
             } else if (_nextPressed > 0) {
-                nextItem();
+                //nextItem();
+                _lastNext = 0;
                 _nextPressed = 0;
             }
             if (_menuInput.IsPreviousPressed()) {
                 _previousPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
+                if (_lastPrevious < _previousPressed) {
+                    _soundEffects[2].Play();
+                    previousItem();
+                    if (_lastPrevious == 0) {
+                        _lastPrevious += 500;
+                    } else {
+                        _lastPrevious += 100;
+                    }
+                }
             } else if (_previousPressed > 0) {
-                previousItem();
+                //previousItem();
+                _lastPrevious = 0;
                 _previousPressed = 0;
             }
             if (_menuInput.IsSelectPressed()) {
@@ -135,6 +161,39 @@ namespace TinyShopping {
                 _submitPressed = 0;
                 _soundEffects[2].Play();
                 _menuItems[_currentSelection].ApplyAction();
+            }
+            if (_menuInput.IsLeftPressed()) {
+                _leftPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
+                if (_lastLeft < _leftPressed) {
+                    _soundEffects[2].Play();
+                    _menuItems[_currentSelection].ApplyActionLeft();
+                    if (_lastLeft == 0) {
+                        _lastLeft += 500;
+                    } else {
+                        _lastLeft += 100;
+                    }
+                }
+            } else if (_leftPressed > 0) {
+                _leftPressed = 0;
+                _lastLeft = 0;
+                //_soundEffects[2].Play();
+            }
+            if (_menuInput.IsRightPressed()) {
+                _rightPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
+                if (_lastRight < _rightPressed) {
+                    _menuItems[_currentSelection].ApplyActionRight();
+                    _soundEffects[2].Play();
+                    if (_lastRight == 0) {
+                        _lastRight += 500;
+                    } else {
+                        _lastRight += 100;
+                    }
+                }
+            } else if (_rightPressed > 0) {
+                _rightPressed = 0;
+                _lastRight = 0;
+                //_soundEffects[2].Play();
+                //_menuItems[_currentSelection].ApplyActionRight();
             }
             if (_menuInput.IsBackPressed()) {
                 _backPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
@@ -208,7 +267,7 @@ namespace TinyShopping {
                 menuItem.Draw(batch, itemRect);
                 menuLocation += new Vector2(0, _itemSize.Y + _itemPadding);
             }
-            
+
             //batch.DrawRectangle(_explanationRegion, Color.Red);
             int i = 0;
             foreach (var explanation in _explanations) {

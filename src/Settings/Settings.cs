@@ -8,9 +8,10 @@ namespace TinyShopping {
 
     public class Settings {
         public bool music { get; set; } = true;
+        public int musicVolume { get; set; } = 20;
         public bool soundEffects { get; set; } = true;
         public bool fullScreen { get; set; } = false;
-        public string version { get; set; } = "1.0";
+        public string version { get; set; } = "1.1";
     }
 
     public class SettingsHandler {
@@ -28,7 +29,7 @@ namespace TinyShopping {
         public void SaveSettings() {
             var options = new JsonSerializerOptions { WriteIndented = true };
             string jsonSettings = JsonSerializer.Serialize(settings, options);
-            File.WriteAllText(_settingsPath,jsonSettings);
+            File.WriteAllText(_settingsPath, jsonSettings);
         }
 
         public bool LoadSettings() {
@@ -41,7 +42,7 @@ namespace TinyShopping {
                 if (loadedSettings.version == settings.version) {
                     settings = loadedSettings;
                 }
-                return  true;
+                return true;
             }
             return false;
         }
@@ -54,16 +55,26 @@ namespace TinyShopping {
 
         private void ApplyMusic() {
             if (settings.music) {
-                MediaPlayer.Volume = 0.5f;
+                MediaPlayer.Volume = 0.01f * (float)GetMusicVolume();
             } else {
                 MediaPlayer.Volume = 0;
             }
-
         }
+
+        public int GetMusicVolume() {
+            return settings.musicVolume;
+        }
+
         public void ToggleSoundEffects() {
             settings.soundEffects = !settings.soundEffects;
             SaveSettings();
             ApplySoundEffects();
+        }
+
+        public void ChangeMusicVolumeSettings(int volume) {
+            settings.musicVolume = volume;
+            ApplyMusic();
+            SaveSettings();
         }
 
         private void ApplySoundEffects() {
@@ -83,6 +94,7 @@ namespace TinyShopping {
             if (graphics.IsFullScreen != settings.fullScreen) {
                 graphics.ToggleFullScreen();
             }
+            SaveSettings();
 
         }
 

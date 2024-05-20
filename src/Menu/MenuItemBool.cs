@@ -7,7 +7,7 @@ namespace TinyShopping {
     class MenuItemBool: MenuItem {
         private bool _state;
 
-        public MenuItemBool(string name, Action nextScene, bool state): base(name, nextScene) {
+        public MenuItemBool(string name, Action selectAction, bool state): base(name, selectAction) {
             _state = state;
         }
 
