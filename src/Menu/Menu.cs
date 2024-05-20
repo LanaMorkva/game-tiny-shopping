@@ -103,13 +103,7 @@ namespace TinyShopping {
         }
 
         public void UnloadContent(ContentManager content) {
-            content.UnloadAsset("fonts/General");
-            content.UnloadAsset("sounds/beep-deep");
-            content.UnloadAsset("sounds/cash_register");
-            content.UnloadAsset("sounds/beep-extra-deep");
-            foreach (var menuItem in _menuItems) {
-                menuItem.UnloadContent(content);
-            }
+            //do not unload common class, see note in discord #monogame-csharp
         }
 
         /// <summary>

@@ -91,11 +91,6 @@ namespace TinyShopping.SettingsMenu
             base.Draw(gameTime);
         }
 
-        public void NotImplementedScene()
-        {
-            // empty
-        }
-
         public void ChangeMusicSettings() {
             SettingsHandler.ToggleMusic();
         }
