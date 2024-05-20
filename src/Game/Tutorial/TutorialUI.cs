@@ -69,10 +69,10 @@ namespace TinyShopping.Game {
             batch.DrawString(_font, text, position, _textColor, 0, origin, scale, SpriteEffects.None, 0); // scale used to be 0.95f
         }
         public void DrawBoldString(SpriteBatch batch, String text, Vector2 position, float scale, float border = .005f) {
-            Vector2 origin = _fontBig.MeasureString(text) / 2;
+            Vector2 origin = _font.MeasureString(text) / 2;
 
-            batch.DrawString(_fontBig, text, position, Color.Black, 0, origin, scale + border, SpriteEffects.None, 0);
-            batch.DrawString(_fontBig, text, position, _textColor, 0, origin, scale, SpriteEffects.None, 0);
+            batch.DrawString(_font, text, position, Color.Black, 0, origin, scale + border, SpriteEffects.None, 0);
+            batch.DrawString(_font, text, position, _textColor, 0, origin, scale, SpriteEffects.None, 0);
         }
     }
 }

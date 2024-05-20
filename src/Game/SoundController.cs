@@ -43,6 +43,13 @@ namespace TinyShopping.Game {
             _battleSongFast = content.Load<Song>("songs/drama_fast");
         }
 
+        public void UnloadContent(ContentManager content) {
+            content.UnloadAsset("songs/basic_without_intro");
+            content.UnloadAsset("songs/basic_fast");
+            content.UnloadAsset("songs/drama");
+            content.UnloadAsset("songs/drama_fast");
+        }
+
         /// <summary>
         /// Updates the music
         /// </summary>

@@ -118,8 +118,26 @@ namespace TinyShopping.Game {
 
         public override void UnloadContent()
         {
-            //TODO: unload everything, so it wont hang in the ContentManager memory
             _world.UnloadContent(Content);
+            _insectHandler.UnloadContent(Content);
+            _pheromoneHandler.UnloadContent(Content);
+            _splitScreenHandler.UnloadContent(Content);
+            _ui.UnloadContent(Content);
+            _sound.UnloadContent(Content);
+            _pauseMenu.UnloadContent(Content);
+            _tutorialMenu.UnloadContent(Content);
+            Content.UnloadAsset("tutorial/game_intro");
+            Content.UnloadAsset("tutorial/camera");
+            Content.UnloadAsset("tutorial/camera_waiting");
+            Content.UnloadAsset("tutorial/ants_intro");
+            Content.UnloadAsset("tutorial/ants_in_progress");
+            Content.UnloadAsset("tutorial/ants_trails");
+            Content.UnloadAsset("tutorial/pheromones_intro");
+            Content.UnloadAsset("tutorial/collect_food");
+            Content.UnloadAsset("tutorial/exchange_food");
+            Content.UnloadAsset("tutorial/exchange_food_done");
+            Content.UnloadAsset("tutorial/goal");
+            Content.UnloadAsset("tutorial/final_message");
             base.UnloadContent();
         }
 

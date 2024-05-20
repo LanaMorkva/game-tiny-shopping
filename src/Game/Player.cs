@@ -62,6 +62,10 @@ namespace TinyShopping.Game {
             _texture = content.Load<Texture2D>("ui/cursor");
         }
 
+        public void UnloadContent(ContentManager content) {
+            content.UnloadAsset("ui/cursor");
+        }
+
         /// <summary>
         /// Draws the player cursor.
         /// </summary>

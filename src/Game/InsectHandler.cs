@@ -81,6 +81,12 @@ namespace TinyShopping.Game {
             _colonies = new Colony[] { colony1, colony2 };
         }
 
+        public void UnloadContent(ContentManager content) {
+            foreach (var colony in _colonies) {
+                colony.UnloadContent(content);
+            }
+        }
+
         /// <summary>
         /// Updates the colonies' insects.
         /// </summary>

@@ -36,6 +36,11 @@ namespace TinyShopping {
             _roundRectTexture = content.Load<Texture2D>("main_menu/rounded_rect");
         }
 
+        public virtual void UnloadContent(ContentManager content) {
+            content.UnloadAsset("fonts/General");
+            content.UnloadAsset("main_menu/rounded_rect");
+        }
+
         public virtual void Draw(SpriteBatch batch, Rectangle itemRect) {
             string text = _name;
             Color color = isSelected ? _selectColor : _rectColor;

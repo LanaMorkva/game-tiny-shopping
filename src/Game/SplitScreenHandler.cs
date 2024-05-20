@@ -95,6 +95,11 @@ namespace TinyShopping.Game {
             Camera2.LookAt(mapCenter);
         }
 
+        public void UnloadContent(ContentManager content) {
+            _player1.UnloadContent(content);
+            _player2.UnloadContent(content);
+        }
+
         /// <summary>
         /// Updates the game objects.
         /// </summary>

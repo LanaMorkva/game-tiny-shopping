@@ -16,8 +16,6 @@ namespace TinyShopping.Game {
         protected static readonly float _fontScale = 0.4f;
 
         protected SpriteFont _font;
-        protected SpriteFont _fontBig;
-        protected SpriteFont _fontGeneral;
 
         private Texture2D _appleTexture;
 
@@ -71,8 +69,6 @@ namespace TinyShopping.Game {
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
             _font = content.Load<SpriteFont>("fonts/General");
-            _fontBig = content.Load<SpriteFont>("fonts/General"); //FunBig
-            _fontGeneral = content.Load<SpriteFont>("fonts/General");
 
             _appleTexture = content.Load<Texture2D>("stats/apple");
             _circleTexture = content.Load<Texture2D>("stats/circle");
@@ -87,6 +83,21 @@ namespace TinyShopping.Game {
             _keyboardButtons = content.Load<Texture2D>("stats/numbers");
 
             _insectController.LoadContent(content);
+        }
+
+        public void UnloadContent(ContentManager content) {
+            content.UnloadAsset("fonts/General");
+            content.UnloadAsset("fonts/General");
+            content.UnloadAsset("stats/apple");
+            content.UnloadAsset("stats/circle");
+            content.UnloadAsset("stats/Ant_Icon");
+            content.UnloadAsset("stats/Termite_Icon");
+            content.UnloadAsset("stats/rounded_rectangle");
+            content.UnloadAsset("sounds/countdown_3_seconds");
+            content.UnloadAsset("sounds/final_whistle");
+            content.UnloadAsset("stats/controller");
+            content.UnloadAsset("stats/numbers");
+            _insectController.UnloadContent(content);
         }
 
         /// <summary>
@@ -245,9 +256,9 @@ namespace TinyShopping.Game {
             }
 
             var textPos = imagePos + new Vector2(0, textureSize.Y);
-            Vector2 origin = _fontGeneral.MeasureString(text) / 2;
-            batch.DrawString(_fontGeneral, text, textPos - new Vector2(3, 3), Color.Black, 0, origin, 1.0f, SpriteEffects.None, 0);
-            batch.DrawString(_fontGeneral, text, textPos, _textColor, 0, origin, 1.0f, SpriteEffects.None, 0);
+            Vector2 origin = _font.MeasureString(text) / 2;
+            batch.DrawString(_font, text, textPos - new Vector2(3, 3), Color.Black, 0, origin, 1.0f, SpriteEffects.None, 0);
+            batch.DrawString(_font, text, textPos, _textColor, 0, origin, 1.0f, SpriteEffects.None, 0);
         }
 
         protected void DrawReturnMessage(SpriteBatch batch) {
@@ -259,9 +270,9 @@ namespace TinyShopping.Game {
             }
             text += "to return to main menu";
 
-            Vector2 origin = _fontGeneral.MeasureString(text) / 2;
+            Vector2 origin = _font.MeasureString(text) / 2;
             var pos = new Vector2(_scene.Width / 2, _scene.Height - origin.Y - 10);
-            batch.DrawString(_fontGeneral, text, pos, _textColor, 0, origin, 0.4f, SpriteEffects.None, 0);
+            batch.DrawString(_font, text, pos, _textColor, 0, origin, 0.4f, SpriteEffects.None, 0);
         }
 
         /// <summary>
@@ -319,10 +330,10 @@ namespace TinyShopping.Game {
             batch.DrawString(_font, text, position, _textColor, 0, origin, scale, SpriteEffects.None, 0); // scale used to be 0.95f
         }
         private void DrawBoldString(SpriteBatch batch, String text, Vector2 position, float scale, float border = .005f) {
-            Vector2 origin = _fontBig.MeasureString(text) / 2;
+            Vector2 origin = _font.MeasureString(text) / 2;
 
-            batch.DrawString(_fontBig, text, position, Color.Black, 0, origin, scale + border, SpriteEffects.None, 0);
-            batch.DrawString(_fontBig, text, position, _textColor, 0, origin, scale, SpriteEffects.None, 0);
+            batch.DrawString(_font, text, position, Color.Black, 0, origin, scale + border, SpriteEffects.None, 0);
+            batch.DrawString(_font, text, position, _textColor, 0, origin, scale, SpriteEffects.None, 0);
         }
 
         protected void DrawOutlinedTexture(SpriteBatch batch, Texture2D texture, Rectangle rect, Color color, int border = 5, bool flipped = false) {

@@ -68,6 +68,14 @@ namespace TinyShopping.Game {
         public override void UnloadContent()
         {
             _world.UnloadContent(Content);
+            _insectHandler.UnloadContent(Content);
+            _pheromoneHandler.UnloadContent(Content);
+            _splitScreenHandler.UnloadContent(Content);
+            
+            _ui.UnloadContent(Content);
+            _sound.UnloadContent(Content);
+
+            _pauseMenu.UnloadContent(Content);
             base.UnloadContent();
         }
 

@@ -40,6 +40,11 @@ namespace TinyShopping.Game {
             _soundEffects.Add(contentManager.Load<SoundEffect>("sounds/glass_knock"));
         }
 
+        public void UnloadContent(ContentManager contentManager) {
+            contentManager.UnloadAsset("pheromone_particle");
+            contentManager.UnloadAsset("sounds/glass_knock");
+        }
+
         /// <summary>
         /// Adds a new pheromone.
         /// </summary>
