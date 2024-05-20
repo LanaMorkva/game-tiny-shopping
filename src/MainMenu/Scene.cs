@@ -70,6 +70,16 @@ namespace TinyShopping.MainMenu
             _supermarketNoiseInstance.Play();
         }
 
+        public override void UnloadContent() {
+            Content.UnloadAsset("main_menu/teaser");
+            Content.UnloadAsset("main_menu/game_title");
+            Content.UnloadAsset("fonts/General");
+            Content.UnloadAsset("songs/basic_supermarket");
+            Content.UnloadAsset("sounds/supermarket_atmosphere");
+            _selectMenu.UnloadContent(Content);
+            base.UnloadContent();
+        }
+
         public override void Update(GameTime gameTime)
         {
             _selectMenu.Update(gameTime);

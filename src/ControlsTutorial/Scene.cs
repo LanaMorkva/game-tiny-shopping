@@ -47,6 +47,14 @@ namespace TinyShopping.ControlsTutorial
             base.LoadContent();
         }
 
+        public override void UnloadContent()
+        {
+            Content.UnloadAsset("tutorial/controls_gamepad");
+            Content.UnloadAsset("tutorial/controls_keyboard");
+            _selectMenu.UnloadContent(Content);
+            base.UnloadContent();
+        }
+
         public override void Update(GameTime gameTime)
         {
             _selectMenu.Update(gameTime);

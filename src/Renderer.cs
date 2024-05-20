@@ -64,6 +64,8 @@ namespace TinyShopping {
         }
 
         public void ChangeScene(Scene newScene) {
+            _scene.UnloadContent();
+
             newScene.Initialize();
             newScene.LoadContent();
             _prevScene = _scene;
@@ -74,6 +76,7 @@ namespace TinyShopping {
             if (_prevScene != null) {
                 _scene.UnloadContent();
                 _scene = _prevScene;
+                _scene.LoadContent();
                 _prevScene = null;
             }
         }

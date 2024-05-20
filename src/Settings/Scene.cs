@@ -29,7 +29,7 @@ namespace TinyShopping.SettingsMenu {
             int menuPosY = (int)(Height / 10);
             int menuW = (int)(Width / 2.3);
             var menuRegion = new Rectangle(menuW / 10, menuPosY, menuW, Height - menuPosY);
-            var menuItemSize = new Vector2((int)(Width / 3), Height / 12);
+            var menuItemSize = new Vector2((int)(Width / 2.2), Height / 10);
 
             _titleLocation = new Vector2(menuW / 8, (int)(menuPosY / 3));
 
@@ -57,6 +57,14 @@ namespace TinyShopping.SettingsMenu {
             base.LoadContent();
         }
 
+        public override void UnloadContent()
+        {
+            Content.UnloadAsset("main_menu/teaser");
+            Content.UnloadAsset("fonts/General");
+            _selectMenu.UnloadContent(Content);
+            base.UnloadContent();
+        }
+
         public override void Update(GameTime gameTime) {
             _selectMenu.Update(gameTime);
             base.Update(gameTime);
@@ -75,10 +83,6 @@ namespace TinyShopping.SettingsMenu {
 
             SpriteBatch.End();
             base.Draw(gameTime);
-        }
-
-        public void NotImplementedScene() {
-            // empty
         }
 
         public void ChangeMusicSettings() {
