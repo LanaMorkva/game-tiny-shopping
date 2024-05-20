@@ -23,12 +23,7 @@ namespace TinyShopping.Game {
         public SoundController(Scene scene) {
             _scene = scene;
             MediaPlayer.IsRepeating = true;
-
             MediaPlayer.Stop();
-            if (_scene.SettingsHandler.settings.music) {
-                MediaPlayer.Volume = 0.5f;
-            }
-
         }
 
         /// <summary>

@@ -63,9 +63,6 @@ namespace TinyShopping.MainMenu
             _backgroundSong = Content.Load<Song>("songs/basic_supermarket");
             SoundEffect supermarketNoise = Content.Load<SoundEffect>("sounds/supermarket_atmosphere");
             base.LoadContent();
-            if (SettingsHandler.settings.music) {
-                MediaPlayer.Volume = 0.2f;
-            }
             MediaPlayer.Play(_backgroundSong);
             MediaPlayer.IsRepeating = true;
             _supermarketNoiseInstance = supermarketNoise.CreateInstance();

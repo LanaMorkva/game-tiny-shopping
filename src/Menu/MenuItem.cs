@@ -55,5 +55,11 @@ namespace TinyShopping {
         public virtual void ApplyAction() {
             _selectAction();
         }
+        public virtual void ApplyActionLeft() {
+            //_selectAction();
+        }
+        public virtual void ApplyActionRight() {
+            //_selectAction();
+        }
     }
 }
