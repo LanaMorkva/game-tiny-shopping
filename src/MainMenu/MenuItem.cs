@@ -7,14 +7,7 @@ namespace TinyShopping.MainMenu {
 
     internal class MainMenuItem: MenuItem {
 
-        protected Texture2D _roundRectTexture;
-
         public MainMenuItem(string name, Action nextScene): base(name, nextScene) {
-        }
-
-        public override void LoadContent(ContentManager content) {
-            base.LoadContent(content);
-            _roundRectTexture = content.Load<Texture2D>("main_menu/rounded_rect");
         }
 
         public override void Draw(SpriteBatch batch, Rectangle itemRect) {
