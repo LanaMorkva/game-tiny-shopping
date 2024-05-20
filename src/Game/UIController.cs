@@ -38,6 +38,7 @@ namespace TinyShopping.Game {
         private List<SoundEffect> _soundEffects;
 
         protected Scene _scene;
+        protected World _world;
 
         private double _runtimeMs;
 
@@ -53,10 +54,11 @@ namespace TinyShopping.Game {
 
         protected UIInsectController _insectController;
 
-        public UIController(GraphicsDevice device, SplitScreenHandler handler, Scene scene) {
+        public UIController(GraphicsDevice device, SplitScreenHandler handler, Scene scene, World world) {
             _handler = handler;
             _runtimeMs = 0;
             _scene = scene;
+            _world = world;
             _soundEffects = new List<SoundEffect>();
             _playerOne = CreateMenuInput(PlayerIndex.One);
             _insectController = new UIInsectController(handler);
@@ -96,8 +98,26 @@ namespace TinyShopping.Game {
                 if (_countdownMs == 0) {
                     _soundEffects[0].Play();
                 }
+
                 _countdownMs += gameTime.ElapsedGameTime.TotalMilliseconds;
-                if (_countdownMs >= 4000) {
+                
+                if (_countdownMs >= 3000) {
+                    float lerp = Math.Clamp((float)(_countdownMs - 3000) / 1000f, 0, 1);
+                    Vector2 start = _world.GetWorldBoundary().Center.ToVector2();
+                    Vector2 end_player1 = _world.GetSpawnPositions()[0];
+                    Vector2 end_player2 = _world.GetSpawnPositions()[1];
+                    Vector2 tangent1 = new Vector2(2.8f, 0f);
+                    Vector2 tangent2 = new Vector2(3.86f, 0.2f);
+                    _handler.Camera1.LookAt(Vector2.Hermite(start, tangent1, end_player1, tangent2, lerp));
+                    _handler.Camera2.LookAt(Vector2.Hermite(start, tangent1, end_player2, tangent2, lerp));
+                }
+
+                float lerpVal = (float)_countdownMs / Constants.TIME_COUNTDOWN_MS;
+                float currentZoom = MathHelper.Hermite(0.5f, 0.3f, 2f, 4.8f, lerpVal);
+                _handler.Camera1.SetZoom(currentZoom);
+                _handler.Camera2.SetZoom(currentZoom);
+
+                if (_countdownMs >= Constants.TIME_COUNTDOWN_MS) {
                     _countdownMs = 0.0;
                     _scene.gameState = GameState.Playing;
                 }
@@ -152,16 +172,17 @@ namespace TinyShopping.Game {
         /// <param name="batch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime, Vector2 player1_pos, Vector2 player2_pos, bool player1_keyboard, bool player2_keyboard) {
-            DrawBorder(batch);
-            DrawStatistics(batch);
-            DrawRemainingTime(batch);
-            _insectController.Draw(batch, gameTime);
             if (_runtimeMs > 10000) {
                 DrawControls(batch);
             } 
+            
+            DrawBorder(batch);
             if (_scene.gameState == GameState.StartCountdown) {
                 DrawCountdown(batch);
             } else if (_scene.gameState == GameState.Playing) {
+                DrawStatistics(batch);
+                DrawRemainingTime(batch);
+                _insectController.Draw(batch, gameTime);
                 if (_runtimeMs < 10000) {
                     var buttonColor = new Color(122, 119, 110, 200);
                     DrawCursorExplanations(batch, player1_pos, buttonColor, PlayerIndex.One, true, player1_keyboard);
@@ -281,8 +302,8 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="batch">The sprite batch to write to.</param>
         private void DrawCountdown(SpriteBatch batch) {
-            int secs = 3 - (int) (_countdownMs / 1000);
-            string secStr = "" + secs;
+            int secs = (int)(Constants.TIME_COUNTDOWN_MS / 1000f - _countdownMs / 1000f);
+            string secStr = secs.ToString();
             if (secs == 0) {
                 secStr = "Go!";
             }

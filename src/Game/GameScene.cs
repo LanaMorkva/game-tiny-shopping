@@ -27,7 +27,7 @@ namespace TinyShopping.Game {
             _pheromoneHandler = new PheromoneHandler(_world);
             _insectHandler = new InsectHandler(_world, _pheromoneHandler, _world.FruitHandler);
             _splitScreenHandler = new SplitScreenHandler(this, _world, _insectHandler, _pheromoneHandler);
-            _ui = new UIController(GraphicsDevice, _splitScreenHandler, this);
+            _ui = new UIController(GraphicsDevice, _splitScreenHandler, this, _world);
             _sound = new SoundController(this);
 
             var menuRegion = new Rectangle(0, 0, Width, Height);

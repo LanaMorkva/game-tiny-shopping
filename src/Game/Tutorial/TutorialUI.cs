@@ -16,7 +16,7 @@ namespace TinyShopping.Game {
         double _tutorialPhaseStartedS = 0;
 
         public TutorialUIController(GraphicsDevice device, SplitScreenHandler handler, Scene scene): 
-        base(device, handler, scene) {
+        base(device, handler, scene, null) {
             _handler = handler;
             _scene = scene;
             _playerOne = CreateMenuInput(PlayerIndex.One);
