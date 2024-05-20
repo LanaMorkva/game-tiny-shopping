@@ -33,7 +33,7 @@ namespace TinyShopping.SettingsMenu
             int menuPosY = (int)(Height / 10);
             int menuW = (int)(Width / 2.3);
             var menuRegion = new Rectangle(menuW / 10, menuPosY, menuW, Height - menuPosY);
-            var menuItemSize = new Vector2((int)(Width / 3), Height / 12);
+            var menuItemSize = new Vector2((int)(Width / 2.2), Height / 10);
 
             _titleLocation = new Vector2(menuW / 8, (int)(menuPosY / 3));
 
