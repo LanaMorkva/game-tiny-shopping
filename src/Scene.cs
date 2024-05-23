@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 
 namespace TinyShopping {
 
@@ -58,11 +57,11 @@ namespace TinyShopping {
         }
 
         public virtual void UnloadContent() {
-
+            SettingsHandler.SoundPlayer.RemoveCurrent();
         }
 
         public virtual void Terminate() {
-            MediaPlayer.Stop();
+            //MediaPlayer.Stop();
         }
 
         public virtual void Update(GameTime gameTime) {

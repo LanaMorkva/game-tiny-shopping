@@ -76,6 +76,7 @@ namespace TinyShopping.Game {
             _termiteCharachterTexture = content.Load<Texture2D>("stats/Termite_Icon");
             _roundRectTexture = content.Load<Texture2D>("stats/rounded_rectangle");
 
+            _soundEffects.Clear();
             _soundEffects.Add(content.Load<SoundEffect>("sounds/countdown_3_seconds"));
             _soundEffects.Add(content.Load<SoundEffect>("sounds/final_whistle"));
 
@@ -107,7 +108,7 @@ namespace TinyShopping.Game {
         public virtual void Update(GameTime gameTime) {
             if (_scene.gameState == GameState.StartCountdown) {
                 if (_countdownMs == 0) {
-                    _soundEffects[0].Play();
+                    _scene.SettingsHandler.SoundPlayer.playSoundEffect(_soundEffects[0], 1);
                 }
 
                 _countdownMs += gameTime.ElapsedGameTime.TotalMilliseconds;
@@ -155,7 +156,7 @@ namespace TinyShopping.Game {
 
                 // Play end of game sound
                 if (_scene.gameState == GameState.Ended) {
-                    _soundEffects[1].Play();
+                    _scene.SettingsHandler.SoundPlayer.playSoundEffect(_soundEffects[1], 1);
                 }
 
             } else if (_scene.gameState == GameState.Ended) {

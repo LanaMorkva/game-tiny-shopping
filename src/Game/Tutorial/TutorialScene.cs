@@ -61,21 +61,21 @@ namespace TinyShopping.Game {
         public TutorialScene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
             base(content, graphics, manager, game, settingsHandler) {
             _world = new World("map_isometric/map-tutorial");
-            _pheromoneHandler = new PheromoneHandler(_world);
-            _insectHandler = new InsectHandler(_world, _pheromoneHandler, _world.FruitHandler);
+            _pheromoneHandler = new PheromoneHandler(_world, SettingsHandler.SoundPlayer);
+            _insectHandler = new InsectHandler(_world, _pheromoneHandler, _world.FruitHandler, SettingsHandler.SoundPlayer);
             _splitScreenHandler = new SplitScreenHandler(this, _world, _insectHandler, _pheromoneHandler);
             _ui = new TutorialUIController(GraphicsDevice, _splitScreenHandler, this);
             _sound = new SoundController(this);
 
             var menuItemSize = new Vector2((int)(Width / 3), Height / 12);
             Rectangle explanationRegion = new Rectangle(50, Height - 100, 300, 100);
-            _pauseMenu = new SelectMenu(new Rectangle(0, 0, Width, Height), menuItemSize, ResumeGame, explanationRegion);
+            _pauseMenu = new SelectMenu(new Rectangle(0, 0, Width, Height), menuItemSize, ResumeGame, explanationRegion, this.SettingsHandler.SoundPlayer);
 
 
             menuItemSize = new Vector2((int)(Width / 7), Height / 15);
             var tutorialMenuRect = new Rectangle((int)(Width / 2.5), (int)(Height / 2.5), Width, Height);
             
-            _tutorialMenu = new TutorialMenu(tutorialMenuRect, Vector2.Zero, menuItemSize, LoadMainMenu, explanationRegion);
+            _tutorialMenu = new TutorialMenu(tutorialMenuRect, Vector2.Zero, menuItemSize, LoadMainMenu, explanationRegion, this.SettingsHandler.SoundPlayer);
         }
 
         public override void Initialize() {

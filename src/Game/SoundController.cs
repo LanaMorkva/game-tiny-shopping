@@ -1,16 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Media;
-using System;
+using Microsoft.Xna.Framework.Audio;
 
 namespace TinyShopping.Game {
 
     internal class SoundController {
 
-        private Song _regularSong;
-        private Song _regularSongFast;
-        private Song _battleSong;
-        private Song _battleSongFast;
+        private SoundEffectInstance _regularSong;
+        private SoundEffectInstance _regularSongFast;
+        //private Song _battleSong;
+        //private Song _battleSongFast;
 
         private Scene _scene;
 
@@ -22,8 +21,6 @@ namespace TinyShopping.Game {
 
         public SoundController(Scene scene) {
             _scene = scene;
-            MediaPlayer.IsRepeating = true;
-            MediaPlayer.Stop();
         }
 
         /// <summary>
@@ -32,10 +29,14 @@ namespace TinyShopping.Game {
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
             _input = new KeyboardInput(PlayerIndex.One, content);
-            _regularSong = content.Load<Song>("songs/basic_without_intro");
-            _regularSongFast = content.Load<Song>("songs/basic_fast");
-            _battleSong = content.Load<Song>("songs/drama");
-            _battleSongFast = content.Load<Song>("songs/drama_fast");
+            _regularSong = content.Load<SoundEffect>("songs/basic_without_intro").CreateInstance();
+            _regularSongFast = content.Load<SoundEffect>("songs/basic_fast").CreateInstance();
+            _regularSong.IsLooped = true;
+            _regularSong.IsLooped = true;
+            //_regularSong = _regularSong.CreateInstance();
+            //_regularSong = _regularSongFast.CreateInstance();
+            //_battleSong = content.Load<Song>("songs/drama");
+            //_battleSongFast = content.Load<Song>("songs/drama_fast");
         }
 
         public void UnloadContent(ContentManager content) {
@@ -52,24 +53,27 @@ namespace TinyShopping.Game {
         /// <param name="controller">The UI controller of the game</param>
         public void Update(GameTime gameTime, UIController controller) {
             if (_scene.gameState == GameState.Playing && !_isPlaying && _scene.SettingsHandler.settings.music) {
-                MediaPlayer.Play(_regularSong);
+                _scene.SettingsHandler.SoundPlayer.playSong(_regularSong, 0.6f);
                 _isPlaying = true;
             }
 
             if (_scene.gameState == GameState.Playing && !_finalMinuteStarted && controller.GetRemainingTime() <= 60 && _scene.SettingsHandler.settings.music) {
                 _finalMinuteStarted = true;
-                TimeSpan songPosition = MediaPlayer.PlayPosition * (10f/12f);
-                if ((int) songPosition.TotalSeconds >= (int) _regularSongFast.Duration.TotalSeconds) {
-                    songPosition = TimeSpan.Zero;
-                }
-                MediaPlayer.Play(_regularSongFast, songPosition);
+                //TimeSpan songPosition = MediaPlayer.PlayPosition * (10f/12f);
+                //_regularSong.State.
+                //if ((int) songPosition.TotalSeconds >= (int) _regularSongFast.Duration.TotalSeconds) {
+                    //songPosition = TimeSpan.Zero;
+                //}
+                _regularSong.Stop();
+                _scene.SettingsHandler.SoundPlayer.playSong(_regularSongFast, 0.6f);
             }
 
             // TODO: Swap song if battle is currently playing
             // Need a function to get if any ants are in battle
 
             if (_scene.gameState == GameState.Ended) {
-                MediaPlayer.Stop();
+                _regularSongFast.Stop();
+                _regularSong.Stop();
             }
 
         }
