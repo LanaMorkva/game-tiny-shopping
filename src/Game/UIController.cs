@@ -76,6 +76,7 @@ namespace TinyShopping.Game {
             _termiteCharachterTexture = content.Load<Texture2D>("stats/Termite_Icon");
             _roundRectTexture = content.Load<Texture2D>("stats/rounded_rectangle");
 
+            _soundEffects.Clear();
             _soundEffects.Add(content.Load<SoundEffect>("sounds/countdown_3_seconds"));
             _soundEffects.Add(content.Load<SoundEffect>("sounds/final_whistle"));
 

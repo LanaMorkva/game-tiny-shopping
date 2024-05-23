@@ -103,6 +103,7 @@ namespace TinyShopping {
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
             _font = content.Load<SpriteFont>("fonts/General");
+            _soundEffects.Clear();
             _soundEffects.Add(content.Load<SoundEffect>("sounds/beep-deep"));
             _soundEffects.Add(content.Load<SoundEffect>("sounds/cash_register"));
             _soundEffects.Add(content.Load<SoundEffect>("sounds/beep-extra-deep"));

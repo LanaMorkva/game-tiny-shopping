@@ -87,6 +87,7 @@ namespace TinyShopping.Game {
         public void LoadContent(ContentManager content) {
             var texturePath = _type == ColonyType.ANT ? "ants/ant_texture" : "termites/termite_texture";
             _texture = content.Load<Texture2D>(texturePath);
+            _soundEffects.Clear();
             _soundEffects.Add(content.Load<SoundEffect>("sounds/cash_register"));
             _soundEffects.Add(content.Load<SoundEffect>("sounds/insect_dying"));
         }
