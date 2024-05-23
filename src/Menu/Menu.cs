@@ -60,19 +60,22 @@ namespace TinyShopping {
 
         protected List<MenuExplanation> _explanations;
 
-        public SelectMenu(Rectangle menuRegion, Vector2 itemSize, Action backAction, Rectangle explanationRegion) : this(menuRegion, new Vector2(0, 0), itemSize, backAction, explanationRegion, CreateDefaultExplanations()) {
+        protected SoundPlayer _soundPlayer;
+
+        public SelectMenu(Rectangle menuRegion, Vector2 itemSize, Action backAction, Rectangle explanationRegion, SoundPlayer soundPlayer) : this(menuRegion, new Vector2(0, 0), itemSize, backAction, explanationRegion, CreateDefaultExplanations(), soundPlayer) {
         }
 
-        public SelectMenu(Rectangle menuRegion, Vector2 itemSize, Action backAction, Rectangle explanationRegion, List<MenuExplanation> explanations) : this(menuRegion, new Vector2(0, 0), itemSize, backAction, explanationRegion, explanations) {
+        public SelectMenu(Rectangle menuRegion, Vector2 itemSize, Action backAction, Rectangle explanationRegion, List<MenuExplanation> explanations, SoundPlayer soundPlayer) : this(menuRegion, new Vector2(0, 0), itemSize, backAction, explanationRegion, explanations, soundPlayer) {
         }
 
-        public SelectMenu(Rectangle menuRegion, Vector2 centerOffset, Vector2 itemSize, Action backAction, Rectangle explanationRegion) : this(menuRegion, centerOffset, itemSize, backAction, explanationRegion, CreateDefaultExplanations()) {
+        public SelectMenu(Rectangle menuRegion, Vector2 centerOffset, Vector2 itemSize, Action backAction, Rectangle explanationRegion, SoundPlayer soundPlayer) : this(menuRegion, centerOffset, itemSize, backAction, explanationRegion, CreateDefaultExplanations(), soundPlayer) {
         }
 
-        public SelectMenu(Rectangle menuRegion, Vector2 centerOffset, Vector2 itemSize, Action backAction, Rectangle explanationRegion, List<MenuExplanation> explanations) {
+        public SelectMenu(Rectangle menuRegion, Vector2 centerOffset, Vector2 itemSize, Action backAction, Rectangle explanationRegion, List<MenuExplanation> explanations, SoundPlayer soundPlayer) {
             _menuRegion = menuRegion;
             _centerOffset = centerOffset;
             _itemSize = itemSize;
+            _soundPlayer = soundPlayer;
 
             _currentSelection = 0;
             _soundEffects = new List<SoundEffect>();
@@ -120,7 +123,6 @@ namespace TinyShopping {
             if (_menuInput.IsNextPressed()) {
                 _nextPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
                 if (_lastNext < _nextPressed) {
-                    _soundEffects[2].Play();
                     nextItem();
                     if (_lastNext == 0) {
                         _lastNext += 500;
@@ -129,14 +131,12 @@ namespace TinyShopping {
                     }
                 }
             } else if (_nextPressed > 0) {
-                //nextItem();
                 _lastNext = 0;
                 _nextPressed = 0;
             }
             if (_menuInput.IsPreviousPressed()) {
                 _previousPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
                 if (_lastPrevious < _previousPressed) {
-                    _soundEffects[2].Play();
                     previousItem();
                     if (_lastPrevious == 0) {
                         _lastPrevious += 500;
@@ -145,7 +145,6 @@ namespace TinyShopping {
                     }
                 }
             } else if (_previousPressed > 0) {
-                //previousItem();
                 _lastPrevious = 0;
                 _previousPressed = 0;
             }
@@ -153,13 +152,13 @@ namespace TinyShopping {
                 _submitPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
             } else if (_submitPressed > 0) {
                 _submitPressed = 0;
-                _soundEffects[2].Play();
+                _soundPlayer.playSoundEffect(_soundEffects[2], 1);
                 _menuItems[_currentSelection].ApplyAction();
             }
             if (_menuInput.IsLeftPressed()) {
                 _leftPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
                 if (_lastLeft < _leftPressed) {
-                    _soundEffects[2].Play();
+                    _soundPlayer.playSoundEffect(_soundEffects[2], 1);
                     _menuItems[_currentSelection].ApplyActionLeft();
                     if (_lastLeft == 0) {
                         _lastLeft += 500;
@@ -170,13 +169,12 @@ namespace TinyShopping {
             } else if (_leftPressed > 0) {
                 _leftPressed = 0;
                 _lastLeft = 0;
-                //_soundEffects[2].Play();
             }
             if (_menuInput.IsRightPressed()) {
                 _rightPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
                 if (_lastRight < _rightPressed) {
                     _menuItems[_currentSelection].ApplyActionRight();
-                    _soundEffects[2].Play();
+                    _soundPlayer.playSoundEffect(_soundEffects[2], 1);
                     if (_lastRight == 0) {
                         _lastRight += 500;
                     } else {
@@ -186,14 +184,12 @@ namespace TinyShopping {
             } else if (_rightPressed > 0) {
                 _rightPressed = 0;
                 _lastRight = 0;
-                //_soundEffects[2].Play();
-                //_menuItems[_currentSelection].ApplyActionRight();
             }
             if (_menuInput.IsBackPressed()) {
                 _backPressed += (int)Math.Floor(gameTime.ElapsedGameTime.TotalMilliseconds);
             } else if (_backPressed > 0) {
                 _backPressed = 0;
-                _soundEffects[2].Play();
+                _soundPlayer.playSoundEffect(_soundEffects[2], 1);
                 _backAction();
             }
 
@@ -205,13 +201,13 @@ namespace TinyShopping {
             if (_currentSelection < 0) {
                 _currentSelection = _menuItems.Count - 1;
             }
-            _soundEffects[0].Play();
+            _soundPlayer.playSoundEffect(_soundEffects[0], 1);
         }
 
         private void nextItem() {
             _currentSelection += 1;
             _currentSelection %= _menuItems.Count;
-            _soundEffects[0].Play();
+            _soundPlayer.playSoundEffect(_soundEffects[0], 1);
         }
 
         private void setActiveItem() {

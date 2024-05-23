@@ -11,11 +11,14 @@ namespace TinyShopping {
 
         private SettingsHandler _settingsHandler;
 
+        private SoundPlayer _soundPlayer;
+
         public Renderer() {
             _graphics = new GraphicsDeviceManager(this); 
             Content.RootDirectory = "Content";
             IsMouseVisible = false;
-            _settingsHandler = new SettingsHandler();
+            _soundPlayer = new SoundPlayer(100, 100);
+            _settingsHandler = new SettingsHandler(_soundPlayer);
         }
 
         protected override void Initialize() {

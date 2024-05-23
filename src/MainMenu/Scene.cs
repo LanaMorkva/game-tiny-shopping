@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended;
 
 namespace TinyShopping.MainMenu
@@ -24,7 +23,7 @@ namespace TinyShopping.MainMenu
 
         private SpriteFont _font;
 
-        private Song _backgroundSong;
+        private SoundEffectInstance _backgroundSong;
         private SoundEffectInstance _supermarketNoiseInstance;
 
         private Color _backColor = new Color(211, 237, 150);
@@ -47,7 +46,7 @@ namespace TinyShopping.MainMenu
             Vector2 centerOffset = new Vector2(0, -(menuRegion.Y / 3));
             
             Rectangle explanationRegion = new Rectangle(50, Height - 150, 300, 100);
-            _selectMenu = new MainSelectMenu(menuRegion, centerOffset, menuItemSize, explanationRegion);
+            _selectMenu = new MainSelectMenu(menuRegion, centerOffset, menuItemSize, explanationRegion, this.SettingsHandler.SoundPlayer);
             _selectMenu.AddItem(new MainMenuItem("New Game", StartGame));
             _selectMenu.AddItem(new MainMenuItem("Tutorial", StartTutorial));
             _selectMenu.AddItem(new MainMenuItem("Controls", ControlsTutorial));
@@ -55,7 +54,7 @@ namespace TinyShopping.MainMenu
             _selectMenu.AddItem(new MainMenuItem("Quit", ExitGame));
 
             menuRegion = new Rectangle(0, Height/4, Width, Height);
-            _firstTimeTutorialMenu = new SelectMenu(menuRegion, menuItemSize, MainSelectMenu.NoAction, explanationRegion);
+            _firstTimeTutorialMenu = new SelectMenu(menuRegion, menuItemSize, MainSelectMenu.NoAction, explanationRegion, this.SettingsHandler.SoundPlayer);
             _firstTimeTutorialMenu.AddItem(new MainMenuItem("Yes", AcceptTutorialPrompt));
             _firstTimeTutorialMenu.AddItem(new MainMenuItem("No", DeclineTutorialPrompt));
 
@@ -69,15 +68,15 @@ namespace TinyShopping.MainMenu
             _font = Content.Load<SpriteFont>("fonts/General");
             _selectMenu.LoadContent(Content);
             _firstTimeTutorialMenu.LoadContent(Content);
-            _backgroundSong = Content.Load<Song>("songs/basic_supermarket");
-            SoundEffect supermarketNoise = Content.Load<SoundEffect>("sounds/supermarket_atmosphere");
+            _backgroundSong = Content.Load<SoundEffect>("songs/basic_supermarket").CreateInstance();
             _tutorialPropmtTexture = Content.Load<Texture2D>("tutorial/tutorial_prompt");
             base.LoadContent();
-            MediaPlayer.Play(_backgroundSong);
-            MediaPlayer.IsRepeating = true;
-            _supermarketNoiseInstance = supermarketNoise.CreateInstance();
+            _backgroundSong.IsLooped = true;
+            SettingsHandler.SoundPlayer.playSong(_backgroundSong, 1f);
+            
+            _supermarketNoiseInstance = Content.Load<SoundEffect>("sounds/supermarket_atmosphere").CreateInstance();
             _supermarketNoiseInstance.IsLooped = true;
-            _supermarketNoiseInstance.Play();
+            SettingsHandler.SoundPlayer.playSong(_supermarketNoiseInstance, 1f);
         }
 
         public override void UnloadContent() {

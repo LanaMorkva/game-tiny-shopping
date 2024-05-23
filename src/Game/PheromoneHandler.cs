@@ -20,15 +20,18 @@ namespace TinyShopping.Game {
 
         private List<SoundEffect> _soundEffects;
 
+        private SoundPlayer _soundPlayer;
+
         /// <summary>
         /// Creates a new pheromone handler for two players.
         /// </summary>
         /// <param name="world">The world to exist in.</param>
-        public PheromoneHandler(World world) {
+        public PheromoneHandler(World world, SoundPlayer soundPlayer) {
             _world = world;
             _pheromones = new List<Pheromone>[] { new (), new () };
             _returnPheromones = new List<Pheromone>[] { new(), new() };
             _soundEffects = new List<SoundEffect>();
+            _soundPlayer = soundPlayer;
         }
 
         /// <summary>
@@ -77,7 +80,7 @@ namespace TinyShopping.Game {
                 _pheromones[player].Add(p);
             }
             if (isPlayer) {
-                _soundEffects[0].Play();
+                _soundPlayer.playSoundEffect(_soundEffects[0], 1f);
             }
         }
 

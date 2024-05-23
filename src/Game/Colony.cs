@@ -117,7 +117,7 @@ namespace TinyShopping.Game {
                     insect.Update(gameTime);
                     remaining.Add(insect);
                 } else {
-                    _soundEffects[1].Play();
+                    _insectHandler._soundPlayer.playSoundEffect(_soundEffects[1], 1f);
                 }
             }
             Insects = remaining;
@@ -162,7 +162,7 @@ namespace TinyShopping.Game {
         /// </summary>
         public void IncreaseFruitCount() {
             _collectedFruit += 1;
-            _soundEffects[0].Play();
+            _insectHandler._soundPlayer.playSoundEffect(_soundEffects[0], 1f);
         }
 
         /// <summary>

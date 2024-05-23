@@ -191,31 +191,31 @@
 
 #begin songs/basic_fast.wav
 /importer:WavImporter
-/processor:SongProcessor
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:songs/basic_fast.wav
 
 #begin songs/basic_supermarket.wav
 /importer:WavImporter
-/processor:SongProcessor
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:songs/basic_supermarket.wav
 
 #begin songs/basic_without_intro.wav
 /importer:WavImporter
-/processor:SongProcessor
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:songs/basic_without_intro.wav
 
 #begin songs/drama_fast.wav
 /importer:WavImporter
-/processor:SongProcessor
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:songs/drama_fast.wav
 
 #begin songs/drama.wav
 /importer:WavImporter
-/processor:SongProcessor
+/processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:songs/drama.wav
 
@@ -465,6 +465,18 @@
 /processorParam:TextureFormat=Color
 /build:tutorial/camera.png
 
+#begin tutorial/collect_food.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:tutorial/collect_food.png
+
 #begin tutorial/controls_gamepad.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -489,7 +501,7 @@
 /processorParam:TextureFormat=Color
 /build:tutorial/controls_keyboard.png
 
-#begin tutorial/game_intro.png
+#begin tutorial/exchange_food_done.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -499,43 +511,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:tutorial/game_intro.png
-
-#begin ui/cursor.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:ui/cursor.png
-
-#begin tutorial/pheromones_intro.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:tutorial/pheromones_intro.png
-
-#begin tutorial/collect_food.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:tutorial/collect_food.png
+/build:tutorial/exchange_food_done.png
 
 #begin tutorial/exchange_food.png
 /importer:TextureImporter
@@ -549,7 +525,7 @@
 /processorParam:TextureFormat=Color
 /build:tutorial/exchange_food.png
 
-#begin tutorial/exchange_food_done.png
+#begin tutorial/final_message.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -559,7 +535,19 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:tutorial/exchange_food_done.png
+/build:tutorial/final_message.png
+
+#begin tutorial/game_intro.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:tutorial/game_intro.png
 
 #begin tutorial/goal.png
 /importer:TextureImporter
@@ -573,7 +561,7 @@
 /processorParam:TextureFormat=Color
 /build:tutorial/goal.png
 
-#begin tutorial/final_message.png
+#begin tutorial/pheromones_intro.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -583,7 +571,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:tutorial/final_message.png
+/build:tutorial/pheromones_intro.png
 
 #begin tutorial/tutorial_prompt.png
 /importer:TextureImporter
@@ -596,3 +584,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:tutorial/tutorial_prompt.png
+
+#begin ui/cursor.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ui/cursor.png
+

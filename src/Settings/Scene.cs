@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
@@ -17,6 +18,9 @@ namespace TinyShopping.SettingsMenu {
 
         private Rectangle _imageRegion;
         private Rectangle _titleRegion;
+
+        private SoundEffectInstance _backgroundSong;
+        private SoundEffectInstance _supermarketNoiseInstance;
 
         private Color _backColor = new Color(211, 237, 150);
 
@@ -42,10 +46,11 @@ namespace TinyShopping.SettingsMenu {
                 new("<A>", "Change Setting", Color.Green),
                 new("<B>", "Back", Color.Red)
             };
-            _selectMenu = new SelectMenu(menuRegion, menuItemSize, GoBack, explanationRegion, explanations);
+            _selectMenu = new SelectMenu(menuRegion, menuItemSize, GoBack, explanationRegion, explanations, this.SettingsHandler.SoundPlayer);
             _selectMenu.AddItem(new MenuItemBool("Music", ChangeMusicSettings, SettingsHandler.settings.music));
             _selectMenu.AddItem(new MenuItemInt("Music Volume", DecreaseMusicVolumeSettings, IncreaseMusicVolumeSettings, SettingsHandler.settings.musicVolume, 0, 100));
             _selectMenu.AddItem(new MenuItemBool("Sound Effects", ChangeSoundEffectsSettings, SettingsHandler.settings.soundEffects));
+            _selectMenu.AddItem(new MenuItemInt("Effects Volume", DecreaseEffectsVolumeSettings, IncreaseEffectsVolumeSettings, SettingsHandler.settings.effectsVolume, 0, 100));
             _selectMenu.AddItem(new MenuItemBool("Fullscreen", ChangeFullScreenSettings, SettingsHandler.settings.fullScreen));
             base.Initialize();
         }
@@ -53,7 +58,14 @@ namespace TinyShopping.SettingsMenu {
         public override void LoadContent() {
             _imageTexture = Content.Load<Texture2D>("main_menu/teaser");
             _font = Content.Load<SpriteFont>("fonts/General");
+            _backgroundSong = Content.Load<SoundEffect>("songs/basic_supermarket").CreateInstance();
+            _supermarketNoiseInstance = Content.Load<SoundEffect>("sounds/supermarket_atmosphere").CreateInstance();
             _selectMenu.LoadContent(Content);
+
+            _supermarketNoiseInstance.IsLooped = true;
+            _backgroundSong.IsLooped = true;
+            SettingsHandler.SoundPlayer.playSong(_backgroundSong, 1f);
+            SettingsHandler.SoundPlayer.playSong(_supermarketNoiseInstance, 1f);
             base.LoadContent();
         }
 
@@ -103,6 +115,14 @@ namespace TinyShopping.SettingsMenu {
 
         public void DecreaseMusicVolumeSettings() {
             SettingsHandler.ChangeMusicVolumeSettings(SettingsHandler.GetMusicVolume() - 1);
+        }
+
+        public void DecreaseEffectsVolumeSettings() {
+            SettingsHandler.ChangeEffectsVolumeSettings(SettingsHandler.GetEffectsVolume() - 1);
+        }
+
+        public void IncreaseEffectsVolumeSettings() {
+            SettingsHandler.ChangeEffectsVolumeSettings(SettingsHandler.GetEffectsVolume() + 1);
         }
     }
 }
