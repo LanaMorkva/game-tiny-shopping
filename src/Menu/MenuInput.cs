@@ -20,6 +20,7 @@ namespace TinyShopping {
     
         public abstract bool IsLeftPressed();
         public abstract bool IsRightPressed();
+        public abstract bool IsHideUIPressed();
     }
 
     internal class GamePadMenuInput : MenuInput {
@@ -74,6 +75,12 @@ namespace TinyShopping {
         {
             GamePadState cState = GamePad.GetState(_playerIndex);
             return cState.IsButtonDown(_rightButton);
+        }
+
+        public override bool IsHideUIPressed()
+        {
+            //debug feature, not available for gamepad
+            return false; 
         }
 
     }
@@ -139,6 +146,12 @@ namespace TinyShopping {
         private bool IsButtonPressed(Keys key) {
             KeyboardState kState = Keyboard.GetState();
             return kState.IsKeyDown(key);
+        }
+
+        public override bool IsHideUIPressed()
+        {
+            KeyboardState kState = Keyboard.GetState();
+            return kState.IsKeyDown(Keys.F1);
         }
     }
 }

@@ -51,6 +51,7 @@ namespace TinyShopping.Game {
         protected bool _selectPressed;
 
         protected UIInsectController _insectController;
+        private bool _hideUI = false;
 
         public UIController(GraphicsDevice device, SplitScreenHandler handler, Scene scene, World world) {
             _handler = handler;
@@ -135,6 +136,9 @@ namespace TinyShopping.Game {
                 }
             } else if (_scene.gameState == GameState.Playing) {
                 _runtimeMs += gameTime.ElapsedGameTime.TotalMilliseconds;
+                if (_playerOne.IsHideUIPressed()) {
+                    _hideUI = !_hideUI;
+                }
 
                 if (_runtimeMs > Constants.TIME_LIMIT_S * 1000) {
                     _scene.gameState = GameState.Ended;
@@ -184,22 +188,22 @@ namespace TinyShopping.Game {
         /// <param name="batch">The sprite batch to draw to.</param>
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime, Vector2 player1_pos, Vector2 player2_pos, bool player1_keyboard, bool player2_keyboard) {
-            if (_runtimeMs > 10000) {
-                DrawControls(batch);
-            } 
-            
             DrawBorder(batch);
             if (_scene.gameState == GameState.StartCountdown) {
                 DrawCountdown(batch);
             } else if (_scene.gameState == GameState.Playing) {
-                DrawStatistics(batch);
                 DrawRemainingTime(batch);
+                if (!_hideUI){
+                    DrawStatistics(batch);
+                    if (_runtimeMs < 10000) {
+                        var buttonColor = new Color(122, 119, 110, 200);
+                        DrawCursorExplanations(batch, player1_pos, buttonColor, PlayerIndex.One, true, player1_keyboard);
+                        DrawCursorExplanations(batch, player2_pos, buttonColor, PlayerIndex.Two, true, player2_keyboard);
+                    } else {
+                        DrawControls(batch);
+                    } 
+                }
                 _insectController.Draw(batch, gameTime);
-                if (_runtimeMs < 10000) {
-                    var buttonColor = new Color(122, 119, 110, 200);
-                    DrawCursorExplanations(batch, player1_pos, buttonColor, PlayerIndex.One, true, player1_keyboard);
-                    DrawCursorExplanations(batch, player2_pos, buttonColor, PlayerIndex.Two, true, player2_keyboard);
-                } 
             } else if (_scene.gameState == GameState.Ended) {
                 DrawWinMessage(batch);
                 if (_afterGameMs <= 0) {
