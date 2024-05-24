@@ -40,7 +40,9 @@ namespace TinyShopping.Game {
             Left,
             Right,
             LeftFull,
-            RightFull
+            RightFull,
+            LeftAttack,
+            RightAttack
         }
 
         private Texture2D _texture;
@@ -134,10 +136,12 @@ namespace TinyShopping.Game {
             Health = _attributes.maxHealth;
             _aiHandler = new AIHandler(this, services);
 
-            _animationManager.AddAnimation(AnimationKey.Left, new Animation(_texture, 2, 4, 0.2f, 1));
-            _animationManager.AddAnimation(AnimationKey.Right, new Animation(_texture, 2, 4, 0.2f, 2));
-            _animationManager.AddAnimation(AnimationKey.LeftFull, new Animation(_texture, 2, 4, 0.2f, 3));
-            _animationManager.AddAnimation(AnimationKey.RightFull, new Animation(_texture, 2, 4, 0.2f, 4));
+            _animationManager.AddAnimation(AnimationKey.Left, new Animation(_texture, 2, 6, 0.2f, 1));
+            _animationManager.AddAnimation(AnimationKey.Right, new Animation(_texture, 2, 6, 0.2f, 2));
+            _animationManager.AddAnimation(AnimationKey.LeftFull, new Animation(_texture, 2, 6, 0.2f, 3));
+            _animationManager.AddAnimation(AnimationKey.RightFull, new Animation(_texture, 2, 6, 0.2f, 4));
+            _animationManager.AddAnimation(AnimationKey.LeftAttack, new Animation(_texture, 2, 6, 0.2f, 5));
+            _animationManager.AddAnimation(AnimationKey.RightAttack, new Animation(_texture, 2, 6, 0.2f, 6));
         }
 
         /// <summary>
@@ -206,15 +210,30 @@ namespace TinyShopping.Game {
             // TODO: fix idle state, fix rotation, add more rotation states
             
             bool movesLeft = _position.Rotation <= Math.PI;
-            if (movesLeft && !IsCarrying) {
-                _animationManager.Update(AnimationKey.Left, gameTime);
+            bool isInAttackMode = _state == InsectState.FightRun || _state == InsectState.FightWander || _state == InsectState.Fight;
+            AnimationKey animationKey;
+            if (movesLeft)
+            {
+                if (IsCarrying) animationKey = AnimationKey.LeftFull;
+                else if (isInAttackMode) animationKey = AnimationKey.LeftAttack;
+                else animationKey = AnimationKey.Left;
+            } else
+            {
+                if (IsCarrying) animationKey = AnimationKey.RightFull;
+                else if (isInAttackMode) animationKey = AnimationKey.RightAttack;
+                else animationKey = AnimationKey.Right;
+            }
+            _animationManager.Update(animationKey, gameTime);
+
+            /*if (movesLeft && !IsCarrying) {
+                
             } else  if (!movesLeft && !IsCarrying) {
                 _animationManager.Update(AnimationKey.Right, gameTime);
             } else if (movesLeft && IsCarrying) {
                 _animationManager.Update(AnimationKey.LeftFull, gameTime);
             } else if (!movesLeft && IsCarrying) {
                 _animationManager.Update(AnimationKey.RightFull, gameTime);
-            }
+            }*/
         }
 
 
