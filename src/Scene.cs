@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Media;
 
 namespace TinyShopping {
 
@@ -16,7 +15,6 @@ namespace TinyShopping {
     }
 
     public abstract class Scene {
-
         public bool IsStarted {get; set; }
         public bool IsOver { get; set; }
 
@@ -59,11 +57,11 @@ namespace TinyShopping {
         }
 
         public virtual void UnloadContent() {
-
+            SettingsHandler.SoundPlayer.RemoveCurrent();
         }
 
         public virtual void Terminate() {
-            MediaPlayer.Stop();
+            //MediaPlayer.Stop();
         }
 
         public virtual void Update(GameTime gameTime) {
@@ -79,8 +77,22 @@ namespace TinyShopping {
 
         }
 
+        public void GoBack() {
+            Game.GoBack();
+        }
+
         public void LoadMainMenu() {
-            Game.ChangeScene(new MainMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
+            Game.ChangeSceneUnload(new MainMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
+        }
+
+        public void SettingsMenu()
+        {
+            Game.ChangeScene(new SettingsMenu.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
+        }
+
+        public void ControlsTutorial()
+        {
+            Game.ChangeScene(new ControlsTutorial.Scene(Content, GraphicsDevice, GraphicsDeviceManager, Game, SettingsHandler));
         }
 
         public void ResumeGame() {

@@ -61,26 +61,28 @@ namespace TinyShopping.Game {
         public TutorialScene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
             base(content, graphics, manager, game, settingsHandler) {
             _world = new World("map_isometric/map-tutorial");
-            _pheromoneHandler = new PheromoneHandler(_world);
-            _insectHandler = new InsectHandler(_world, _pheromoneHandler, _world.FruitHandler);
+            _pheromoneHandler = new PheromoneHandler(_world, SettingsHandler.SoundPlayer);
+            _insectHandler = new InsectHandler(_world, _pheromoneHandler, _world.FruitHandler, SettingsHandler.SoundPlayer);
             _splitScreenHandler = new SplitScreenHandler(this, _world, _insectHandler, _pheromoneHandler);
             _ui = new TutorialUIController(GraphicsDevice, _splitScreenHandler, this);
             _sound = new SoundController(this);
 
             var menuItemSize = new Vector2((int)(Width / 3), Height / 12);
             Rectangle explanationRegion = new Rectangle(50, Height - 100, 300, 100);
-            _pauseMenu = new SelectMenu(new Rectangle(0, 0, Width, Height), menuItemSize, ResumeGame, explanationRegion);
+            _pauseMenu = new SelectMenu(new Rectangle(0, 0, Width, Height), menuItemSize, ResumeGame, explanationRegion, this.SettingsHandler.SoundPlayer);
 
 
             menuItemSize = new Vector2((int)(Width / 7), Height / 15);
             var tutorialMenuRect = new Rectangle((int)(Width / 2.5), (int)(Height / 2.5), Width, Height);
             
-            _tutorialMenu = new TutorialMenu(tutorialMenuRect, Vector2.Zero, menuItemSize, LoadMainMenu, explanationRegion);
+            _tutorialMenu = new TutorialMenu(tutorialMenuRect, Vector2.Zero, menuItemSize, LoadMainMenu, explanationRegion, this.SettingsHandler.SoundPlayer);
         }
 
         public override void Initialize() {
             _splitScreenHandler.Initialize();
             _pauseMenu.AddItem(new MenuItem("Resume", ResumeGame));
+            _pauseMenu.AddItem(new MenuItem("Settings", SettingsMenu));
+            _pauseMenu.AddItem(new MenuItem("Controls", ControlsTutorial));
             _pauseMenu.AddItem(new MenuItem("Quit Tutorial", LoadMainMenu));
             _tutorialMenu.AddItem(new MenuItem("Next", NextTutorialPhase));
             _runtimeS = 0;
@@ -116,8 +118,26 @@ namespace TinyShopping.Game {
 
         public override void UnloadContent()
         {
-            //TODO: unload everything, so it wont hang in the ContentManager memory
             _world.UnloadContent(Content);
+            _insectHandler.UnloadContent(Content);
+            _pheromoneHandler.UnloadContent(Content);
+            _splitScreenHandler.UnloadContent(Content);
+            _ui.UnloadContent(Content);
+            _sound.UnloadContent(Content);
+            _pauseMenu.UnloadContent(Content);
+            _tutorialMenu.UnloadContent(Content);
+            Content.UnloadAsset("tutorial/game_intro");
+            Content.UnloadAsset("tutorial/camera");
+            Content.UnloadAsset("tutorial/camera_waiting");
+            Content.UnloadAsset("tutorial/ants_intro");
+            Content.UnloadAsset("tutorial/ants_in_progress");
+            Content.UnloadAsset("tutorial/ants_trails");
+            Content.UnloadAsset("tutorial/pheromones_intro");
+            Content.UnloadAsset("tutorial/collect_food");
+            Content.UnloadAsset("tutorial/exchange_food");
+            Content.UnloadAsset("tutorial/exchange_food_done");
+            Content.UnloadAsset("tutorial/goal");
+            Content.UnloadAsset("tutorial/final_message");
             base.UnloadContent();
         }
 

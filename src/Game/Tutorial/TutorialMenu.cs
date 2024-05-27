@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Input;
 namespace TinyShopping.Game {
 
     class TutorialMenu: SelectMenu {
-        public TutorialMenu(Rectangle menuRegion, Vector2 centerOffset, Vector2 itemSize, Action backAction, Rectangle explanationRegion): base(menuRegion, centerOffset, itemSize, backAction, explanationRegion) {
+        public TutorialMenu(Rectangle menuRegion, Vector2 centerOffset, Vector2 itemSize, Action backAction, Rectangle explanationRegion, SoundPlayer soundPlayer): base(menuRegion, centerOffset, itemSize, backAction, explanationRegion, soundPlayer) {
             GamePadState state = GamePad.GetState(PlayerIndex.One);
             if (state.IsConnected) {
                 _explanations = new List<MenuExplanation> {new("<Right>", "Next", Color.Green)};
@@ -22,7 +22,7 @@ namespace TinyShopping.Game {
                 _continuePressed = true;
             } else if (_continuePressed) {
                 _continuePressed = false;
-                _soundEffects[2].Play();
+                _soundPlayer.playSoundEffect(_soundEffects[2], 1f);
                 _menuItems[_currentSelection].ApplyAction();
             }
 

@@ -67,3 +67,6 @@ monodroid*.msi
 
 artifacts/
 .vs/
+
+# VS code
+.editorconfig

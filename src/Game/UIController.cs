@@ -16,8 +16,6 @@ namespace TinyShopping.Game {
         protected static readonly float _fontScale = 0.4f;
 
         protected SpriteFont _font;
-        protected SpriteFont _fontBig;
-        protected SpriteFont _fontGeneral;
 
         private Texture2D _appleTexture;
 
@@ -38,6 +36,7 @@ namespace TinyShopping.Game {
         private List<SoundEffect> _soundEffects;
 
         protected Scene _scene;
+        protected World _world;
 
         private double _runtimeMs;
 
@@ -52,11 +51,13 @@ namespace TinyShopping.Game {
         protected bool _selectPressed;
 
         protected UIInsectController _insectController;
+        private bool _hideUI = false;
 
-        public UIController(GraphicsDevice device, SplitScreenHandler handler, Scene scene) {
+        public UIController(GraphicsDevice device, SplitScreenHandler handler, Scene scene, World world) {
             _handler = handler;
             _runtimeMs = 0;
             _scene = scene;
+            _world = world;
             _soundEffects = new List<SoundEffect>();
             _playerOne = CreateMenuInput(PlayerIndex.One);
             _insectController = new UIInsectController(handler);
@@ -69,8 +70,6 @@ namespace TinyShopping.Game {
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
             _font = content.Load<SpriteFont>("fonts/General");
-            _fontBig = content.Load<SpriteFont>("fonts/General"); //FunBig
-            _fontGeneral = content.Load<SpriteFont>("fonts/General");
 
             _appleTexture = content.Load<Texture2D>("stats/apple");
             _circleTexture = content.Load<Texture2D>("stats/circle");
@@ -78,13 +77,29 @@ namespace TinyShopping.Game {
             _termiteCharachterTexture = content.Load<Texture2D>("stats/Termite_Icon");
             _roundRectTexture = content.Load<Texture2D>("stats/rounded_rectangle");
 
-            _soundEffects.Add(content.Load<SoundEffect>("sounds/countdown_3_seconds"));
+            _soundEffects.Clear();
+            _soundEffects.Add(content.Load<SoundEffect>("sounds/countdown_4_seconds"));
             _soundEffects.Add(content.Load<SoundEffect>("sounds/final_whistle"));
 
             _gamepadButtons = content.Load<Texture2D>("stats/controller");
             _keyboardButtons = content.Load<Texture2D>("stats/numbers");
 
             _insectController.LoadContent(content);
+        }
+
+        public void UnloadContent(ContentManager content) {
+            content.UnloadAsset("fonts/General");
+            content.UnloadAsset("fonts/General");
+            content.UnloadAsset("stats/apple");
+            content.UnloadAsset("stats/circle");
+            content.UnloadAsset("stats/Ant_Icon");
+            content.UnloadAsset("stats/Termite_Icon");
+            content.UnloadAsset("stats/rounded_rectangle");
+            content.UnloadAsset("sounds/countdown_4_seconds");
+            content.UnloadAsset("sounds/final_whistle");
+            content.UnloadAsset("stats/controller");
+            content.UnloadAsset("stats/numbers");
+            _insectController.UnloadContent(content);
         }
 
         /// <summary>
@@ -94,15 +109,36 @@ namespace TinyShopping.Game {
         public virtual void Update(GameTime gameTime) {
             if (_scene.gameState == GameState.StartCountdown) {
                 if (_countdownMs == 0) {
-                    _soundEffects[0].Play();
+                    _scene.SettingsHandler.SoundPlayer.playSoundEffect(_soundEffects[0], 1);
                 }
+
                 _countdownMs += gameTime.ElapsedGameTime.TotalMilliseconds;
-                if (_countdownMs >= 4000) {
+                
+                if (_countdownMs >= 3000) {
+                    float lerp = Math.Clamp((float)(_countdownMs - 3000) / 1000f, 0, 1);
+                    Vector2 start = _world.GetWorldBoundary().Center.ToVector2();
+                    Vector2 end_player1 = _world.GetSpawnPositions()[0];
+                    Vector2 end_player2 = _world.GetSpawnPositions()[1];
+                    Vector2 tangent1 = new Vector2(2.8f, 0f);
+                    Vector2 tangent2 = new Vector2(3.86f, 0.2f);
+                    _handler.Camera1.LookAt(Vector2.Hermite(start, tangent1, end_player1, tangent2, lerp));
+                    _handler.Camera2.LookAt(Vector2.Hermite(start, tangent1, end_player2, tangent2, lerp));
+                }
+
+                float lerpVal = (float)_countdownMs / Constants.TIME_COUNTDOWN_MS;
+                float currentZoom = MathHelper.Hermite(0.5f, 0.3f, 2f, 4.8f, lerpVal);
+                _handler.Camera1.SetZoom(currentZoom);
+                _handler.Camera2.SetZoom(currentZoom);
+
+                if (_countdownMs >= Constants.TIME_COUNTDOWN_MS) {
                     _countdownMs = 0.0;
                     _scene.gameState = GameState.Playing;
                 }
             } else if (_scene.gameState == GameState.Playing) {
                 _runtimeMs += gameTime.ElapsedGameTime.TotalMilliseconds;
+                if (_playerOne.IsHideUIPressed()) {
+                    _hideUI = !_hideUI;
+                }
 
                 if (_runtimeMs > Constants.TIME_LIMIT_S * 1000) {
                     _scene.gameState = GameState.Ended;
@@ -124,7 +160,7 @@ namespace TinyShopping.Game {
 
                 // Play end of game sound
                 if (_scene.gameState == GameState.Ended) {
-                    _soundEffects[1].Play();
+                    _scene.SettingsHandler.SoundPlayer.playSoundEffect(_soundEffects[1], 1);
                 }
 
             } else if (_scene.gameState == GameState.Ended) {
@@ -153,20 +189,21 @@ namespace TinyShopping.Game {
         /// <param name="gameTime">The current game time.</param>
         public void Draw(SpriteBatch batch, GameTime gameTime, Vector2 player1_pos, Vector2 player2_pos, bool player1_keyboard, bool player2_keyboard) {
             DrawBorder(batch);
-            DrawStatistics(batch);
-            DrawRemainingTime(batch);
-            _insectController.Draw(batch, gameTime);
-            if (_runtimeMs > 10000) {
-                DrawControls(batch);
-            } 
             if (_scene.gameState == GameState.StartCountdown) {
                 DrawCountdown(batch);
             } else if (_scene.gameState == GameState.Playing) {
-                if (_runtimeMs < 10000) {
-                    var buttonColor = new Color(122, 119, 110, 200);
-                    DrawCursorExplanations(batch, player1_pos, buttonColor, PlayerIndex.One, true, player1_keyboard);
-                    DrawCursorExplanations(batch, player2_pos, buttonColor, PlayerIndex.Two, true, player2_keyboard);
-                } 
+                DrawRemainingTime(batch);
+                if (!_hideUI){
+                    DrawStatistics(batch);
+                    if (_runtimeMs < 10000) {
+                        var buttonColor = new Color(122, 119, 110, 200);
+                        DrawCursorExplanations(batch, player1_pos, buttonColor, PlayerIndex.One, true, player1_keyboard);
+                        DrawCursorExplanations(batch, player2_pos, buttonColor, PlayerIndex.Two, true, player2_keyboard);
+                    } else {
+                        DrawControls(batch);
+                    } 
+                }
+                _insectController.Draw(batch, gameTime);
             } else if (_scene.gameState == GameState.Ended) {
                 DrawWinMessage(batch);
                 if (_afterGameMs <= 0) {
@@ -224,9 +261,9 @@ namespace TinyShopping.Game {
             }
 
             var textPos = imagePos + new Vector2(0, textureSize.Y);
-            Vector2 origin = _fontGeneral.MeasureString(text) / 2;
-            batch.DrawString(_fontGeneral, text, textPos - new Vector2(3, 3), Color.Black, 0, origin, 1.0f, SpriteEffects.None, 0);
-            batch.DrawString(_fontGeneral, text, textPos, _textColor, 0, origin, 1.0f, SpriteEffects.None, 0);
+            Vector2 origin = _font.MeasureString(text) / 2;
+            batch.DrawString(_font, text, textPos - new Vector2(3, 3), Color.Black, 0, origin, 1.0f, SpriteEffects.None, 0);
+            batch.DrawString(_font, text, textPos, _textColor, 0, origin, 1.0f, SpriteEffects.None, 0);
         }
 
         protected void DrawReturnMessage(SpriteBatch batch) {
@@ -238,9 +275,9 @@ namespace TinyShopping.Game {
             }
             text += "to return to main menu";
 
-            Vector2 origin = _fontGeneral.MeasureString(text) / 2;
+            Vector2 origin = _font.MeasureString(text) / 2;
             var pos = new Vector2(_scene.Width / 2, _scene.Height - origin.Y - 10);
-            batch.DrawString(_fontGeneral, text, pos, _textColor, 0, origin, 0.4f, SpriteEffects.None, 0);
+            batch.DrawString(_font, text, pos, _textColor, 0, origin, 0.4f, SpriteEffects.None, 0);
         }
 
         /// <summary>
@@ -263,7 +300,11 @@ namespace TinyShopping.Game {
             if (secs < 0) {
                 time = "00:00";
             }
-            DrawString(batch, time, new Vector2(_scene.Width / 2, offsetTop), _fontScale);
+            if (secs <= 5) {
+                DrawStringColor(batch, time, new Vector2(_scene.Width / 2, offsetTop), _fontScale, Color.Red);
+            } else {
+                DrawString(batch, time, new Vector2(_scene.Width / 2, offsetTop), _fontScale);
+            }
         }
 
         public float GetRemainingTime() {
@@ -281,8 +322,8 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="batch">The sprite batch to write to.</param>
         private void DrawCountdown(SpriteBatch batch) {
-            int secs = 3 - (int) (_countdownMs / 1000);
-            string secStr = "" + secs;
+            int secs = (int)(Constants.TIME_COUNTDOWN_MS / 1000f - _countdownMs / 1000f);
+            string secStr = secs.ToString();
             if (secs == 0) {
                 secStr = "Go!";
             }
@@ -297,11 +338,15 @@ namespace TinyShopping.Game {
             Vector2 origin = _font.MeasureString(text) / 2;
             batch.DrawString(_font, text, position, _textColor, 0, origin, scale, SpriteEffects.None, 0); // scale used to be 0.95f
         }
+        private void DrawStringColor(SpriteBatch batch, String text, Vector2 position, float scale, Color color) {
+            Vector2 origin = _font.MeasureString(text) / 2;
+            batch.DrawString(_font, text, position, color, 0, origin, scale, SpriteEffects.None, 0); // scale used to be 0.95f
+        }
         private void DrawBoldString(SpriteBatch batch, String text, Vector2 position, float scale, float border = .005f) {
-            Vector2 origin = _fontBig.MeasureString(text) / 2;
+            Vector2 origin = _font.MeasureString(text) / 2;
 
-            batch.DrawString(_fontBig, text, position, Color.Black, 0, origin, scale + border, SpriteEffects.None, 0);
-            batch.DrawString(_fontBig, text, position, _textColor, 0, origin, scale, SpriteEffects.None, 0);
+            batch.DrawString(_font, text, position, Color.Black, 0, origin, scale + border, SpriteEffects.None, 0);
+            batch.DrawString(_font, text, position, _textColor, 0, origin, scale, SpriteEffects.None, 0);
         }
 
         protected void DrawOutlinedTexture(SpriteBatch batch, Texture2D texture, Rectangle rect, Color color, int border = 5, bool flipped = false) {

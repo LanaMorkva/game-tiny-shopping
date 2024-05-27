@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -89,17 +90,20 @@ namespace TinyShopping.Game {
             
             _player1.LoadContent(content);
             _player2.LoadContent(content);
+            var mapCenter = _world.GetWorldBoundary().Center.ToVector2();
+            Camera1.LookAt(mapCenter);
+            Camera2.LookAt(mapCenter);
+        }
 
-            Camera1.LookAt(spawnPositions[0]);
-            Camera1.ZoomIn(0.5f);
-            Camera2.LookAt(spawnPositions[1]);
-            Camera2.ZoomIn(0.5f);
+        public void UnloadContent(ContentManager content) {
+            _player1.UnloadContent(content);
+            _player2.UnloadContent(content);
         }
 
         /// <summary>
         /// Updates the game objects.
         /// </summary>
-        /// <param name="gameTime">The current game time.</param>
+        /// <param name="gameTime">The current game time.</param>   
         public void Update(GameTime gameTime, Scene scene) {
             _player1.Update(gameTime, this, scene);
             _player2.Update(gameTime, this, scene);
@@ -204,7 +208,9 @@ namespace TinyShopping.Game {
             }
 
             currentCamera.TargetMovement = cameraMoveDirection;
-            currentCamera.ZoomIn(zoom);
+            if (zoom != 0f) {
+                currentCamera.ZoomIn(zoom);
+            }
         }
 
         public float GetZoomValue(int playerId) {

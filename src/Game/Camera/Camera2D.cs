@@ -48,6 +48,10 @@ namespace TinyShopping.Game
             Position = position - new Vector2(_size.X / 2f, _size.Y / 2f);
         }
 
+        public void SetZoom(float zoom) {
+            Zoom = zoom;
+        }
+
         public void ZoomIn(float deltaZoom) {
             Zoom = MathHelper.Clamp(Zoom + deltaZoom, Constants.ZOOM_MIN, Constants.ZOOM_MAX);
         }

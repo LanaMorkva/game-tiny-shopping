@@ -1,16 +1,18 @@
 using System.IO;
 using System.Text.Json;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Media;
 
 namespace TinyShopping {
 
     public class Settings {
         public bool music { get; set; } = true;
+        public int musicVolume { get; set; } = 20;
         public bool soundEffects { get; set; } = true;
+
+        public int effectsVolume { get; set; } = 20;
         public bool fullScreen { get; set; } = false;
-        public string version { get; set; } = "1.0";
+		public bool firstLaunch {get; set; } = true;
+        public string version { get; set; } = "1.2";
     }
 
     public class SettingsHandler {
@@ -19,16 +21,20 @@ namespace TinyShopping {
 
         string _settingsPath = "tiny-shopping-settings.json";
 
-        public SettingsHandler() {
-            settings = new Settings();
-            LoadSettings();
+        public SoundPlayer SoundPlayer { get; private set; }
 
+        public SettingsHandler(SoundPlayer soundPlayer) {
+            settings = new Settings();
+            SoundPlayer = soundPlayer;
+            LoadSettings();
+            SoundPlayer.SetMusicMasterVolume(settings.musicVolume);
+            SoundPlayer.SetEffectsMasterVolume(settings.effectsVolume);
         }
 
         public void SaveSettings() {
             var options = new JsonSerializerOptions { WriteIndented = true };
             string jsonSettings = JsonSerializer.Serialize(settings, options);
-            File.WriteAllText(_settingsPath,jsonSettings);
+            File.WriteAllText(_settingsPath, jsonSettings);
         }
 
         public bool LoadSettings() {
@@ -41,7 +47,7 @@ namespace TinyShopping {
                 if (loadedSettings.version == settings.version) {
                     settings = loadedSettings;
                 }
-                return  true;
+                return true;
             }
             return false;
         }
@@ -54,23 +60,52 @@ namespace TinyShopping {
 
         private void ApplyMusic() {
             if (settings.music) {
-                MediaPlayer.Volume = 0.5f;
+                SoundPlayer.SetMusicMasterVolume(settings.musicVolume);
+                //MediaPlayer.Volume = 0.01f * (float)GetMusicVolume();
             } else {
-                MediaPlayer.Volume = 0;
+                SoundPlayer.SetMusicMasterVolume(0);
+                //MediaPlayer.Volume = 0;
             }
-
         }
+
+        public int GetMusicVolume() {
+            return settings.musicVolume;
+        }
+
+        public int GetEffectsVolume() {
+            return settings.effectsVolume;
+        }
+
         public void ToggleSoundEffects() {
             settings.soundEffects = !settings.soundEffects;
             SaveSettings();
             ApplySoundEffects();
         }
 
+        public void ChangeMusicVolumeSettings(int volume) {
+            settings.musicVolume = volume;
+            ApplyMusic();
+            SaveSettings();
+        }
+
+        public void ChangeEffectsVolumeSettings(int volume) {
+            settings.effectsVolume = volume;
+            ApplySoundEffects();
+            SaveSettings();
+        }
+
+        public void SetFirstLaunch(bool value) {
+            settings.firstLaunch = value;
+            SaveSettings();
+        }
+
         private void ApplySoundEffects() {
             if (settings.soundEffects) {
-                SoundEffect.MasterVolume = 1;
+                SoundPlayer.SetEffectsMasterVolume(settings.effectsVolume);
+                //SoundEffect.MasterVolume = 1;
             } else {
-                SoundEffect.MasterVolume = 0;
+                SoundPlayer.SetEffectsMasterVolume(0);
+                //SoundEffect.MasterVolume = 0;
             }
         }
         public void ToggleFullScreen(GraphicsDeviceManager graphics) {
@@ -83,6 +118,7 @@ namespace TinyShopping {
             if (graphics.IsFullScreen != settings.fullScreen) {
                 graphics.ToggleFullScreen();
             }
+            SaveSettings();
 
         }
 

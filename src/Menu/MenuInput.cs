@@ -17,6 +17,10 @@ namespace TinyShopping {
         public abstract bool IsBackPressed();
 
         public abstract bool IsStartedPressed();
+    
+        public abstract bool IsLeftPressed();
+        public abstract bool IsRightPressed();
+        public abstract bool IsHideUIPressed();
     }
 
     internal class GamePadMenuInput : MenuInput {
@@ -24,6 +28,9 @@ namespace TinyShopping {
         private Buttons _selectButton = Buttons.A;
         private Buttons _nextButton = Buttons.DPadDown;
         private Buttons _previousButton = Buttons.DPadUp;
+
+        private Buttons _leftButton = Buttons.DPadLeft;
+        private Buttons _rightButton = Buttons.DPadRight;
         private Buttons _backButton = Buttons.B;
         private Buttons _startButton = Buttons.DPadRight;
 
@@ -58,6 +65,24 @@ namespace TinyShopping {
             return cState.IsButtonDown(_startButton);
         }
 
+        public override bool IsLeftPressed()
+        {
+            GamePadState cState = GamePad.GetState(_playerIndex);
+            return cState.IsButtonDown(_leftButton);
+        }
+
+        public override bool IsRightPressed()
+        {
+            GamePadState cState = GamePad.GetState(_playerIndex);
+            return cState.IsButtonDown(_rightButton);
+        }
+
+        public override bool IsHideUIPressed()
+        {
+            //debug feature, not available for gamepad
+            return false; 
+        }
+
     }
 
     internal class KeyboardMenuInput : MenuInput {
@@ -71,6 +96,9 @@ namespace TinyShopping {
         private Keys _backKey = Keys.Escape;
 
         private Keys _startKey = Keys.Enter;
+
+        private Keys _leftKey = Keys.Left;
+        private Keys _rightKey = Keys.Right;
 
 
         public KeyboardMenuInput(PlayerIndex playerIndex) {
@@ -105,9 +133,25 @@ namespace TinyShopping {
             return kState.IsKeyDown(_startKey);
         }
 
+        public override bool IsLeftPressed()
+        {
+            return IsButtonPressed(_leftKey);
+        }
+
+        public override bool IsRightPressed()
+        {
+            return IsButtonPressed(_rightKey);
+        }
+
         private bool IsButtonPressed(Keys key) {
             KeyboardState kState = Keyboard.GetState();
             return kState.IsKeyDown(key);
+        }
+
+        public override bool IsHideUIPressed()
+        {
+            KeyboardState kState = Keyboard.GetState();
+            return kState.IsKeyDown(Keys.F1);
         }
     }
 }

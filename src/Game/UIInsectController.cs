@@ -38,6 +38,12 @@ namespace TinyShopping.Game {
             _borderSize = Constants.INSECT_ICON_SIZE + _borderPadding * 2;
         }
 
+        public void UnloadContent(ContentManager content) {
+            content.UnloadAsset("icon_border_v");
+            content.UnloadAsset("icon_border_h");
+            content.UnloadAsset("sleep_indicator");
+        }
+
         /// <summary>
         /// Draws icons.
         /// </summary>

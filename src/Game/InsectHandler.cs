@@ -50,6 +50,8 @@ namespace TinyShopping.Game {
 
         private FruitHandler _fruitHandler;
 
+        public SoundPlayer _soundPlayer;
+
         private Colony[] _colonies;
         private List<Shot> _shots;
 
@@ -59,10 +61,11 @@ namespace TinyShopping.Game {
         /// <param name="world">The world to exist in.</param>
         /// <param name="pheromones">The pheromone handler to use.</param>
         /// <param name="fruits">The fruit handler to use.</param>
-        public InsectHandler(World world, PheromoneHandler pheromones, FruitHandler fruits) {
+        public InsectHandler(World world, PheromoneHandler pheromones, FruitHandler fruits, SoundPlayer soundPlayer) {
             _world = world;
             _pheromoneHandler = pheromones;
             _fruitHandler = fruits;
+            _soundPlayer = soundPlayer;
 
             _shots = new List<Shot>();
         }
@@ -79,6 +82,12 @@ namespace TinyShopping.Game {
             colony2.Initialize();
             colony2.LoadContent(content);
             _colonies = new Colony[] { colony1, colony2 };
+        }
+
+        public void UnloadContent(ContentManager content) {
+            foreach (var colony in _colonies) {
+                colony.UnloadContent(content);
+            }
         }
 
         /// <summary>

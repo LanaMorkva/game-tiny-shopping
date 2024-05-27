@@ -87,6 +87,7 @@ namespace TinyShopping.Game {
         public void LoadContent(ContentManager content) {
             var texturePath = _type == ColonyType.ANT ? "ants/ant_texture" : "termites/termite_texture";
             _texture = content.Load<Texture2D>(texturePath);
+            _soundEffects.Clear();
             _soundEffects.Add(content.Load<SoundEffect>("sounds/cash_register"));
             _soundEffects.Add(content.Load<SoundEffect>("sounds/insect_dying"));
         }
@@ -117,7 +118,7 @@ namespace TinyShopping.Game {
                     insect.Update(gameTime);
                     remaining.Add(insect);
                 } else {
-                    _soundEffects[1].Play();
+                    _insectHandler._soundPlayer.playSoundEffect(_soundEffects[1], 1f);
                 }
             }
             Insects = remaining;
@@ -162,7 +163,7 @@ namespace TinyShopping.Game {
         /// </summary>
         public void IncreaseFruitCount() {
             _collectedFruit += 1;
-            _soundEffects[0].Play();
+            _insectHandler._soundPlayer.playSoundEffect(_soundEffects[0], 1f);
         }
 
         /// <summary>
