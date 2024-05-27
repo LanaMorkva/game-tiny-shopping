@@ -78,7 +78,7 @@ namespace TinyShopping.Game {
             _roundRectTexture = content.Load<Texture2D>("stats/rounded_rectangle");
 
             _soundEffects.Clear();
-            _soundEffects.Add(content.Load<SoundEffect>("sounds/countdown_3_seconds"));
+            _soundEffects.Add(content.Load<SoundEffect>("sounds/countdown_4_seconds"));
             _soundEffects.Add(content.Load<SoundEffect>("sounds/final_whistle"));
 
             _gamepadButtons = content.Load<Texture2D>("stats/controller");
@@ -95,7 +95,7 @@ namespace TinyShopping.Game {
             content.UnloadAsset("stats/Ant_Icon");
             content.UnloadAsset("stats/Termite_Icon");
             content.UnloadAsset("stats/rounded_rectangle");
-            content.UnloadAsset("sounds/countdown_3_seconds");
+            content.UnloadAsset("sounds/countdown_4_seconds");
             content.UnloadAsset("sounds/final_whistle");
             content.UnloadAsset("stats/controller");
             content.UnloadAsset("stats/numbers");
@@ -300,7 +300,11 @@ namespace TinyShopping.Game {
             if (secs < 0) {
                 time = "00:00";
             }
-            DrawString(batch, time, new Vector2(_scene.Width / 2, offsetTop), _fontScale);
+            if (secs <= 5) {
+                DrawStringColor(batch, time, new Vector2(_scene.Width / 2, offsetTop), _fontScale, Color.Red);
+            } else {
+                DrawString(batch, time, new Vector2(_scene.Width / 2, offsetTop), _fontScale);
+            }
         }
 
         public float GetRemainingTime() {
@@ -333,6 +337,10 @@ namespace TinyShopping.Game {
         private void DrawString(SpriteBatch batch, String text, Vector2 position, float scale) {
             Vector2 origin = _font.MeasureString(text) / 2;
             batch.DrawString(_font, text, position, _textColor, 0, origin, scale, SpriteEffects.None, 0); // scale used to be 0.95f
+        }
+        private void DrawStringColor(SpriteBatch batch, String text, Vector2 position, float scale, Color color) {
+            Vector2 origin = _font.MeasureString(text) / 2;
+            batch.DrawString(_font, text, position, color, 0, origin, scale, SpriteEffects.None, 0); // scale used to be 0.95f
         }
         private void DrawBoldString(SpriteBatch batch, String text, Vector2 position, float scale, float border = .005f) {
             Vector2 origin = _font.MeasureString(text) / 2;
