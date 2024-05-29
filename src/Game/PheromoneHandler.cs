@@ -45,7 +45,7 @@ namespace TinyShopping.Game {
         }
 
         public void UnloadContent(ContentManager contentManager) {
-            contentManager.UnloadAsset("pheromone_particle");
+            //contentManager.UnloadAsset("pheromone_particle"); // If this is unloaded Pheromones break
             contentManager.UnloadAsset("sounds/glass_knock");
         }
 

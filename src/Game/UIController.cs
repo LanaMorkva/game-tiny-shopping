@@ -97,8 +97,8 @@ namespace TinyShopping.Game {
             content.UnloadAsset("stats/rounded_rectangle");
             content.UnloadAsset("sounds/countdown_4_seconds");
             content.UnloadAsset("sounds/final_whistle");
-            content.UnloadAsset("stats/controller");
-            content.UnloadAsset("stats/numbers");
+            //content.UnloadAsset("stats/controller"); // Unloading this breaks the menu that uses them
+            //content.UnloadAsset("stats/numbers");
             _insectController.UnloadContent(content);
         }
 
@@ -300,7 +300,7 @@ namespace TinyShopping.Game {
             if (secs < 0) {
                 time = "00:00";
             }
-            if (secs <= 5) {
+            if (secs <= 5 && mins == 0) {
                 DrawStringColor(batch, time, new Vector2(_scene.Width / 2, offsetTop), _fontScale, Color.Red);
             } else {
                 DrawString(batch, time, new Vector2(_scene.Width / 2, offsetTop), _fontScale);
