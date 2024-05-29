@@ -11,8 +11,6 @@ namespace TinyShopping.Game {
         private SoundEffectInstance _regularSongFast;
         private SoundEffectInstance _finalMinuteIntroduction;
         private SoundEffectInstance _finalSecondsCountdown;
-        //private Song _battleSong;
-        //private Song _battleSongFast;
 
         private Scene _scene;
 
@@ -21,6 +19,8 @@ namespace TinyShopping.Game {
         private bool _finalMinuteStarted;
         private bool _finalMinuteSongs;
         private bool _finalSecondsStarted;
+
+        private GameState _lastState;
 
         private PlayerInput _input;
 
@@ -33,17 +33,13 @@ namespace TinyShopping.Game {
         /// </summary>
         /// <param name="content">The content manager.</param>
         public void LoadContent(ContentManager content) {
-            _input = new KeyboardInput(PlayerIndex.One, content);
+            _input = new KeyboardInput(PlayerIndex.One, content); // TODO: Should be in Initialize
             _regularSong = content.Load<SoundEffect>("sounds/main_long_basic").CreateInstance();
             _regularSongFast = content.Load<SoundEffect>("sounds/main_long_fast").CreateInstance();
             _finalMinuteIntroduction = content.Load<SoundEffect>("sounds/final_minute_starts").CreateInstance();
             _finalSecondsCountdown = content.Load<SoundEffect>("sounds/countdown_last_seconds").CreateInstance();
             _regularSong.IsLooped = true;
             _regularSongFast.IsLooped = true;
-            //_regularSong = _regularSong.CreateInstance();
-            //_regularSong = _regularSongFast.CreateInstance();
-            //_battleSong = content.Load<Song>("songs/drama");
-            //_battleSongFast = content.Load<Song>("songs/drama_fast");
         }
 
         public void UnloadContent(ContentManager content) {
@@ -60,6 +56,20 @@ namespace TinyShopping.Game {
         /// <param name="gameTime">The current game time.</param>
         /// <param name="controller">The UI controller of the game</param>
         public void Update(GameTime gameTime, UIController controller) {
+
+            if (_scene.gameState == GameState.Playing && _lastState == GameState.Paused) {
+                // Continue music
+                if (controller.GetRemainingTime() > 60) {
+                    _scene.SettingsHandler.SoundPlayer.playSong(_regularSong, 0.6f);
+                } else if (controller.GetRemainingTime() > 0) {
+                    _scene.SettingsHandler.SoundPlayer.playSong(_regularSongFast, 0.6f);
+                }
+            } else if (_scene.gameState == GameState.Paused && _lastState == GameState.Playing) {
+                // Stop music
+                _regularSongFast.Stop();
+                _regularSong.Stop();
+            }
+
             if (_scene.gameState == GameState.Playing && !_isPlaying && _scene.SettingsHandler.settings.music) {
                 _scene.SettingsHandler.SoundPlayer.playSong(_regularSong, 0.6f);
                 _isPlaying = true;
@@ -67,11 +77,6 @@ namespace TinyShopping.Game {
 
             if (_scene.gameState == GameState.Playing && !_finalMinuteStarted && controller.GetRemainingTime() <= 60 && _scene.SettingsHandler.settings.music) {
                 _finalMinuteStarted = true;
-                //TimeSpan songPosition = MediaPlayer.PlayPosition * (10f/12f);
-                //_regularSong.State.
-                //if ((int) songPosition.TotalSeconds >= (int) _regularSongFast.Duration.TotalSeconds) {
-                    //songPosition = TimeSpan.Zero;
-                //}
                 _scene.SettingsHandler.SoundPlayer.playSong(_finalMinuteIntroduction, 1f);
             }
 
@@ -92,10 +97,11 @@ namespace TinyShopping.Game {
             // Need a function to get if any ants are in battle
 
             if (_scene.gameState == GameState.Ended) {
-                Console.WriteLine("Game ended");
                 _regularSongFast.Stop();
                 _regularSong.Stop();
             }
+
+            _lastState = _scene.gameState;
 
         }
     }

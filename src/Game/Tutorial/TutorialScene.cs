@@ -57,6 +57,7 @@ namespace TinyShopping.Game {
         private int _player1AntCount = 0;
         private int _player2AntCount = 0;
 
+        private bool _newScene;
 
         public TutorialScene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
             base(content, graphics, manager, game, settingsHandler) {
@@ -76,6 +77,7 @@ namespace TinyShopping.Game {
             var tutorialMenuRect = new Rectangle((int)(Width / 2.5), (int)(Height / 2.5), Width, Height);
             
             _tutorialMenu = new TutorialMenu(tutorialMenuRect, Vector2.Zero, menuItemSize, LoadMainMenu, explanationRegion, this.SettingsHandler.SoundPlayer);
+            _newScene = true;
         }
 
         public override void Initialize() {
@@ -92,9 +94,9 @@ namespace TinyShopping.Game {
 
         public override void LoadContent() {
             _world.LoadContent(Content, GraphicsDevice);
-            _insectHandler.LoadContent(Content);
+            _insectHandler.LoadContent(Content, _newScene);
             _pheromoneHandler.LoadContent(Content);
-            _splitScreenHandler.LoadContent(Content);
+            _splitScreenHandler.LoadContent(Content, _newScene);
 
             _ui.LoadContent(Content);
             _sound.LoadContent(Content);
@@ -114,6 +116,7 @@ namespace TinyShopping.Game {
             _goalTexture = Content.Load<Texture2D>("tutorial/goal");
             _finalMessageTexture = Content.Load<Texture2D>("tutorial/final_message");
             base.LoadContent();
+            _newScene = false;
         }
 
         public override void UnloadContent()

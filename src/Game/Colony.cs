@@ -94,7 +94,7 @@ namespace TinyShopping.Game {
 
         public void UnloadContent(ContentManager content) {
             var texturePath = _type == ColonyType.ANT ? "ants/ant_texture" : "termites/termite_texture";
-            content.UnloadAsset(texturePath);
+            //content.UnloadAsset(texturePath); // If this texture is unloaded the whole game breaks (because Insects depend on it and copy it)
             content.UnloadAsset("sounds/cash_register");
             content.UnloadAsset("sounds/insect_dying");
         }

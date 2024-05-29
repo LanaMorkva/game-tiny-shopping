@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -20,6 +21,7 @@ namespace TinyShopping.Game {
         private SplitScreenHandler _splitScreenHandler;
 
         private SelectMenu _pauseMenu;
+        private bool _newScene;
 
         public GameScene(ContentManager content, GraphicsDevice graphics, GraphicsDeviceManager manager, Renderer game, SettingsHandler settingsHandler) :
             base(content, graphics, manager, game, settingsHandler) {
@@ -40,6 +42,7 @@ namespace TinyShopping.Game {
             };
             _pauseMenu = new SelectMenu(menuRegion, menuItemSize, ResumeGame, explanationRegion, explanations, this.SettingsHandler.SoundPlayer);
             gameState = GameState.StartCountdown;
+            _newScene = true;
         }
 
         public override void Initialize() {
@@ -53,16 +56,21 @@ namespace TinyShopping.Game {
 
         public override void LoadContent() {
             _world.LoadContent(Content, GraphicsDevice);
-            _world.InitializeFruitHandler();
-            _insectHandler.LoadContent(Content);
+            if (_newScene) {
+                _world.InitializeFruitHandler();
+            }
+
+            _insectHandler.LoadContent(Content, _newScene);
             _pheromoneHandler.LoadContent(Content);
-            _splitScreenHandler.LoadContent(Content);
+            _splitScreenHandler.LoadContent(Content, _newScene);
 
             _ui.LoadContent(Content);
             _sound.LoadContent(Content);
 
             _pauseMenu.LoadContent(Content);
             base.LoadContent();
+
+            _newScene = false;
         }
 
         public override void UnloadContent()
