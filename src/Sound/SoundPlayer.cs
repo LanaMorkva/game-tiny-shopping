@@ -24,8 +24,15 @@ namespace TinyShopping {
         }
 
         // Use this for fire and forget, one time sound effect
-        public void playSoundEffect(SoundEffect soundEffect, float volumeFactor) {
-            soundEffect.Play(0.01f * (float)_effectsMasterVolume, 0f, 0f);
+        public bool playSoundEffect(SoundEffect soundEffect, float volumeFactor) {
+            try {
+                soundEffect.Play(0.01f * (float)_effectsMasterVolume, 0f, 0f);
+                return true;
+            } catch (NullReferenceException ex) {
+                // This case can happen if sound effect has been unloaded but update function is still running
+                // This should be fixed in the game logic itself (update should not be called after unloading)
+                return false;
+            }
         }
 
         // Use this for looping sound effects, will change sound volume upon 
@@ -48,7 +55,6 @@ namespace TinyShopping {
         }
 
         public void RemoveCurrent() {
-            Console.WriteLine("Remove all songs and soundeffects");
             foreach (var song in _currentSongs) {
                 song.Stop();
                 //song.Dispose();
