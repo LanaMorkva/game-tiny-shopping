@@ -13,6 +13,6 @@ The course organizers assigned us the theme of *Grocery Store*, with a specific 
 
 ### Trailer
 
-![alt text](./3_trailer.gif)
+<img src="./3_trailer.gif" alt="Trailer" width="1920">
 
 Members: Ivan Sobko, Sophya Tsubin, Svitlana Morkva, Claudio Abart, and Luca Halm
