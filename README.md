@@ -13,6 +13,10 @@ The course organizers assigned us the theme of *Grocery Store*, with a specific 
 
 ### Trailer
 
-<img src="assignments\final_presentation\3_trailer.mp4" alt="Trailer" width="1920">
+<img src="./4_voting_teaser.gif" alt="Trailer" width="800"></img>
+
+Check out the whole trailer here: [Link to Trailer](assignments\final_presentation\3_trailer.mp4)
+
+If you would like to learn more about this project, check out the documentation for this project: [Report](assignments\report\6_final_report.pdf)
 
 Members: Ivan Sobko, Sophya Tsubin, Svitlana Morkva, Claudio Abart, and Luca Halm
